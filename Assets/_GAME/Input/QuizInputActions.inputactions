@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "QuizInputActions",
+    "maps": [
+        {
+            "name": "UI",
+            "id": "aaa767f6-4181-44f2-a025-3e05bcccd379",
+            "actions": [
+                {
+                    "name": "Touch",
+                    "type": "Button",
+                    "id": "c0232a5b-d2e8-4679-9c74-18a8e01917cd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "01303751-e61d-46dc-9025-857c726618ac",
+                    "path": "<Touchscreen>/touch*/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Touch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
