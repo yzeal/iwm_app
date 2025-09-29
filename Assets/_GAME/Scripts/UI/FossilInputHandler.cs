@@ -1,8 +1,8 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
+public class FossilInputHandler : MonoBehaviour
 {
     [Header("Input Actions")]
     public InputActionAsset inputActions;
@@ -11,9 +11,9 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
     [Range(0.1f, 1f)]
     public float tiltThreshold = 0.3f;
     
-    [Header("Touch Areas (Simple Fallback)")]
-    public RectTransform leftTouchArea;  // Skip - Linke Bildschirmhälfte
-    public RectTransform rightTouchArea; // Correct - Rechte Bildschirmhälfte
+    [Header("Touch Buttons (Fallback)")]
+    public Button leftButton;   // Skip - Linke Bildschirmhälfte
+    public Button rightButton;  // Correct - Rechte Bildschirmhälfte
     
     [Header("Debug")]
     public bool debugMode = false;
@@ -31,7 +31,28 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
     void Start()
     {
         SetupInputActions();
+        SetupButtons();
         CheckAccelerometerAvailability();
+    }
+    
+    void SetupButtons()
+    {
+        // Setup Button Events
+        if (leftButton != null)
+        {
+            leftButton.onClick.AddListener(() => {
+                if (debugMode) Debug.Log("LEFT BUTTON - Skip");
+                TriggerSkip();
+            });
+        }
+        
+        if (rightButton != null)
+        {
+            rightButton.onClick.AddListener(() => {
+                if (debugMode) Debug.Log("RIGHT BUTTON - Correct");
+                TriggerCorrect();
+            });
+        }
     }
     
     void SetupInputActions()
@@ -49,7 +70,7 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            Debug.LogWarning("No Input Actions assigned! Using touch detection only.");
+            Debug.LogWarning("No Input Actions assigned! Using button fallback only.");
         }
     }
     
@@ -64,7 +85,7 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
         
         if (!accelerometerAvailable)
         {
-            Debug.Log("Accelerometer not available - using touch fallback");
+            Debug.Log("Accelerometer not available - using button fallback");
         }
         
         if (debugMode)
@@ -127,25 +148,6 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
         }
     }
     
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        if (!inputEnabled) return;
-        
-        // Touch-System: Einfache Links/Rechts Aufteilung
-        Vector2 touchPos = eventData.position;
-        
-        if (RectTransformUtility.RectangleContainsScreenPoint(rightTouchArea, touchPos, eventData.pressEventCamera))
-        {
-            if (debugMode) Debug.Log("Touch: RIGHT SIDE - Correct");
-            TriggerCorrect();
-        }
-        else if (RectTransformUtility.RectangleContainsScreenPoint(leftTouchArea, touchPos, eventData.pressEventCamera))
-        {
-            if (debugMode) Debug.Log("Touch: LEFT SIDE - Skip");
-            TriggerSkip();
-        }
-    }
-    
     public void TriggerCorrect()
     {
         if (!inputEnabled) return;
@@ -169,22 +171,36 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
     void DisableInputTemporarily(float duration)
     {
         inputEnabled = false;
+        
+        // Deaktiviere auch Buttons temporär
+        SetButtonsInteractable(false);
+        
         Invoke(nameof(EnableInput), duration);
     }
     
     void EnableInput()
     {
         inputEnabled = true;
+        SetButtonsInteractable(true);
+    }
+    
+    void SetButtonsInteractable(bool interactable)
+    {
+        if (leftButton != null)
+            leftButton.interactable = interactable;
+        if (rightButton != null)
+            rightButton.interactable = interactable;
     }
     
     public void SetInputEnabled(bool enabled)
     {
         inputEnabled = enabled;
+        SetButtonsInteractable(enabled);
         
         if (enabled)
         {
             hasInitialReading = false;
-            CheckAccelerometerAvailability(); // Nochmal prüfen
+            CheckAccelerometerAvailability();
         }
     }
     
@@ -194,7 +210,6 @@ public class FossilInputHandler : MonoBehaviour, IPointerDownHandler
         Debug.Log("Device calibrated");
     }
     
-    // Public method für UI-Testing
     public bool IsUsingAccelerometer()
     {
         return accelerometerAvailable && !forceTouchMode;

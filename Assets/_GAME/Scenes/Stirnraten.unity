@@ -2846,7 +2846,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 4.744, y: -825.2275}
+  m_AnchoredPosition: {x: 4.744, y: -858}
   m_SizeDelta: {x: 826.138, y: 121.023}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1251377181
@@ -2896,8 +2896,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 80
+  m_fontSizeBase: 80
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3973,8 +3973,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FossilInputHandler
   inputActions: {fileID: -944628639613478452, guid: 45881bdc75794b6469a0f71b71088266, type: 3}
   tiltThreshold: 0.3
-  leftTouchArea: {fileID: 537304518}
-  rightTouchArea: {fileID: 319088456}
+  leftButton: {fileID: 537304521}
+  rightButton: {fileID: 319088459}
   debugMode: 0
   forceTouchMode: 0
 --- !u!4 &1916183425
