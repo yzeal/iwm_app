@@ -377,16 +377,14 @@ public class FossilGameManager : MonoBehaviour
     {
         UpdateCurrentTeamImage(currentTeamImage);
         
-        // GEÄNDERT: Bessere Anzeige des Fortschritts
-        int remainingFossils = currentRoundFossils.Count;
-        scoreText.text = $"{correctFossilsThisRound} von {fossilCollection.fossilsPerRound} | Noch {remainingFossils} übrig | {team1Score} : {team2Score}";
+        // VEREINFACHT: Nur erratene/maximale Fossilien anzeigen
+        scoreText.text = $"{correctFossilsThisRound}/{fossilCollection.fossilsPerRound}";
     }
     
     void UpdateTimerDisplay()
     {
-        int minutes = Mathf.FloorToInt(roundTimeLeft / 60);
-        int seconds = Mathf.FloorToInt(roundTimeLeft % 60);
-        timerText.text = $"{minutes:00}:{seconds:00}";
+        int seconds = Mathf.FloorToInt(roundTimeLeft);
+        timerText.text = seconds.ToString();
     }
     
     void RestartGame()
