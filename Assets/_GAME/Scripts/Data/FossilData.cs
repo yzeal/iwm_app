@@ -23,6 +23,10 @@ public class FossilCollection : ScriptableObject
     public string collectionName;
     public int roomNumber;
     
+    [Header("Team Images")]
+    public Sprite team1Image;
+    public Sprite team2Image;
+    
     [Header("Fossils")]
     public FossilData[] fossils;
     

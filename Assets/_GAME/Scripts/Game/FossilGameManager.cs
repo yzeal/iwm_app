@@ -18,6 +18,7 @@ public class FossilGameManager : MonoBehaviour
     
     [Header("Explanation Screen")]
     public TextMeshProUGUI explanationText;
+    public Image currentTeamImageExplanation; // NEU: Team-Bild im Explanation Screen
     public Button startButton;
     
     [Header("Countdown")]
@@ -27,15 +28,18 @@ public class FossilGameManager : MonoBehaviour
     public Image fossilImage;
     public TextMeshProUGUI fossilNameText;
     public TextMeshProUGUI timerText;
-    public TextMeshProUGUI currentTeamText;
+    public Image currentTeamImage; // NEU: Ersetzt currentTeamText
     public TextMeshProUGUI scoreText;
     
     [Header("Input")]
     public FossilInputHandler fossilInputHandler;
     
     [Header("Result Screen")]
+    public Image team1ImageResult; // NEU: Team 1 Bild
     public TextMeshProUGUI team1ScoreText;
+    public Image team2ImageResult; // NEU: Team 2 Bild
     public TextMeshProUGUI team2ScoreText;
+    public Image winnerTeamImage; // NEU: Gewinner Team Bild
     public TextMeshProUGUI winnerText;
     public Button playAgainButton;
     public Button backToMenuButton;
@@ -69,6 +73,12 @@ public class FossilGameManager : MonoBehaviour
             return;
         }
         
+        // Validiere Team-Images
+        if (fossilCollection.team1Image == null || fossilCollection.team2Image == null)
+        {
+            Debug.LogWarning("Team images not assigned in FossilCollection!");
+        }
+        
         SetupUI();
         ShowExplanation();
     }
@@ -80,6 +90,7 @@ public class FossilGameManager : MonoBehaviour
         backToMenuButton.onClick.AddListener(BackToMenu);
         
         SetupInputHandlers();
+        SetupTeamImages();
         
         // Hide all UIs initially
         explanationUI.SetActive(true);
@@ -88,9 +99,18 @@ public class FossilGameManager : MonoBehaviour
         resultUI.SetActive(false);
     }
     
+    void SetupTeamImages()
+    {
+        // Setze Team-Bilder in Result Screen (statisch)
+        if (team1ImageResult && fossilCollection.team1Image)
+            team1ImageResult.sprite = fossilCollection.team1Image;
+            
+        if (team2ImageResult && fossilCollection.team2Image)
+            team2ImageResult.sprite = fossilCollection.team2Image;
+    }
+    
     void SetupInputHandlers()
     {
-        // Nur noch ein Input Handler
         fossilInputHandler.OnCorrectInput += OnCorrectFossil;
         fossilInputHandler.OnSkipInput += OnSkipFossil;
     }
@@ -106,8 +126,27 @@ public class FossilGameManager : MonoBehaviour
                               $"<b>Steuerung:</b>\n" +
                               $"{inputInfo}\n\n" +
                               $"<b>Zeit pro Runde:</b> {fossilCollection.roundDuration} Sekunden\n" +
-                              $"<b>Begriffe pro Runde:</b> {fossilCollection.fossilsPerRound}\n\n" +  // <- KORRIGIERT: fossilsPerRound statt fossilsPerRund
-                              $"Team {currentTeam} ist als erstes dran!";
+                              $"<b>Begriffe pro Runde:</b> {fossilCollection.fossilsPerRound}\n\n" +
+                              $"Dieses Team ist jetzt dran:";
+        
+        // Aktualisiere Team-Bild im Explanation Screen
+        UpdateCurrentTeamImage(currentTeamImageExplanation);
+    }
+    
+    void UpdateCurrentTeamImage(Image targetImage)
+    {
+        if (targetImage == null) return;
+        
+        if (currentTeam == 1 && fossilCollection.team1Image)
+        {
+            targetImage.sprite = fossilCollection.team1Image;
+        }
+        else if (currentTeam == 2 && fossilCollection.team2Image)
+        {
+            targetImage.sprite = fossilCollection.team2Image;
+        }
+        
+        targetImage.gameObject.SetActive(true);
     }
     
     void StartCountdown()
@@ -119,7 +158,7 @@ public class FossilGameManager : MonoBehaviour
     
     IEnumerator CountdownCoroutine()
     {
-        string[] countdownTexts = { "3", "2", "1", "LOS!" };
+        string[] countdownTexts = { "3", "2", "1", "!" };
         
         for (int i = 0; i < countdownTexts.Length; i++)
         {
@@ -256,16 +295,38 @@ public class FossilGameManager : MonoBehaviour
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
         
-        team1ScoreText.text = $"Team 1: {team1Score} Punkte";
-        team2ScoreText.text = $"Team 2: {team2Score} Punkte";
+        // Score-Texte (nur Zahlen, da Bilder separat angezeigt werden)
+        team1ScoreText.text = $"{team1Score} Punkte";
+        team2ScoreText.text = $"{team2Score} Punkte";
         
+        // Gewinner-Logic
         if (team1Score > team2Score)
-            winnerText.text = "Team 1 gewinnt!";
+        {
+            winnerText.text = "Gewinner!";
+            if (winnerTeamImage && fossilCollection.team1Image)
+            {
+                winnerTeamImage.sprite = fossilCollection.team1Image;
+                winnerTeamImage.gameObject.SetActive(true);
+            }
+        }
         else if (team2Score > team1Score)
-            winnerText.text = "Team 2 gewinnt!";
+        {
+            winnerText.text = "Gewinner!";
+            if (winnerTeamImage && fossilCollection.team2Image)
+            {
+                winnerTeamImage.sprite = fossilCollection.team2Image;
+                winnerTeamImage.gameObject.SetActive(true);
+            }
+        }
         else
+        {
             winnerText.text = "Unentschieden!";
-            
+            if (winnerTeamImage)
+            {
+                winnerTeamImage.gameObject.SetActive(false);
+            }
+        }
+        
         // Speichere Ergebnisse
         SaveResults();
     }
@@ -286,8 +347,11 @@ public class FossilGameManager : MonoBehaviour
     
     void UpdateUI()
     {
-        currentTeamText.text = $"Team {currentTeam}";
-        scoreText.text = $"Team 1: {team1Score} | Team 2: {team2Score}";
+        // Aktualisiere aktuelles Team-Bild
+        UpdateCurrentTeamImage(currentTeamImage);
+        
+        // Score-Text bleibt, aber ohne "Team 1"/"Team 2" Präfix
+        scoreText.text = $"{team1Score} : {team2Score}";
     }
     
     void UpdateTimerDisplay()
