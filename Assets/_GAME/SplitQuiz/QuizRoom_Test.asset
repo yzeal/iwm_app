@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3923dc4776ebe947b54a1444889b74d, type: 3}
+  m_Name: QuizRoom_Test
+  m_EditorClassIdentifier: Assembly-CSharp::QuizRoomData
+  roomName: Testraum
+  roomNumber: 1
+  questions:
+  - questionText: Eines der Gesteine hier im Raum hat im Namen sogar etwas, das man
+      normalerweise essen kann. Was ist es?
+    answers:
+    - Blumenkohlbombe
+    - "Br\xF6tchenbombe"
+    - Brokkolibombe
+    - Breibombe
+  - questionText: Wie tief war die Forschungsbohrung im Jahr 2001?
+    answers:
+    - 433m
+    - 113m
+    - 245m
+    - 360m
+  - questionText: "Welche Fossilien werden hier in Messel besonders h\xE4ufig entdeck?"
+    answers:
+    - Tierkot
+    - Dinosauriereier
+    - "Mammutsto\xDFz\xE4hne"
+    - "Haifischz\xE4hne"
+  roomColor: {r: 0, g: 0, b: 1, a: 1}
+  roomIcon: {fileID: 0}
