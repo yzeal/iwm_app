@@ -50,6 +50,7 @@ public class FossilGameManager : MonoBehaviour
     public AudioClip skipSound;
     public AudioClip timeUpSound;
     public AudioClip countdownSound;
+    public AudioClip countdownStartSound; // NEU: Separater Sound für das "!" am Ende
     
     // Game State
     private List<FossilData> currentRoundFossils;
@@ -163,9 +164,17 @@ public class FossilGameManager : MonoBehaviour
         {
             countdownText.text = countdownTexts[i];
             
-            if (audioSource && countdownSound)
+            if (audioSource)
             {
-                audioSource.PlayOneShot(countdownSound);
+                // GEÄNDERT: Unterschiedliche Sounds für Countdown und Start
+                if (i < 3 && countdownSound) // "3", "2", "1"
+                {
+                    audioSource.PlayOneShot(countdownSound);
+                }
+                else if (i == 3 && countdownStartSound) // "!"
+                {
+                    audioSource.PlayOneShot(countdownStartSound);
+                }
             }
             
             yield return new WaitForSeconds(1f);
