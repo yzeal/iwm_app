@@ -32,5 +32,5 @@ MonoBehaviour:
   - fossilName: Darwinius (Hand)
     fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
     description: 
-  fossilsPerRound: 3
+  fossilsPerRound: 4
   roundDuration: 15

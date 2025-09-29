@@ -18,7 +18,7 @@ public class FossilGameManager : MonoBehaviour
     
     [Header("Explanation Screen")]
     public TextMeshProUGUI explanationText;
-    public Image currentTeamImageExplanation; // NEU: Team-Bild im Explanation Screen
+    public Image currentTeamImageExplanation;
     public Button startButton;
     
     [Header("Countdown")]
@@ -28,18 +28,18 @@ public class FossilGameManager : MonoBehaviour
     public Image fossilImage;
     public TextMeshProUGUI fossilNameText;
     public TextMeshProUGUI timerText;
-    public Image currentTeamImage; // NEU: Ersetzt currentTeamText
+    public Image currentTeamImage;
     public TextMeshProUGUI scoreText;
     
     [Header("Input")]
     public FossilInputHandler fossilInputHandler;
     
     [Header("Result Screen")]
-    public Image team1ImageResult; // NEU: Team 1 Bild
+    public Image team1ImageResult;
     public TextMeshProUGUI team1ScoreText;
-    public Image team2ImageResult; // NEU: Team 2 Bild
+    public Image team2ImageResult;
     public TextMeshProUGUI team2ScoreText;
-    public Image winnerTeamImage; // NEU: Gewinner Team Bild
+    public Image winnerTeamImage;
     public TextMeshProUGUI winnerText;
     public Button playAgainButton;
     public Button backToMenuButton;
@@ -56,9 +56,12 @@ public class FossilGameManager : MonoBehaviour
     private int currentFossilIndex = 0;
     private float roundTimeLeft;
     private bool gameActive = false;
-    private int currentTeam = 1; // 1 oder 2
+    private int currentTeam = 1;
     private int team1Score = 0;
     private int team2Score = 0;
+    
+    // NEU: Tracking für korrekte Fossilien pro Runde
+    private int correctFossilsThisRound = 0;
     
     void Start()
     {
@@ -73,7 +76,6 @@ public class FossilGameManager : MonoBehaviour
             return;
         }
         
-        // Validiere Team-Images
         if (fossilCollection.team1Image == null || fossilCollection.team2Image == null)
         {
             Debug.LogWarning("Team images not assigned in FossilCollection!");
@@ -92,7 +94,6 @@ public class FossilGameManager : MonoBehaviour
         SetupInputHandlers();
         SetupTeamImages();
         
-        // Hide all UIs initially
         explanationUI.SetActive(true);
         countdownUI.SetActive(false);
         gameplayUI.SetActive(false);
@@ -101,7 +102,6 @@ public class FossilGameManager : MonoBehaviour
     
     void SetupTeamImages()
     {
-        // Setze Team-Bilder in Result Screen (statisch)
         if (team1ImageResult && fossilCollection.team1Image)
             team1ImageResult.sprite = fossilCollection.team1Image;
             
@@ -129,7 +129,6 @@ public class FossilGameManager : MonoBehaviour
                               $"<b>Begriffe pro Runde:</b> {fossilCollection.fossilsPerRound}\n\n" +
                               $"Dieses Team ist jetzt dran:";
         
-        // Aktualisiere Team-Bild im Explanation Screen
         UpdateCurrentTeamImage(currentTeamImageExplanation);
     }
     
@@ -180,13 +179,13 @@ public class FossilGameManager : MonoBehaviour
         countdownUI.SetActive(false);
         gameplayUI.SetActive(true);
         
-        // Bereite Fossilien für diese Runde vor
+        // Reset für neue Runde
+        correctFossilsThisRound = 0;
         currentRoundFossils = new List<FossilData>(fossilCollection.GetRandomFossils(fossilCollection.fossilsPerRound));
         currentFossilIndex = 0;
         roundTimeLeft = fossilCollection.roundDuration;
         gameActive = true;
         
-        // Enable Input
         fossilInputHandler.SetInputEnabled(true);
         fossilInputHandler.CalibrateDevice();
         
@@ -210,10 +209,17 @@ public class FossilGameManager : MonoBehaviour
     
     void ShowCurrentFossil()
     {
+        // GEÄNDERT: Keine endlose Fossil-Nachladung
         if (currentFossilIndex >= currentRoundFossils.Count)
         {
-            // Alle Fossilien durch - neue zufällige Auswahl
-            currentRoundFossils.AddRange(fossilCollection.GetRandomFossils(fossilCollection.fossilsPerRound));
+            // Falls alle Fossilien durch sind, aber noch nicht genug erraten wurden
+            // -> Mische die Liste neu und beginne von vorn
+            for (int i = currentRoundFossils.Count - 1; i > 0; i--)
+            {
+                int randomIndex = Random.Range(0, i + 1);
+                (currentRoundFossils[i], currentRoundFossils[randomIndex]) = (currentRoundFossils[randomIndex], currentRoundFossils[i]);
+            }
+            currentFossilIndex = 0;
         }
         
         FossilData fossil = currentRoundFossils[currentFossilIndex];
@@ -230,14 +236,40 @@ public class FossilGameManager : MonoBehaviour
             audioSource.PlayOneShot(correctSound);
         }
         
-        // Punkt für aktuelles Team
+        // Erhöhe Score für aktuelles Team
         if (currentTeam == 1)
             team1Score++;
         else
             team2Score++;
-            
-        // Nächstes Fossil
-        currentFossilIndex++;
+        
+        // WICHTIG: Erhöhe Counter für korrekte Fossilien dieser Runde
+        correctFossilsThisRound++;
+        
+        // GEÄNDERT: Entferne das korrekt erratene Fossil aus der Liste
+        currentRoundFossils.RemoveAt(currentFossilIndex);
+        
+        // Index-Korrektur nach dem Entfernen
+        if (currentFossilIndex >= currentRoundFossils.Count)
+        {
+            currentFossilIndex = 0;
+        }
+        
+        // Prüfe ob die maximale Anzahl erreicht wurde
+        if (correctFossilsThisRound >= fossilCollection.fossilsPerRound)
+        {
+            Debug.Log($"Erreicht! {correctFossilsThisRound}/{fossilCollection.fossilsPerRound} Fossilien erraten.");
+            EndRound();
+            return;
+        }
+        
+        // Prüfe ob noch Fossilien übrig sind
+        if (currentRoundFossils.Count == 0)
+        {
+            Debug.Log("Alle Fossilien erraten! Runde beendet.");
+            EndRound();
+            return;
+        }
+        
         ShowCurrentFossil();
         UpdateUI();
     }
@@ -251,12 +283,12 @@ public class FossilGameManager : MonoBehaviour
             audioSource.PlayOneShot(skipSound);
         }
         
-        // Fossil ans Ende der Liste setzen
+        // GEÄNDERT: Fossil ans Ende der Liste setzen, aber in der Liste behalten
         FossilData skippedFossil = currentRoundFossils[currentFossilIndex];
         currentRoundFossils.RemoveAt(currentFossilIndex);
-        currentRoundFossils.Add(skippedFossil);
+        currentRoundFossils.Add(skippedFossil); // Ans Ende anhängen
         
-        // Falls wir am Ende der Liste waren, Index korrigieren
+        // Index-Korrektur nach dem Verschieben
         if (currentFossilIndex >= currentRoundFossils.Count)
         {
             currentFossilIndex = 0;
@@ -276,7 +308,6 @@ public class FossilGameManager : MonoBehaviour
             audioSource.PlayOneShot(timeUpSound);
         }
         
-        // Wechsel zum anderen Team oder zeige Ergebnisse
         if (currentTeam == 1)
         {
             currentTeam = 2;
@@ -295,11 +326,9 @@ public class FossilGameManager : MonoBehaviour
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
         
-        // Score-Texte (nur Zahlen, da Bilder separat angezeigt werden)
         team1ScoreText.text = $"{team1Score} Punkte";
         team2ScoreText.text = $"{team2Score} Punkte";
         
-        // Gewinner-Logic
         if (team1Score > team2Score)
         {
             winnerText.text = "Gewinner!";
@@ -327,7 +356,6 @@ public class FossilGameManager : MonoBehaviour
             }
         }
         
-        // Speichere Ergebnisse
         SaveResults();
     }
     
@@ -347,11 +375,11 @@ public class FossilGameManager : MonoBehaviour
     
     void UpdateUI()
     {
-        // Aktualisiere aktuelles Team-Bild
         UpdateCurrentTeamImage(currentTeamImage);
         
-        // Score-Text bleibt, aber ohne "Team 1"/"Team 2" Präfix
-        scoreText.text = $"{team1Score} : {team2Score}";
+        // GEÄNDERT: Bessere Anzeige des Fortschritts
+        int remainingFossils = currentRoundFossils.Count;
+        scoreText.text = $"{correctFossilsThisRound} von {fossilCollection.fossilsPerRound} | Noch {remainingFossils} übrig | {team1Score} : {team2Score}";
     }
     
     void UpdateTimerDisplay()
@@ -366,6 +394,7 @@ public class FossilGameManager : MonoBehaviour
         team1Score = 0;
         team2Score = 0;
         currentTeam = 1;
+        correctFossilsThisRound = 0;
         
         resultUI.SetActive(false);
         ShowExplanation();
