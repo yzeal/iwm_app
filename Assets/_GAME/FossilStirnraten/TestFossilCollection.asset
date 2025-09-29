@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: TestFossilCollection
+  m_EditorClassIdentifier: Assembly-CSharp::FossilCollection
+  collectionName: Test Fossilien
+  roomNumber: 99
+  fossils:
+  - fossilName: Eurotamandua joresi
+    fossilImage: {fileID: 21300000, guid: c9f945eb0a4f5ab46a4fbac23d49ffb0, type: 3}
+    description: 
+  - fossilName: Darwinius masillae
+    fossilImage: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
+    description: 
+  - fossilName: Diplocynodon darwini
+    fossilImage: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
+    description: 
+  - fossilName: Diplocynodon darwini
+    fossilImage: {fileID: 21300000, guid: 13533468ec60feb46a619d255faf0974, type: 3}
+    description: 
+  - fossilName: Darwinius (Hand)
+    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
+    description: 
+  fossilsPerRound: 3
+  roundDuration: 15
