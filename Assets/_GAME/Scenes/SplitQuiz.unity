@@ -3390,6 +3390,9 @@ MonoBehaviour:
   player2FeedbackText: {fileID: 14509754}
   questionProgressIcons: {fileID: 997243576}
   continueButton: {fileID: 2100877306}
+  correctAnswerColor: {r: 0.09148792, g: 0.5902965, b: 0.3227052, a: 1}
+  wrongAnswerColor: {r: 0.8, g: 0.2, b: 0.2, a: 1}
+  selectedAnswerColor: {r: 1, g: 1, b: 1, a: 0.49803922}
   finalScoreText: {fileID: 689602444}
   playAgainButton: {fileID: 827611267}
   continueToNextRoomButton: {fileID: 830595836}

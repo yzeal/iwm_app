@@ -29,6 +29,11 @@ public class SplitScreenQuizManager : MonoBehaviour
     public QuestionProgressIcons questionProgressIcons; // Ersetzt questionCounterText
     public Button continueButton;
     
+    [Header("Answer Feedback Colors")]
+    [SerializeField] private Color correctAnswerColor = new Color(0.2f, 0.8f, 0.2f); // Grün als Standard
+    [SerializeField] private Color wrongAnswerColor = new Color(0.8f, 0.2f, 0.2f); // Rot als Standard
+    [SerializeField] private Color selectedAnswerColor = Color.gray; // Grau während Auswahl
+    
     [Header("Result Screen")]
     public TextMeshProUGUI finalScoreText;
     public Button playAgainButton;
@@ -179,7 +184,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
         
         // Visual feedback for selection
-        HighlightSelectedButton(player1AnswerButtons[answerIndex], Color.gray);
+        HighlightSelectedButton(player1AnswerButtons[answerIndex], selectedAnswerColor);
         
         CheckIfBothAnswered();
     }
@@ -204,7 +209,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
         
         // Visual feedback for selection
-        HighlightSelectedButton(player2AnswerButtons[answerIndex], Color.gray);
+        HighlightSelectedButton(player2AnswerButtons[answerIndex], selectedAnswerColor);
         
         CheckIfBothAnswered();
     }
@@ -317,7 +322,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         // Highlight selected button with final color and white text
         if (player.selectedAnswerIndex >= 0 && player.selectedAnswerIndex < buttons.Length)
         {
-            Color finalColor = correct ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.8f, 0.2f, 0.2f);
+            Color finalColor = correct ? correctAnswerColor : wrongAnswerColor;
             HighlightSelectedButtonWithTextColor(buttons[player.selectedAnswerIndex], finalColor, Color.white);
         }
     }
