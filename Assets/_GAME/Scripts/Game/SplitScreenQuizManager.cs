@@ -149,6 +149,13 @@ public class SplitScreenQuizManager : MonoBehaviour
             colors.normalColor = Color.white;
             colors.selectedColor = Color.white;
             buttons[i].colors = colors;
+            
+            // Reset text color to default (schwarz)
+            TextMeshProUGUI buttonText = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.color = Color.black;
+            }
         }
     }
     
@@ -160,9 +167,16 @@ public class SplitScreenQuizManager : MonoBehaviour
         player1.selectedAnswerIndex = answerIndex;
         player1AnswerTime = Time.time - questionStartTime;
         
-        // Disable buttons for this player
+        // Disable buttons for this player und setze halbtransparente disabled color
         foreach (var button in player1AnswerButtons)
+        {
             button.interactable = false;
+            
+            // Setze disabled color auf halbtransparent
+            ColorBlock colors = button.colors;
+            colors.disabledColor = new Color(1f, 1f, 1f, 0.5f); // Halbtransparentes Weiﬂ
+            button.colors = colors;
+        }
         
         // Visual feedback for selection
         HighlightSelectedButton(player1AnswerButtons[answerIndex], Color.gray);
@@ -178,9 +192,16 @@ public class SplitScreenQuizManager : MonoBehaviour
         player2.selectedAnswerIndex = answerIndex;
         player2AnswerTime = Time.time - questionStartTime;
         
-        // Disable buttons for this player
+        // Disable buttons for this player und setze halbtransparente disabled color
         foreach (var button in player2AnswerButtons)
+        {
             button.interactable = false;
+            
+            // Setze disabled color auf halbtransparent
+            ColorBlock colors = button.colors;
+            colors.disabledColor = new Color(1f, 1f, 1f, 0.5f); // Halbtransparentes Weiﬂ
+            button.colors = colors;
+        }
         
         // Visual feedback for selection
         HighlightSelectedButton(player2AnswerButtons[answerIndex], Color.gray);
@@ -194,6 +215,23 @@ public class SplitScreenQuizManager : MonoBehaviour
         colors.normalColor = color;
         colors.selectedColor = color;
         button.colors = colors;
+    }
+    
+    void HighlightSelectedButtonWithTextColor(Button button, Color backgroundColor, Color textColor)
+    {
+        // Setze Button-Hintergrundfarbe f¸r alle Zust‰nde
+        ColorBlock colors = button.colors;
+        colors.normalColor = backgroundColor;
+        colors.selectedColor = backgroundColor;
+        colors.disabledColor = backgroundColor; // Wichtig: Auch disabled color setzen
+        button.colors = colors;
+        
+        // Setze Text-Farbe
+        TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+        if (buttonText != null)
+        {
+            buttonText.color = textColor;
+        }
     }
     
     void CheckIfBothAnswered()
@@ -270,11 +308,17 @@ public class SplitScreenQuizManager : MonoBehaviour
         feedbackText.text = feedbackMessage;
         feedbackPanel.SetActive(true);
         
-        // Highlight selected button with final color
+        // Setze alle Buttons auf weiﬂ mit schwarzem Text (disabled color = weiﬂ)
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            HighlightSelectedButtonWithTextColor(buttons[i], Color.white, Color.black);
+        }
+        
+        // Highlight selected button with final color and white text
         if (player.selectedAnswerIndex >= 0 && player.selectedAnswerIndex < buttons.Length)
         {
             Color finalColor = correct ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.8f, 0.2f, 0.2f);
-            HighlightSelectedButton(buttons[player.selectedAnswerIndex], finalColor);
+            HighlightSelectedButtonWithTextColor(buttons[player.selectedAnswerIndex], finalColor, Color.white);
         }
     }
     
