@@ -32,7 +32,7 @@ MonoBehaviour:
     answers:
     - Tierkot
     - Dinosauriereier
-    - "Mammutsto\xDFz\xE4hne"
-    - "Haifischz\xE4hne"
+    - "Mammut\\u00ADsto\xDFz\xE4hne"
+    - "Haifisch\\u00ADz\xE4hne"
   roomColor: {r: 0, g: 0, b: 1, a: 1}
   roomIcon: {fileID: 0}

@@ -27,7 +27,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     [Header("Shared UI")]
     public QuestionProgressIcons questionProgressIcons; // Ersetzt questionCounterText
-    public Button continueButton;
+    public Button continueButton; // Wird vom TouchInputHandler verwendet, kann unsichtbar bleiben
     
     [Header("Answer Feedback Colors")]
     [SerializeField] private Color correctAnswerColor = new Color(0.2f, 0.8f, 0.2f); // Grün als Standard
@@ -96,7 +96,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         // Hide feedback panels initially
         player1FeedbackPanel.SetActive(false);
         player2FeedbackPanel.SetActive(false);
-        continueButton.gameObject.SetActive(false);
+        continueButton.gameObject.SetActive(false); // Bleibt unsichtbar
         resultUI.SetActive(false);
     }
     
@@ -278,8 +278,32 @@ public class SplitScreenQuizManager : MonoBehaviour
             questionProgressIcons.MarkQuestionCompleted();
         }
         
-        // Show continue button
+        // Aktiviere Touch-to-Continue: Button bleibt unsichtbar, aber aktiv für TouchInputHandler
         continueButton.gameObject.SetActive(true);
+        
+        // Optional: Mache den Button unsichtbar aber funktional
+        MakeContinueButtonInvisible();
+    }
+    
+    void MakeContinueButtonInvisible()
+    {
+        // Mache den Button transparent, aber behält seine Funktionalität für TouchInputHandler
+        Image buttonImage = continueButton.GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            Color color = buttonImage.color;
+            color.a = 0f; // Vollständig transparent
+            buttonImage.color = color;
+        }
+        
+        // Verstecke auch den Text
+        TextMeshProUGUI buttonText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (buttonText != null)
+        {
+            Color textColor = buttonText.color;
+            textColor.a = 0f; // Vollständig transparent
+            buttonText.color = textColor;
+        }
     }
     
     int CalculatePoints(bool playerCorrect, float playerTime, float otherPlayerTime, bool otherPlayerCorrect)
@@ -333,7 +357,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         player2ScoreText.text = $"Punkte: {player2.score}";
     }
     
-    void NextQuestion()
+    public void NextQuestion()
     {
         currentQuestionIndex++;
         ShowCurrentQuestion();
