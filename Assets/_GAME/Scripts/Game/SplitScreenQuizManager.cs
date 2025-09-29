@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 
 public class SplitScreenQuizManager : MonoBehaviour
 {
@@ -27,7 +26,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI player2FeedbackText;
     
     [Header("Shared UI")]
-    public TextMeshProUGUI questionCounterText;
+    public QuestionProgressIcons questionProgressIcons; // Ersetzt questionCounterText
     public Button continueButton;
     
     [Header("Result Screen")]
@@ -58,6 +57,12 @@ public class SplitScreenQuizManager : MonoBehaviour
         {
             Debug.LogError("Keine Quiz-Daten gefunden!");
             return;
+        }
+        
+        // Initialisiere das Icon-System
+        if (questionProgressIcons != null)
+        {
+            questionProgressIcons.Initialize(roomData.questions.Length);
         }
         
         SetupUI();
@@ -125,7 +130,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         
         // Update UI state
         UpdateScoreDisplay();
-        questionCounterText.text = $"Frage {currentQuestionIndex + 1} von {roomData.questions.Length}";
         
         // Hide feedback
         player1FeedbackPanel.SetActive(false);
@@ -225,6 +229,12 @@ public class SplitScreenQuizManager : MonoBehaviour
         // Update score display
         UpdateScoreDisplay();
         
+        // Update progress icons - markiere die aktuelle Frage als abgeschlossen
+        if (questionProgressIcons != null)
+        {
+            questionProgressIcons.MarkQuestionCompleted();
+        }
+        
         // Show continue button
         continueButton.gameObject.SetActive(true);
     }
@@ -302,6 +312,12 @@ public class SplitScreenQuizManager : MonoBehaviour
         player1.score = 0;
         player2.score = 0;
         currentQuestionIndex = 0;
+        
+        // Reset progress icons
+        if (questionProgressIcons != null)
+        {
+            questionProgressIcons.ResetProgress();
+        }
         
         // Reset UI
         gameplayUI.SetActive(true);
