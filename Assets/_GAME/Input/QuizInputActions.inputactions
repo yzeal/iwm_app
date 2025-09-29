@@ -29,6 +29,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "FossilGame",
+            "id": "c6ce1f20-ba29-403b-91f8-260965070ed3",
+            "actions": [
+                {
+                    "name": "Accelerometer",
+                    "type": "Value",
+                    "id": "ac206383-a59c-4f17-83d7-b74d6691582a",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Gyroscope",
+                    "type": "Value",
+                    "id": "74366bf7-a69d-4cfe-89b0-d82402440c64",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "58521a59-18a6-4f27-91dc-2c4c22f9a4e5",
+                    "path": "<Accelerometer>/acceleration",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Accelerometer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "61eee96f-b0a5-4379-a8e9-156b77f31746",
+                    "path": "<Gyroscope>/angularVelocity",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Gyroscope",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
