@@ -42,7 +42,7 @@
 2. 4 Antwortmöglichkeiten (1 richtig, 3 falsch) in unterschiedlicher Reihenfolge
 3. Simultane Antwortphase
 4. Feedback mit Punkteverteilung
-5. Continue per Touch
+5. Continue per Touch (anywhere auf Screen)
 6. Ergebnisscreen nach letzter Frage
 
 ## AKTUELLE CODE-STRUKTUR
@@ -52,13 +52,27 @@
 **SplitScreenQuizManager.cs**
 - Zentrale Spiellogik und UI-Management
 - Punkteberechnung basierend auf Antwortzeit
-- Feedback-System für beide Spieler
+- Feedback-System für beide Spieler mit anpassbaren Farben
 - Übergang zwischen Fragen und Ergebnisscreen
+- Integration mit GameDataManager für persistente Speicherung
 
 **TouchInputHandler.cs**  
 - Touch-Eingaben für beide Spielerbereiche
-- Continue-Button Aktivierung
+- Continue-Funktionalität per Touch anywhere
 - Bereichserkennung für Player 1/2 Touch Areas
+
+**QuestionProgressIcons.cs**
+- Icon-basiertes Progress-System (ersetzt Text-Counter)
+- Horizontale Anzeige mit konfigurierbaren Farben
+- Auto-Create Funktionalität für Icons
+- Editor-anpassbare Farben für default/completed States
+
+**GameDataManager.cs (NEU)**
+- Plattformunabhängiges Speichersystem (PlayerPrefs-basiert)
+- Singleton-Pattern für globalen Zugriff
+- Speichert Raumergebnisse, Spielerfortschritt, Session-IDs
+- Backup-System und Error-Handling
+- Funktioniert auf Mobile, Web und Desktop
 
 **QuizRoomData.cs (ScriptableObject)**
 - Raumspezifische Fragen und Metadaten
@@ -77,27 +91,31 @@
 ### UI-STRUKTUR (BEREITS IMPLEMENTIERT)
 - **Split-Screen Layout**: Funktionsfähige gespiegelte Darstellung
 - **Touch Areas**: Klar getrennte Eingabebereiche
-- **Answer Buttons**: 4 Buttons pro Spieler mit Highlighting
-- **Feedback System**: Punkte- und Korrektheit-Anzeige
+- **Answer Buttons**: 4 Buttons pro Spieler mit konfigurierbarem Color-Feedback
+- **Question Progress Icons**: Icon-basierte Progress-Anzeige statt Text
+- **Feedback System**: Anpassbare Farben für richtig/falsch/ausgewählt
 - **Score Display**: Live-Update während Spiel
-- **Continue Mechanism**: Touch-anywhere nach beiden Antworten
+- **Continue Mechanism**: Touch-anywhere System nach beiden Antworten
 
 ## AKTUELLER PROJEKTSTATUS
 
 ### ? VOLLSTÄNDIG IMPLEMENTIERT UND FUNKTIONSFÄHIG
 - Split-Screen Quiz-Mechanik
-- Touch-Input System
+- Touch-Input System mit fullscreen continue
 - Punkteberechnung (Zeit-basiert)
-- UI-Layout und -Management
+- UI-Layout und -Management mit anpassbaren Farben
 - ScriptableObject-basierte Content-Struktur
-- Feedback-System
-- Ergebnisscreen
+- Icon-basiertes Progress-System
+- Feedback-System mit Editor-konfigurierbaren Farben
+- Plattformunabhängiges Save-System für Spielerfortschritt
+- Ergebnisscreen mit automatischer Datenspeicherung
 - Modular structure für verschiedene Räume
 
 ### ?? NÄCHSTE ENTWICKLUNGSSCHRITTE (POTENTIELL)
 - Integration in größeres Führungssystem
 - Weitere Minispiel-Prototypen
 - Content-Integration mit echten Museumsfragen
+- Cloud-Save Erweiterung (Firebase/PlayFab)
 - Performance-Optimierung für mobile Geräte
 - Web-App Export Testing
 
@@ -106,12 +124,16 @@ Assets/_GAME/
 ??? Scripts/
 ?   ??? UI/
 ?   ?   ??? TouchInputHandler.cs
+?   ?   ??? QuestionProgressIcons.cs
 ?   ??? Game/
 ?   ?   ??? SplitScreenQuizManager.cs
 ?   ?   ??? PlayerData.cs
 ?   ??? Data/
-?       ??? QuizRoomData.cs
-?       ??? QuizQuestion.cs
+?   ?   ??? GameDataManager.cs
+?   ?   ??? QuizRoomData.cs
+?   ?   ??? QuizQuestion.cs
+?   ??? Notes/
+?       ??? Notes.md
 ??? ...
 
 ### ?? DEVELOPMENT NOTES
@@ -119,6 +141,8 @@ Assets/_GAME/
 - **Content Management**: QuizRoomData ScriptableObjects für einfache Fragenerstellung
 - **Skalierbarkeit**: System designed für 6 verschiedene Räume
 - **Touch-System**: Funktioniert mit Unity's neuem Input System
+- **Save System**: Plattformunabhängig mit Backup-Funktionalität
+- **Color Management**: Alle UI-Farben editor-anpassbar
 
 ## WICHTIGE IMPLEMENTIERUNGSDETAILS
 
@@ -133,9 +157,24 @@ Assets/_GAME/
 
 ### UI-MANAGEMENT
 - Dynamische Button-Beschriftung
-- Color-Highlighting für ausgewählte Antworten
+- Color-Highlighting mit disabled-Color-System für saubere Darstellung
 - Automatische UI-Updates nach Antworten
+- Icon-basierte Progress-Anzeige mit auto-create Funktionalität
+
+### SAVE-SYSTEM DETAILS
+- **Primärer Storage**: PlayerPrefs mit JSON-Serialisierung
+- **Backup-System**: Automatisches Backup bei jedem Save
+- **Plattform-Support**: Mobile (nativer Storage), Web (LocalStorage), Desktop (Registry)
+- **Datenstruktur**: GameProgressData mit RoomResult-Liste
+- **Session-Tracking**: Unique Session-IDs für Analytics
+- **Error-Handling**: Try-Catch mit Fallback-Mechanismen
+
+### TOUCH-SYSTEM DETAILS
+- **Continue-Mechanismus**: Touch anywhere auf Screen nach Feedback-Phase
+- **Button-Interaktion**: Disabled-Color System verhindert multiple Clicks
+- **Visual Feedback**: Grau ? Grün/Rot ? Continue State
+- **Platform-Agnostic**: Funktioniert mit Mouse und Touch
 
 ---
 
-**LETZTER STATUS**: Alle grundlegenden Features implementiert und funktionsfähig. Projekt bereit für Content-Integration oder Erweiterung um weitere Minispiele.
+**LETZTER STATUS**: Split-Screen Quiz vollständig funktional mit persistentem Save-System. Prototyp bereit für Content-Integration und Erweiterung um weitere Minispiele. Plattformunabhängige Speicherung implementiert.

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // <- Diese Zeile hinzufügen falls nicht vorhanden
 using TMPro;
 
 public class SplitScreenQuizManager : MonoBehaviour
@@ -377,6 +378,18 @@ public class SplitScreenQuizManager : MonoBehaviour
             winnerText = "Unentschieden!";
         
         finalScoreText.text = $"{winnerText}\n\n{player1.playerName}: {player1.score} Punkte\n{player2.playerName}: {player2.score} Punkte";
+        
+        // NEUE ZEILE: Speichere das Ergebnis
+        if (GameDataManager.Instance != null && roomData != null)
+        {
+            GameDataManager.Instance.SaveRoomResult(
+                roomData.roomName,
+                roomData.roomNumber,
+                player1.score,
+                player2.score,
+                roomData.questions.Length
+            );
+        }
     }
     
     void RestartQuiz()
@@ -401,8 +414,11 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void ContinueToNextRoom()
     {
+        // TEMPORÄR: Lade Szene Index 0 für Minigame-Auswahl
+        SceneManager.LoadScene(0);
+        
         // TODO: Implement navigation to next room
-        Debug.Log("Navigation zum nächsten Raum - noch nicht implementiert");
+        // Debug.Log("Navigation zum nächsten Raum - noch nicht implementiert");
         
         // Placeholder für Scene-Management
         // SceneManager.LoadScene("NextRoomScene");
