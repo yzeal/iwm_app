@@ -1109,7 +1109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 421ffedc72bc91b4e9019d9e7a96ec34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FossilGameManager
-  fossilCollection: {fileID: 11400000, guid: 4ab4cd1c90f888644ad20a8fe8f8ba8f, type: 2}
+  fossilCollection: {fileID: 11400000, guid: 557460c43f56d3141bbd460c5b2910c6, type: 2}
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
   gameplayUI: {fileID: 1725218809}

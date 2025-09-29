@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: b0202412414c6f644bb41d8ee6b2fbf4, type: 3}
   m_Name: TestFossilCollection
   m_EditorClassIdentifier: Assembly-CSharp::FossilCollection
-  collectionName: Test Fossilien
-  roomNumber: 99
+  collectionName: 
+  roomNumber: 0
   team1Image: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}
   team2Image: {fileID: 21300000, guid: 92ba78a3ad14fa94a8288756fc8dae5d, type: 3}
   fossils:
@@ -23,14 +23,14 @@ MonoBehaviour:
   - fossilName: Darwinius masillae
     fossilImage: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
     description: 
+  - fossilName: Darwinius Hand
+    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
+    description: 
   - fossilName: Diplocynodon darwini
     fossilImage: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
     description: 
   - fossilName: Diplocynodon darwini
     fossilImage: {fileID: 21300000, guid: 13533468ec60feb46a619d255faf0974, type: 3}
     description: 
-  - fossilName: Darwinius (Hand)
-    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
-    description: 
-  fossilsPerRound: 4
+  fossilsPerRound: 3
   roundDuration: 15
