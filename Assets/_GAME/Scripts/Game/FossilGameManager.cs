@@ -64,6 +64,11 @@ public class FossilGameManager : MonoBehaviour
     // NEU: Tracking für korrekte Fossilien pro Runde
     private int correctFossilsThisRound = 0;
     
+    // NEU: Tracking für Timer-Countdown Sounds
+    private bool hasPlayedThreeSecondWarning = false;
+    private bool hasPlayedTwoSecondWarning = false;
+    private bool hasPlayedOneSecondWarning = false;
+    
     void Start()
     {
         InitializeGame();
@@ -120,7 +125,7 @@ public class FossilGameManager : MonoBehaviour
     {
         string inputInfo = fossilInputHandler.GetInputModeInfo();
         
-        explanationText.text = $"<size=28><b>Fossilien-Stirnraten</b></size>\n\n" +
+        explanationText.text = $"<b>Fossilien-Stirnraten</b>\n\n" +
                               $"<b>Wie gespielt wird:</b>\n" +
                               $"• Halte das Handy an deine Stirn\n" +
                               $"• Dein Team erklärt dir das Fossil\n\n" +
@@ -195,6 +200,11 @@ public class FossilGameManager : MonoBehaviour
         roundTimeLeft = fossilCollection.roundDuration;
         gameActive = true;
         
+        // NEU: Reset Timer-Countdown Flags
+        hasPlayedThreeSecondWarning = false;
+        hasPlayedTwoSecondWarning = false;
+        hasPlayedOneSecondWarning = false;
+        
         fossilInputHandler.SetInputEnabled(true);
         fossilInputHandler.CalibrateDevice();
         
@@ -208,12 +218,44 @@ public class FossilGameManager : MonoBehaviour
         
         roundTimeLeft -= Time.deltaTime;
         
+        // NEU: Spiele Countdown-Sounds in den letzten 3 Sekunden
+        CheckTimerCountdownSounds();
+        
         if (roundTimeLeft <= 0)
         {
             EndRound();
         }
         
         UpdateTimerDisplay();
+    }
+    
+    // NEU: Methode für Timer-Countdown Sounds
+    void CheckTimerCountdownSounds()
+    {
+        if (audioSource && countdownSound)
+        {
+            // 3 Sekunden Warning
+            if (roundTimeLeft <= 3f && roundTimeLeft > 2f && !hasPlayedThreeSecondWarning)
+            {
+                audioSource.PlayOneShot(countdownSound);
+                hasPlayedThreeSecondWarning = true;
+                Debug.Log("3 Sekunden Warning!");
+            }
+            // 2 Sekunden Warning
+            else if (roundTimeLeft <= 2f && roundTimeLeft > 1f && !hasPlayedTwoSecondWarning)
+            {
+                audioSource.PlayOneShot(countdownSound);
+                hasPlayedTwoSecondWarning = true;
+                Debug.Log("2 Sekunden Warning!");
+            }
+            // 1 Sekunde Warning
+            else if (roundTimeLeft <= 1f && roundTimeLeft > 0f && !hasPlayedOneSecondWarning)
+            {
+                audioSource.PlayOneShot(countdownSound);
+                hasPlayedOneSecondWarning = true;
+                Debug.Log("1 Sekunde Warning!");
+            }
+        }
     }
     
     void ShowCurrentFossil()
@@ -402,6 +444,11 @@ public class FossilGameManager : MonoBehaviour
         team2Score = 0;
         currentTeam = 1;
         correctFossilsThisRound = 0;
+        
+        // NEU: Reset Timer-Countdown Flags
+        hasPlayedThreeSecondWarning = false;
+        hasPlayedTwoSecondWarning = false;
+        hasPlayedOneSecondWarning = false;
         
         resultUI.SetActive(false);
         ShowExplanation();
