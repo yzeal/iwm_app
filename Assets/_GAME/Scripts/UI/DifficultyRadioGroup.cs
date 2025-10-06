@@ -8,18 +8,26 @@ public class DifficultyRadioButton
 {
     [Header("UI Components")]
     public Button button;
-    public Image backgroundImage;
-    public Image iconImage; // Für zukünftige Icons
+    public Image checkboxImage; // Hauptbild für Checkbox-Darstellung
+    public Image difficultyIcon; // Optional: Icon für Schwierigkeitsgrad
     public TextMeshProUGUI labelText;
     
     [Header("Difficulty")]
     public DifficultyLevel difficulty;
     
-    [Header("Visual States")]
-    public Color selectedColor = new Color(0.2f, 0.8f, 0.2f); // Grün
-    public Color unselectedColor = Color.white;
-    public Color selectedTextColor = Color.white;
-    public Color unselectedTextColor = Color.black;
+    [Header("Checkbox Sprites")]
+    public Sprite uncheckedSprite; // Bild für unselected State
+    public Sprite checkedSprite;   // Bild für selected State
+    
+    [Header("Optional: Difficulty Icons")]
+    public Sprite kidsIcon;
+    public Sprite bigKidsIcon;
+    public Sprite adultsIcon;
+    
+    [Header("Text Colors (optional)")]
+    public Color selectedTextColor = Color.black;
+    public Color unselectedTextColor = Color.gray;
+    public bool useTextColorChange = false; // Optional: Textfarbe ändern
     
     public bool IsSelected { get; private set; }
     
@@ -31,23 +39,27 @@ public class DifficultyRadioButton
     
     void UpdateVisuals()
     {
-        if (backgroundImage)
+        // Haupt-Feature: Bild-Swapping für Checkbox
+        if (checkboxImage)
         {
-            backgroundImage.color = IsSelected ? selectedColor : unselectedColor;
+            checkboxImage.sprite = IsSelected ? checkedSprite : uncheckedSprite;
         }
         
-        if (labelText)
+        // Optional: Textfarbe ändern
+        if (labelText && useTextColorChange)
         {
             labelText.color = IsSelected ? selectedTextColor : unselectedTextColor;
         }
         
-        // Update Button ColorBlock für bessere Interaktion
+        // Optional: Button-Zustand für Touch-Feedback
         if (button)
         {
-            ColorBlock colors = button.colors;
-            colors.normalColor = IsSelected ? selectedColor : unselectedColor;
-            colors.selectedColor = IsSelected ? selectedColor : unselectedColor;
-            button.colors = colors;
+            // Leichte Transparenz für besseres visuelles Feedback
+            CanvasGroup canvasGroup = button.GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+                canvasGroup = button.gameObject.AddComponent<CanvasGroup>();
+                
+            canvasGroup.alpha = IsSelected ? 1.0f : 0.8f;
         }
     }
     
@@ -64,19 +76,71 @@ public class DifficultyRadioButton
             labelText.text = GetDifficultyDisplayName();
         }
         
+        // Setze Schwierigkeitsgrad-Icon falls vorhanden
+        SetupDifficultyIcon();
+        
+        // Validiere Sprites
+        ValidateSprites();
+        
         SetSelected(false); // Default state
+    }
+    
+    void SetupDifficultyIcon()
+    {
+        if (difficultyIcon)
+        {
+            Sprite iconToUse = difficulty switch
+            {
+                DifficultyLevel.Kids => kidsIcon,
+                DifficultyLevel.BigKids => bigKidsIcon,
+                DifficultyLevel.Adults => adultsIcon,
+                _ => null
+            };
+            
+            if (iconToUse != null)
+            {
+                difficultyIcon.sprite = iconToUse;
+                difficultyIcon.gameObject.SetActive(true);
+            }
+            else
+            {
+                difficultyIcon.gameObject.SetActive(false);
+            }
+        }
+    }
+    
+    void ValidateSprites()
+    {
+        if (uncheckedSprite == null || checkedSprite == null)
+        {
+            Debug.LogWarning($"DifficultyRadioButton ({difficulty}): Missing checkbox sprites! " +
+                           "Please assign uncheckedSprite and checkedSprite in the inspector.");
+        }
     }
     
     string GetDifficultyDisplayName()
     {
         return difficulty switch
         {
-            DifficultyLevel.Kids => "Kids",
+            DifficultyLevel.Kids => "Kinder",
             DifficultyLevel.BigKids => "BigKids",
-            DifficultyLevel.Adults => "Adults",
+            DifficultyLevel.Adults => "Erwachsene",
             _ => "Adults"
         };
     }
+    
+    #region Editor Helpers
+    
+    /// <summary>
+    /// Erstellt Standard-Checkbox-Sprites falls keine vorhanden sind
+    /// </summary>
+    public void CreateDefaultSprites()
+    {
+        // Diese Methode könnte später erweitert werden um Standard-Sprites programmatisch zu erstellen
+        Debug.Log($"Standard-Sprites für {difficulty} erstellen - in Unity manuell zuweisen");
+    }
+    
+    #endregion
 }
 
 public class DifficultyRadioGroup : MonoBehaviour
@@ -84,9 +148,17 @@ public class DifficultyRadioGroup : MonoBehaviour
     [Header("Radio Buttons")]
     public DifficultyRadioButton[] radioButtons;
     
+    [Header("Default Checkbox Sprites (Fallback)")]
+    public Sprite defaultUncheckedSprite;
+    public Sprite defaultCheckedSprite;
+    
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip selectionSound;
+    
+    [Header("Mobile Optimizations")]
+    [SerializeField] private float buttonPadding = 10f; // Abstand zwischen Buttons
+    [SerializeField] private bool enableHapticFeedback = true;
     
     // Events
     public Action<DifficultyLevel> OnDifficultyChanged;
@@ -102,11 +174,53 @@ public class DifficultyRadioGroup : MonoBehaviour
     {
         for (int i = 0; i < radioButtons.Length; i++)
         {
+            // Setze Default-Sprites falls keine zugewiesen sind
+            ApplyDefaultSprites(radioButtons[i]);
+            
+            // Mobile-Optimierungen
+            OptimizeForMobile(radioButtons[i]);
+            
+            // Initialisiere Button
             radioButtons[i].Initialize(OnRadioButtonClicked);
         }
         
         // Setze Standard-Auswahl
         SetSelectedDifficulty(selectedDifficulty);
+    }
+    
+    void ApplyDefaultSprites(DifficultyRadioButton radioButton)
+    {
+        if (radioButton.uncheckedSprite == null && defaultUncheckedSprite != null)
+        {
+            radioButton.uncheckedSprite = defaultUncheckedSprite;
+        }
+        
+        if (radioButton.checkedSprite == null && defaultCheckedSprite != null)
+        {
+            radioButton.checkedSprite = defaultCheckedSprite;
+        }
+    }
+    
+    void OptimizeForMobile(DifficultyRadioButton radioButton)
+    {
+        if (radioButton.button != null)
+        {
+            RectTransform buttonRect = radioButton.button.GetComponent<RectTransform>();
+            if (buttonRect != null)
+            {
+                // Mindest-Touch-Target-Größe für Mobile (empfohlen: 44pt)
+                Vector2 currentSize = buttonRect.sizeDelta;
+                float minSize = 60f; // Unity Units
+                
+                if (currentSize.x < minSize || currentSize.y < minSize)
+                {
+                    buttonRect.sizeDelta = new Vector2(
+                        Mathf.Max(currentSize.x, minSize), 
+                        Mathf.Max(currentSize.y, minSize)
+                    );
+                }
+            }
+        }
     }
     
     void OnRadioButtonClicked(DifficultyLevel difficulty)
@@ -119,8 +233,24 @@ public class DifficultyRadioGroup : MonoBehaviour
             audioSource.PlayOneShot(selectionSound);
         }
         
+        // Mobile Haptic Feedback
+        if (enableHapticFeedback)
+        {
+            TriggerHapticFeedback();
+        }
+        
         // Benachrichtige Listener
         OnDifficultyChanged?.Invoke(difficulty);
+    }
+    
+    void TriggerHapticFeedback()
+    {
+        #if UNITY_IOS || UNITY_ANDROID
+        if (SystemInfo.supportsVibration)
+        {
+            Handheld.Vibrate();
+        }
+        #endif
     }
     
     public void SetSelectedDifficulty(DifficultyLevel difficulty)
@@ -142,25 +272,50 @@ public class DifficultyRadioGroup : MonoBehaviour
     
     #region Editor Helpers
     
-    [ContextMenu("Setup Default Colors")]
-    void SetupDefaultColors()
+    [ContextMenu("Setup All Default Sprites")]
+    void SetupDefaultSprites()
     {
         for (int i = 0; i < radioButtons.Length; i++)
         {
-            radioButtons[i].selectedColor = new Color(0.2f, 0.8f, 0.2f); // Grün
-            radioButtons[i].unselectedColor = Color.white;
-            radioButtons[i].selectedTextColor = Color.white;
-            radioButtons[i].unselectedTextColor = Color.black;
+            ApplyDefaultSprites(radioButtons[i]);
+            radioButtons[i].CreateDefaultSprites();
         }
+        Debug.Log("Default sprites setup completed. Assign checkbox sprites in inspector.");
     }
     
-    [ContextMenu("Test Selection")]
-    void TestSelection()
+    [ContextMenu("Test Selection - Kids")]
+    void TestSelectionKids()
     {
-        if (radioButtons.Length > 0)
+        OnRadioButtonClicked(DifficultyLevel.Kids);
+    }
+    
+    [ContextMenu("Test Selection - BigKids")]
+    void TestSelectionBigKids()
+    {
+        OnRadioButtonClicked(DifficultyLevel.BigKids);
+    }
+    
+    [ContextMenu("Test Selection - Adults")]
+    void TestSelectionAdults()
+    {
+        OnRadioButtonClicked(DifficultyLevel.Adults);
+    }
+    
+    [ContextMenu("Validate All Buttons")]
+    void ValidateAllButtons()
+    {
+        int validButtons = 0;
+        for (int i = 0; i < radioButtons.Length; i++)
         {
-            OnRadioButtonClicked(radioButtons[0].difficulty);
+            if (radioButtons[i].button != null && 
+                radioButtons[i].checkboxImage != null &&
+                radioButtons[i].uncheckedSprite != null && 
+                radioButtons[i].checkedSprite != null)
+            {
+                validButtons++;
+            }
         }
+        Debug.Log($"Valid buttons: {validButtons}/{radioButtons.Length}");
     }
     
     #endregion
