@@ -18,7 +18,6 @@ public class TeamSettingsManager : MonoBehaviour
     [Header("Action Buttons")]
     public Button applyButton;
     public Button backButton;
-    public Button resetButton;
     
     [Header("Team Icons (Default)")]
     public Sprite defaultTeam1Icon;
@@ -132,10 +131,9 @@ public class TeamSettingsManager : MonoBehaviour
     
     void SetupUI()
     {
-        // Setup Button Events
+        // Setup Button Events (Reset Button entfernt)
         applyButton.onClick.AddListener(ApplySettings);
         backButton.onClick.AddListener(BackToMenu);
-        resetButton.onClick.AddListener(ResetToDefaults);
         
         // Setup Radio Group Events
         team1DifficultyGroup.OnDifficultyChanged += OnTeam1DifficultyChanged;
@@ -147,7 +145,7 @@ public class TeamSettingsManager : MonoBehaviour
     
     void AdaptButtonsForMobile()
     {
-        Button[] buttons = { applyButton, backButton, resetButton };
+        Button[] buttons = { applyButton, backButton }; // Reset Button entfernt
         
         foreach (Button button in buttons)
         {
@@ -251,20 +249,6 @@ public class TeamSettingsManager : MonoBehaviour
         buttonText.text = originalText;
     }
     
-    void ResetToDefaults()
-    {
-        PlayButtonSound();
-        
-        // Setze beide Teams auf Adults (Standard)
-        team1DifficultyGroup.SetSelectedDifficulty(DifficultyLevel.Adults);
-        team2DifficultyGroup.SetSelectedDifficulty(DifficultyLevel.Adults);
-        
-        Debug.Log("Settings reset to defaults (Adults)");
-        
-        // Haptic Feedback
-        TriggerHapticFeedback();
-    }
-    
     void BackToMenu()
     {
         PlayButtonSound();
@@ -319,13 +303,6 @@ public class TeamSettingsManager : MonoBehaviour
         AdaptToSafeArea();
         AdaptButtonsForMobile();
         Debug.Log($"Mobile adaptations applied. Platform: {Application.platform}");
-    }
-    
-    [ContextMenu("Set Mixed Difficulties")]
-    void DebugSetMixed()
-    {
-        team1DifficultyGroup.SetSelectedDifficulty(DifficultyLevel.Kids);
-        team2DifficultyGroup.SetSelectedDifficulty(DifficultyLevel.Adults);
     }
     
     #endregion
