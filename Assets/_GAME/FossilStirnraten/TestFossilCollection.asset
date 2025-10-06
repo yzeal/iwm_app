@@ -16,21 +16,48 @@ MonoBehaviour:
   roomNumber: 0
   team1Image: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}
   team2Image: {fileID: 21300000, guid: 92ba78a3ad14fa94a8288756fc8dae5d, type: 3}
-  fossils:
-  - fossilName: Eurotamandua joresi
+  kidsFossils:
+  - fossilName: "[K] Ameisenb\xE4r"
     fossilImage: {fileID: 21300000, guid: c9f945eb0a4f5ab46a4fbac23d49ffb0, type: 3}
     description: 
-  - fossilName: Darwinius masillae
+  - fossilName: '[K] Ida (Primat)'
     fossilImage: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
     description: 
-  - fossilName: Darwinius Hand
-    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
-    description: 
-  - fossilName: Diplocynodon darwini
+  - fossilName: '[K] Krokodil'
     fossilImage: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
     description: 
-  - fossilName: Diplocynodon darwini
-    fossilImage: {fileID: 21300000, guid: 13533468ec60feb46a619d255faf0974, type: 3}
+  - fossilName: '[K] Primatenhand'
+    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
+    description: 
+  bigKidsFossils:
+  - fossilName: "[BK] Ameisenb\xE4r"
+    fossilImage: {fileID: 21300000, guid: c9f945eb0a4f5ab46a4fbac23d49ffb0, type: 3}
+    description: 
+  - fossilName: '[BK] Ida (Primat)'
+    fossilImage: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
+    description: 
+  - fossilName: '[BK] Krokodil'
+    fossilImage: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
+    description: 
+  - fossilName: '[BK] Primatenhand'
+    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
+    description: 
+  adultsFossils:
+  - fossilName: '[A] Eurotamandua joresi'
+    fossilImage: {fileID: 21300000, guid: c9f945eb0a4f5ab46a4fbac23d49ffb0, type: 3}
+    description: 
+  - fossilName: '[A] Darwinius masillae'
+    fossilImage: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
+    description: 
+  - fossilName: '[A] Diplocynodon darwini'
+    fossilImage: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
+    description: 
+  - fossilName: '[A] Darwinius masillae (Hand)'
+    fossilImage: {fileID: 21300000, guid: 58856b3c10fec374aaec415ffbf7c6f7, type: 3}
     description: 
   fossilsPerRound: 3
   roundDuration: 15
+  timeSettings:
+    kidsTimeMultiplier: 2
+    bigKidsTimeMultiplier: 1.5
+    adultsTimeMultiplier: 1

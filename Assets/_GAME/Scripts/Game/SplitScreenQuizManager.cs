@@ -47,6 +47,10 @@ public class SplitScreenQuizManager : MonoBehaviour
     private bool bothPlayersAnswered = false;
     private bool showingFeedback = false;
     
+    // NEU: Fragen für beide Teams basierend auf Schwierigkeitsgrad
+    private QuizQuestion[] team1Questions;
+    private QuizQuestion[] team2Questions;
+    
     // Timing system for first/second answer
     private float player1AnswerTime = float.MaxValue;
     private float player2AnswerTime = float.MaxValue;
@@ -59,20 +63,49 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void InitializeQuiz()
     {
-        if (roomData == null || roomData.questions.Length == 0)
+        if (roomData == null)
         {
             Debug.LogError("Keine Quiz-Daten gefunden!");
+            return;
+        }
+        
+        // NEU: Lade Fragen basierend auf Team-Schwierigkeitsgraden
+        LoadQuestionsForTeams();
+        
+        // Verwende die kleinere Anzahl an Fragen als Limit
+        int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
+        if (maxQuestions == 0)
+        {
+            Debug.LogError("Keine Fragen für die gewählten Schwierigkeitsgrade verfügbar!");
             return;
         }
         
         // Initialisiere das Icon-System
         if (questionProgressIcons != null)
         {
-            questionProgressIcons.Initialize(roomData.questions.Length);
+            questionProgressIcons.Initialize(maxQuestions);
         }
         
         SetupUI();
         ShowCurrentQuestion();
+    }
+    
+    // NEU: Lade Fragen basierend auf Team-Schwierigkeitsgraden
+    void LoadQuestionsForTeams()
+    {
+        DifficultyLevel team1Difficulty = DifficultyLevel.Adults;
+        DifficultyLevel team2Difficulty = DifficultyLevel.Adults;
+        
+        if (GameDataManager.Instance != null)
+        {
+            team1Difficulty = GameDataManager.Instance.GetTeamDifficulty(0);
+            team2Difficulty = GameDataManager.Instance.GetTeamDifficulty(1);
+        }
+        
+        team1Questions = roomData.GetQuestionsForDifficulty(team1Difficulty);
+        team2Questions = roomData.GetQuestionsForDifficulty(team2Difficulty);
+        
+        Debug.Log($"Team 1 ({team1Difficulty}): {team1Questions.Length} Fragen, Team 2 ({team2Difficulty}): {team2Questions.Length} Fragen");
     }
     
     void SetupUI()
@@ -103,13 +136,17 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void ShowCurrentQuestion()
     {
-        if (currentQuestionIndex >= roomData.questions.Length)
+        int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
+        
+        if (currentQuestionIndex >= maxQuestions)
         {
             ShowResults();
             return;
         }
         
-        QuizQuestion question = roomData.questions[currentQuestionIndex];
+        // NEU: Hole Fragen für beide Teams basierend auf ihren Schwierigkeitsgraden
+        QuizQuestion team1Question = team1Questions[currentQuestionIndex];
+        QuizQuestion team2Question = team2Questions[currentQuestionIndex];
         
         // Reset player states
         player1.ResetForNewQuestion();
@@ -123,12 +160,12 @@ public class SplitScreenQuizManager : MonoBehaviour
         questionStartTime = Time.time;
         
         // Generate different shuffled answers for each player
-        player1.shuffledAnswers = question.GetShuffledAnswers();
-        player2.shuffledAnswers = question.GetShuffledAnswers();
+        player1.shuffledAnswers = team1Question.GetShuffledAnswers();
+        player2.shuffledAnswers = team2Question.GetShuffledAnswers();
         
-        // Update question texts
-        player1QuestionText.text = question.questionText;
-        player2QuestionText.text = question.questionText;
+        // Update question texts - NEU: Unterschiedliche Fragen pro Team möglich
+        player1QuestionText.text = team1Question.questionText;
+        player2QuestionText.text = team2Question.questionText;
         
         // Update answer buttons
         UpdateAnswerButtons(player1AnswerButtons, player1.shuffledAnswers, true);
@@ -252,11 +289,14 @@ public class SplitScreenQuizManager : MonoBehaviour
     void ProcessAnswers()
     {
         showingFeedback = true;
-        QuizQuestion question = roomData.questions[currentQuestionIndex];
+        
+        // NEU: Hole die entsprechenden Fragen für beide Teams
+        QuizQuestion team1Question = team1Questions[currentQuestionIndex];
+        QuizQuestion team2Question = team2Questions[currentQuestionIndex];
         
         // Check correct answers
-        bool player1Correct = IsAnswerCorrect(player1, question);
-        bool player2Correct = IsAnswerCorrect(player2, question);
+        bool player1Correct = IsAnswerCorrect(player1, team1Question);
+        bool player2Correct = IsAnswerCorrect(player2, team2Question);
         
         // Calculate scores based on correctness and timing
         int player1Points = CalculatePoints(player1Correct, player1AnswerTime, player2AnswerTime, player2Correct);
@@ -379,7 +419,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         
         finalScoreText.text = $"{winnerText}\n\n{player1.playerName}: {player1.score} Punkte\n{player2.playerName}: {player2.score} Punkte";
         
-        // NEUE ZEILE: Speichere das Ergebnis
+        // Speichere das Ergebnis
         if (GameDataManager.Instance != null && roomData != null)
         {
             GameDataManager.Instance.SaveRoomResult(
@@ -387,7 +427,7 @@ public class SplitScreenQuizManager : MonoBehaviour
                 roomData.roomNumber,
                 player1.score,
                 player2.score,
-                roomData.questions.Length
+                currentQuestionIndex // Verwende die tatsächlich gespielte Anzahl an Fragen
             );
         }
     }
@@ -399,9 +439,14 @@ public class SplitScreenQuizManager : MonoBehaviour
         player2.score = 0;
         currentQuestionIndex = 0;
         
+        // NEU: Lade Fragen neu (falls sich Schwierigkeitsgrade geändert haben)
+        LoadQuestionsForTeams();
+        
         // Reset progress icons
         if (questionProgressIcons != null)
         {
+            int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
+            questionProgressIcons.Initialize(maxQuestions);
             questionProgressIcons.ResetProgress();
         }
         

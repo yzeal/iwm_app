@@ -14,25 +14,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuizRoomData
   roomName: Testraum
   roomNumber: 1
-  questions:
-  - questionText: Eines der Gesteine hier im Raum hat im Namen sogar etwas, das man
-      normalerweise essen kann. Was ist es?
+  kidsQuestions:
+  - questionText: '[K] Eines der Gesteine hier im Raum hat im Namen sogar etwas,
+      das man normalerweise essen kann. Was ist es?'
     answers:
     - Blumenkohl\u00ADbombe
-    - "Br\xF6tchenbombe"
-    - Brokkolibombe
+    - "Br\xF6tchen\\u00ADbombe"
     - Breibombe
-  - questionText: Wie tief war die Forschungsbohrung im Jahr 2001?
+    - Brokkoli\u00ADbombe
+  - questionText: '[K] Wie tief war die Forschungsbohrung im Jahr 2001?'
     answers:
     - 433m
-    - 113m
     - 245m
     - 360m
-  - questionText: "Welche Fossilien werden hier in Messel besonders h\xE4ufig entdeck?"
+    - 113m
+  - questionText: "[K] Welche Fossilien werden hier in Messel besonders h\xE4ufig
+      entdeckt?"
     answers:
     - Tierkot
-    - Dinosauriereier
-    - "Mammut\\u00ADsto\xDFz\xE4hne"
+    - Dinosaurier\u00ADeier
     - "Haifisch\\u00ADz\xE4hne"
+    - "Mammut\\u00ADsto\xDFz\xE4hne"
+  bigKidsQuestions:
+  - questionText: '[BK] Eines der Gesteine hier im Raum hat im Namen sogar etwas,
+      das man normalerweise essen kann. Was ist es?'
+    answers:
+    - Blumenkohl\u00ADbombe
+    - "Br\xF6tchen\\u00ADbombe"
+    - Breibombe
+    - Brokkoli\u00ADbombe
+  - questionText: '[BK] Wie tief war die Forschungsbohrung im Jahr 2001?'
+    answers:
+    - 433m
+    - 245m
+    - 360m
+    - 113m
+  - questionText: "[BK] Welche Fossilien werden hier in Messel besonders h\xE4ufig
+      entdeckt?"
+    answers:
+    - Tierkot
+    - Dinosaurier\u00ADeier
+    - "Haifisch\\u00ADz\xE4hne"
+    - "Mammut\\u00ADsto\xDFz\xE4hne"
+  adultsQuestions:
+  - questionText: '[A] Eines der Gesteine hier im Raum hat im Namen sogar etwas,
+      das man normalerweise essen kann. Was ist es?'
+    answers:
+    - Blumenkohl\u00ADbombe
+    - "Br\xF6tchen\\u00ADbombe"
+    - Breibombe
+    - Brokkoli\u00ADbombe
+  - questionText: '[A] Wie tief war die Forschungsbohrung im Jahr 2001?'
+    answers:
+    - 433m
+    - 245m
+    - 360m
+    - 113m
+  - questionText: "[A] Welche Fossilien werden hier in Messel besonders h\xE4ufig
+      entdeckt?"
+    answers:
+    - Tierkot
+    - Dinosaurier\u00ADeier
+    - "Haifisch\\u00ADz\xE4hne"
+    - "Mammut\\u00ADsto\xDFz\xE4hne"
   roomColor: {r: 0, g: 0, b: 1, a: 1}
   roomIcon: {fileID: 0}
+  timeSettings:
+    kidsTimeMultiplier: 1.5
+    bigKidsTimeMultiplier: 1.2
+    adultsTimeMultiplier: 1

@@ -10,11 +10,13 @@ public class GameProgressData
     public int currentRoomIndex = 0;
     public DateTime lastPlayedTime;
     public string sessionId;
+    public TeamSettings teamSettings = new TeamSettings(); // NEU: Team-Schwierigkeitsgrade
     
     public GameProgressData()
     {
         sessionId = System.Guid.NewGuid().ToString();
         lastPlayedTime = DateTime.Now;
+        teamSettings = new TeamSettings(); // Sicherstellen, dass TeamSettings initialisiert sind
     }
 }
 
@@ -42,6 +44,11 @@ public class GameDataManager : MonoBehaviour
     public static GameDataManager Instance { get; private set; }
     
     public GameProgressData CurrentProgress { get; private set; }
+    
+    // NEU: Properties für einfachen Zugriff auf Team-Einstellungen
+    public TeamSettings TeamSettings => CurrentProgress.teamSettings;
+    public DifficultyLevel Team1Difficulty => CurrentProgress.teamSettings.team1Difficulty;
+    public DifficultyLevel Team2Difficulty => CurrentProgress.teamSettings.team2Difficulty;
     
     void Awake()
     {
@@ -95,6 +102,29 @@ public class GameDataManager : MonoBehaviour
     {
         CurrentProgress.playerName = name;
         SaveGameData();
+    }
+    
+    // NEU: Team-Schwierigkeitsgrad-Management
+    public void SetTeamDifficulty(int teamIndex, DifficultyLevel difficulty)
+    {
+        CurrentProgress.teamSettings.SetTeamDifficulty(teamIndex, difficulty);
+        CurrentProgress.lastPlayedTime = DateTime.Now;
+        SaveGameData();
+        Debug.Log($"Team {teamIndex + 1} difficulty set to {difficulty}");
+    }
+    
+    public DifficultyLevel GetTeamDifficulty(int teamIndex)
+    {
+        return CurrentProgress.teamSettings.GetTeamDifficulty(teamIndex);
+    }
+    
+    public void SetTeamDifficulties(DifficultyLevel team1, DifficultyLevel team2)
+    {
+        CurrentProgress.teamSettings.team1Difficulty = team1;
+        CurrentProgress.teamSettings.team2Difficulty = team2;
+        CurrentProgress.lastPlayedTime = DateTime.Now;
+        SaveGameData();
+        Debug.Log($"Team difficulties set: Team1={team1}, Team2={team2}");
     }
     
     public RoomResult GetRoomResult(int roomNumber)
@@ -165,6 +195,14 @@ public class GameDataManager : MonoBehaviour
             if (!string.IsNullOrEmpty(jsonData))
             {
                 CurrentProgress = JsonUtility.FromJson<GameProgressData>(jsonData);
+                
+                // NEU: Sicherstellen, dass TeamSettings existieren (für bestehende Saves)
+                if (CurrentProgress.teamSettings == null)
+                {
+                    CurrentProgress.teamSettings = new TeamSettings();
+                    SaveGameData(); // Aktualisiere den Save mit den neuen TeamSettings
+                }
+                
                 Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}");
             }
             else
@@ -204,13 +242,27 @@ public class GameDataManager : MonoBehaviour
     {
         Debug.Log($"Progress: Room {CurrentProgress.currentRoomIndex}, " +
                  $"Completed Rooms: {CurrentProgress.roomResults.Count}, " +
-                 $"Session: {CurrentProgress.sessionId}");
+                 $"Session: {CurrentProgress.sessionId}, " +
+                 $"Team1: {Team1Difficulty}, Team2: {Team2Difficulty}");
     }
     
     [ContextMenu("Reset All Data")]
     void DebugResetData()
     {
         ResetProgress();
+    }
+    
+    // NEU: Debug-Methoden für Schwierigkeitsgrade
+    [ContextMenu("Set Both Teams to Kids")]
+    void DebugSetKids()
+    {
+        SetTeamDifficulties(DifficultyLevel.Kids, DifficultyLevel.Kids);
+    }
+    
+    [ContextMenu("Set Mixed Difficulties")]
+    void DebugSetMixed()
+    {
+        SetTeamDifficulties(DifficultyLevel.Kids, DifficultyLevel.Adults);
     }
     
     #endregion

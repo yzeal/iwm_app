@@ -76,10 +76,16 @@ public class FossilGameManager : MonoBehaviour
     
     void InitializeGame()
     {
-        if (fossilCollection == null || fossilCollection.fossils.Length == 0)
+        if (fossilCollection == null)
         {
             Debug.LogError("No fossil collection assigned!");
             return;
+        }
+        
+        // NEU: Prüfe ob Fossilien für alle Schwierigkeitsgrade vorhanden sind
+        if (!fossilCollection.HasFossilsForAllDifficulties())
+        {
+            Debug.LogWarning("Not all difficulty levels have fossils assigned!");
         }
         
         if (fossilCollection.team1Image == null || fossilCollection.team2Image == null)
@@ -125,17 +131,40 @@ public class FossilGameManager : MonoBehaviour
     {
         string inputInfo = fossilInputHandler.GetInputModeInfo();
         
+        // NEU: Hole Team-Schwierigkeitsgrade vom GameDataManager
+        DifficultyLevel currentTeamDifficulty = DifficultyLevel.Adults;
+        if (GameDataManager.Instance != null)
+        {
+            currentTeamDifficulty = GameDataManager.Instance.GetTeamDifficulty(currentTeam - 1);
+        }
+        
+        // NEU: Berechne angepasste Rundendauer basierend auf Schwierigkeitsgrad
+        float adjustedDuration = fossilCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
+        
         explanationText.text = $"<b>Fossilien-Stirnraten</b>\n\n" +
                               $"<b>Wie gespielt wird:</b>\n" +
                               $"• Halte das Handy an deine Stirn\n" +
                               $"• Dein Team erklärt dir das Fossil\n\n" +
                               $"<b>Steuerung:</b>\n" +
                               $"{inputInfo}\n\n" +
-                              $"<b>Zeit pro Runde:</b> {fossilCollection.roundDuration} Sekunden\n" +
-                              $"<b>Begriffe pro Runde:</b> {fossilCollection.fossilsPerRound}\n\n" +
+                              $"<b>Zeit pro Runde:</b> {adjustedDuration:F0} Sekunden\n" +
+                              $"<b>Begriffe pro Runde:</b> {fossilCollection.fossilsPerRound}\n" +
+                              $"<b>Schwierigkeitsgrad:</b> {GetDifficultyDisplayName(currentTeamDifficulty)}\n\n" +
                               $"Dieses Team ist jetzt dran:";
         
         UpdateCurrentTeamImage(currentTeamImageExplanation);
+    }
+    
+    // NEU: Hilfsmethode für Schwierigkeitsgrad-Anzeige
+    string GetDifficultyDisplayName(DifficultyLevel difficulty)
+    {
+        return difficulty switch
+        {
+            DifficultyLevel.Kids => "Kids",
+            DifficultyLevel.BigKids => "BigKids", 
+            DifficultyLevel.Adults => "Adults",
+            _ => "Adults"
+        };
     }
     
     void UpdateCurrentTeamImage(Image targetImage)
@@ -195,9 +224,22 @@ public class FossilGameManager : MonoBehaviour
         
         // Reset für neue Runde
         correctFossilsThisRound = 0;
-        currentRoundFossils = new List<FossilData>(fossilCollection.GetRandomFossils(fossilCollection.fossilsPerRound));
+        
+        // NEU: Hole Fossilien basierend auf Team-Schwierigkeitsgrad
+        DifficultyLevel currentTeamDifficulty = DifficultyLevel.Adults;
+        if (GameDataManager.Instance != null)
+        {
+            currentTeamDifficulty = GameDataManager.Instance.GetTeamDifficulty(currentTeam - 1);
+        }
+        
+        // NEU: Lade Fossilien für den entsprechenden Schwierigkeitsgrad
+        FossilData[] availableFossils = fossilCollection.GetRandomFossils(fossilCollection.fossilsPerRound, currentTeamDifficulty);
+        currentRoundFossils = new List<FossilData>(availableFossils);
+        
         currentFossilIndex = 0;
-        roundTimeLeft = fossilCollection.roundDuration;
+        
+        // NEU: Verwende angepasste Rundendauer basierend auf Schwierigkeitsgrad
+        roundTimeLeft = fossilCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
         gameActive = true;
         
         // NEU: Reset Timer-Countdown Flags
