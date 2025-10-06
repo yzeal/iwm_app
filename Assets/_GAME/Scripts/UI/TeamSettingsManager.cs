@@ -27,11 +27,50 @@ public class TeamSettingsManager : MonoBehaviour
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip buttonClickSound;
+    public AudioClip appliedSound; // Separater Sound für "Gespeichert" Feedback
+    
+    [Header("Mobile UI Settings")]
+    [SerializeField] private bool adaptToSafeArea = true; // Für iOS Notch/Safe Area
     
     void Start()
     {
+        // Mobile-spezifische Initialisierung
+        if (adaptToSafeArea)
+        {
+            AdaptToSafeArea();
+        }
+        
         InitializeSettings();
         SetupUI();
+    }
+    
+    /// <summary>
+    /// Passt das UI an die Safe Area von mobilen Geräten an
+    /// </summary>
+    void AdaptToSafeArea()
+    {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+            if (canvasRect != null)
+            {
+                // Hole Safe Area (wichtig für iPhone mit Notch)
+                Rect safeArea = Screen.safeArea;
+                Vector2 anchorMin = safeArea.position;
+                Vector2 anchorMax = safeArea.position + safeArea.size;
+                
+                anchorMin.x /= Screen.width;
+                anchorMin.y /= Screen.height;
+                anchorMax.x /= Screen.width;
+                anchorMax.y /= Screen.height;
+                
+                canvasRect.anchorMin = anchorMin;
+                canvasRect.anchorMax = anchorMax;
+                
+                Debug.Log($"Safe Area angepasst: {safeArea}");
+            }
+        }
     }
     
     void InitializeSettings()
@@ -68,6 +107,27 @@ public class TeamSettingsManager : MonoBehaviour
             
         if (team2Icon && defaultTeam2Icon)
             team2Icon.sprite = defaultTeam2Icon;
+            
+        // Mobile-optimierte Icon-Größen
+        if (team1Icon) AdaptIconForMobile(team1Icon);
+        if (team2Icon) AdaptIconForMobile(team2Icon);
+    }
+    
+    void AdaptIconForMobile(Image icon)
+    {
+        // Stelle sicher, dass Icons auf mobilen Geräten gut sichtbar sind
+        RectTransform iconRect = icon.GetComponent<RectTransform>();
+        if (iconRect != null)
+        {
+            // Mindestgröße für Touch-Targets auf Mobile (empfohlen: 44pt auf iOS, 48dp auf Android)
+            float minSize = 60f; // Unity Units
+            Vector2 currentSize = iconRect.sizeDelta;
+            
+            if (currentSize.x < minSize || currentSize.y < minSize)
+            {
+                iconRect.sizeDelta = new Vector2(Mathf.Max(currentSize.x, minSize), Mathf.Max(currentSize.y, minSize));
+            }
+        }
     }
     
     void SetupUI()
@@ -80,18 +140,67 @@ public class TeamSettingsManager : MonoBehaviour
         // Setup Radio Group Events
         team1DifficultyGroup.OnDifficultyChanged += OnTeam1DifficultyChanged;
         team2DifficultyGroup.OnDifficultyChanged += OnTeam2DifficultyChanged;
+        
+        // Mobile-optimierte Button-Größen
+        AdaptButtonsForMobile();
+    }
+    
+    void AdaptButtonsForMobile()
+    {
+        Button[] buttons = { applyButton, backButton, resetButton };
+        
+        foreach (Button button in buttons)
+        {
+            if (button != null)
+            {
+                RectTransform buttonRect = button.GetComponent<RectTransform>();
+                if (buttonRect != null)
+                {
+                    // Mindest-Touch-Target-Größe für Mobile
+                    Vector2 currentSize = buttonRect.sizeDelta;
+                    float minHeight = 50f; // Mindesthöhe für Touch-Targets
+                    
+                    if (currentSize.y < minHeight)
+                    {
+                        buttonRect.sizeDelta = new Vector2(currentSize.x, minHeight);
+                    }
+                }
+            }
+        }
     }
     
     void OnTeam1DifficultyChanged(DifficultyLevel newDifficulty)
     {
         PlayButtonSound();
         Debug.Log($"Team 1 difficulty changed to: {newDifficulty}");
+        
+        // Mobile Haptic Feedback (falls gewünscht)
+        TriggerHapticFeedback();
     }
     
     void OnTeam2DifficultyChanged(DifficultyLevel newDifficulty)
     {
         PlayButtonSound();
         Debug.Log($"Team 2 difficulty changed to: {newDifficulty}");
+        
+        // Mobile Haptic Feedback (falls gewünscht)
+        TriggerHapticFeedback();
+    }
+    
+    void TriggerHapticFeedback()
+    {
+        // Haptic Feedback für iOS/Android
+        #if UNITY_IOS
+        if (UnityEngine.iOS.Device.generation != UnityEngine.iOS.DeviceGeneration.iPhoneUnknown)
+        {
+            Handheld.Vibrate();
+        }
+        #elif UNITY_ANDROID
+        if (SystemInfo.supportsVibration)
+        {
+            Handheld.Vibrate();
+        }
+        #endif
     }
     
     void ApplySettings()
@@ -110,12 +219,21 @@ public class TeamSettingsManager : MonoBehaviour
         
         // Feedback für den Nutzer
         ShowAppliedFeedback();
+        
+        // Haptic Feedback für erfolgreiche Aktion
+        TriggerHapticFeedback();
     }
     
     void ShowAppliedFeedback()
     {
-        // Visuelles Feedback - Button kurz grün färben oder ähnliches
+        // Visuelles Feedback - Button kurz grün färben
         StartCoroutine(AppliedFeedbackCoroutine());
+        
+        // Audio Feedback
+        if (audioSource && appliedSound)
+        {
+            audioSource.PlayOneShot(appliedSound);
+        }
     }
     
     System.Collections.IEnumerator AppliedFeedbackCoroutine()
@@ -127,7 +245,7 @@ public class TeamSettingsManager : MonoBehaviour
         string originalText = buttonText.text;
         buttonText.text = "Gespeichert!";
         
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f); // Etwas länger für Mobile
         
         applyButton.GetComponent<Image>().color = originalColor;
         buttonText.text = originalText;
@@ -142,6 +260,9 @@ public class TeamSettingsManager : MonoBehaviour
         team2DifficultyGroup.SetSelectedDifficulty(DifficultyLevel.Adults);
         
         Debug.Log("Settings reset to defaults (Adults)");
+        
+        // Haptic Feedback
+        TriggerHapticFeedback();
     }
     
     void BackToMenu()
@@ -160,6 +281,26 @@ public class TeamSettingsManager : MonoBehaviour
         }
     }
     
+    #region Mobile Platform Detection
+    
+    bool IsMobile()
+    {
+        return Application.platform == RuntimePlatform.Android || 
+               Application.platform == RuntimePlatform.IPhonePlayer;
+    }
+    
+    bool IsIOS()
+    {
+        return Application.platform == RuntimePlatform.IPhonePlayer;
+    }
+    
+    bool IsAndroid()
+    {
+        return Application.platform == RuntimePlatform.Android;
+    }
+    
+    #endregion
+    
     #region Debug Methods
     
     [ContextMenu("Print Current Settings")]
@@ -170,6 +311,14 @@ public class TeamSettingsManager : MonoBehaviour
             Debug.Log($"Current Settings: Team1={GameDataManager.Instance.GetTeamDifficulty(0)}, " +
                      $"Team2={GameDataManager.Instance.GetTeamDifficulty(1)}");
         }
+    }
+    
+    [ContextMenu("Test Mobile Adaptations")]
+    void TestMobileAdaptations()
+    {
+        AdaptToSafeArea();
+        AdaptButtonsForMobile();
+        Debug.Log($"Mobile adaptations applied. Platform: {Application.platform}");
     }
     
     [ContextMenu("Set Mixed Difficulties")]
