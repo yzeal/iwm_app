@@ -10,13 +10,15 @@ public class GameProgressData
     public int currentRoomIndex = 0;
     public DateTime lastPlayedTime;
     public string sessionId;
-    public TeamSettings teamSettings = new TeamSettings(); // NEU: Team-Schwierigkeitsgrade
+    public TeamSettings teamSettings = new TeamSettings(); // Team-Schwierigkeitsgrade
+    public Language selectedLanguage = Language.German_Standard; // NEU: Sprache speichern
     
     public GameProgressData()
     {
         sessionId = System.Guid.NewGuid().ToString();
         lastPlayedTime = DateTime.Now;
-        teamSettings = new TeamSettings(); // Sicherstellen, dass TeamSettings initialisiert sind
+        teamSettings = new TeamSettings();
+        selectedLanguage = Language.German_Standard; // Standard-Sprache
     }
 }
 
@@ -45,10 +47,13 @@ public class GameDataManager : MonoBehaviour
     
     public GameProgressData CurrentProgress { get; private set; }
     
-    // NEU: Properties für einfachen Zugriff auf Team-Einstellungen
+    // Properties für einfachen Zugriff auf Team-Einstellungen
     public TeamSettings TeamSettings => CurrentProgress.teamSettings;
     public DifficultyLevel Team1Difficulty => CurrentProgress.teamSettings.team1Difficulty;
     public DifficultyLevel Team2Difficulty => CurrentProgress.teamSettings.team2Difficulty;
+    
+    // NEU: Properties für Sprach-Zugriff
+    public Language CurrentLanguage => CurrentProgress.selectedLanguage;
     
     void Awake()
     {
@@ -58,12 +63,62 @@ public class GameDataManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadGameData();
+            
+            // NEU: Sprache mit LanguageSystem synchronisieren
+            SyncLanguageWithSystem();
         }
         else
         {
             Destroy(gameObject);
         }
     }
+    
+    #region Language Management (NEU)
+    
+    /// <summary>
+    /// Sprache setzen und mit LanguageSystem synchronisieren
+    /// </summary>
+    public void SetLanguage(Language language)
+    {
+        if (CurrentProgress.selectedLanguage != language)
+        {
+            CurrentProgress.selectedLanguage = language;
+            CurrentProgress.lastPlayedTime = DateTime.Now;
+            SaveGameData();
+            
+            // Mit LanguageSystem synchronisieren
+            if (LanguageSystem.Instance != null)
+            {
+                LanguageSystem.Instance.SetLanguage(language);
+            }
+            
+            Debug.Log($"Language changed to: {language}");
+        }
+    }
+    
+    /// <summary>
+    /// Sprache mit LanguageSystem synchronisieren beim Start
+    /// </summary>
+    private void SyncLanguageWithSystem()
+    {
+        if (LanguageSystem.Instance != null)
+        {
+            // Wenn LanguageSystem eine andere Sprache hat, diese übernehmen
+            Language systemLanguage = LanguageSystem.Instance.GetCurrentLanguage();
+            if (systemLanguage != CurrentProgress.selectedLanguage)
+            {
+                CurrentProgress.selectedLanguage = systemLanguage;
+                SaveGameData();
+            }
+            else
+            {
+                // GameDataManager-Sprache an LanguageSystem weitergeben
+                LanguageSystem.Instance.SetLanguage(CurrentProgress.selectedLanguage);
+            }
+        }
+    }
+    
+    #endregion
     
     #region Public Methods
     
@@ -104,7 +159,7 @@ public class GameDataManager : MonoBehaviour
         SaveGameData();
     }
     
-    // NEU: Team-Schwierigkeitsgrad-Management
+    // Team-Schwierigkeitsgrad-Management
     public void SetTeamDifficulty(int teamIndex, DifficultyLevel difficulty)
     {
         CurrentProgress.teamSettings.SetTeamDifficulty(teamIndex, difficulty);
@@ -140,9 +195,11 @@ public class GameDataManager : MonoBehaviour
     
     public void ResetProgress()
     {
+        Language currentLang = CurrentProgress.selectedLanguage; // Sprache beibehalten
         CurrentProgress = new GameProgressData();
+        CurrentProgress.selectedLanguage = currentLang; // Sprache wiederherstellen
         SaveGameData();
-        Debug.Log("Game progress reset");
+        Debug.Log("Game progress reset (language preserved)");
     }
     
     #endregion
@@ -196,14 +253,17 @@ public class GameDataManager : MonoBehaviour
             {
                 CurrentProgress = JsonUtility.FromJson<GameProgressData>(jsonData);
                 
-                // NEU: Sicherstellen, dass TeamSettings existieren (für bestehende Saves)
+                // Sicherstellen, dass TeamSettings existieren (für bestehende Saves)
                 if (CurrentProgress.teamSettings == null)
                 {
                     CurrentProgress.teamSettings = new TeamSettings();
-                    SaveGameData(); // Aktualisiere den Save mit den neuen TeamSettings
                 }
                 
-                Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}");
+                // NEU: Sicherstellen, dass selectedLanguage gesetzt ist (für bestehende Saves)
+                // Bei alten Saves ist selectedLanguage = 0 (German_Standard), was perfekt ist
+                
+                Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}, Language: {CurrentProgress.selectedLanguage}");
+                SaveGameData(); // Aktualisiere Save falls Migrationen stattgefunden haben
             }
             else
             {
@@ -243,7 +303,8 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Progress: Room {CurrentProgress.currentRoomIndex}, " +
                  $"Completed Rooms: {CurrentProgress.roomResults.Count}, " +
                  $"Session: {CurrentProgress.sessionId}, " +
-                 $"Team1: {Team1Difficulty}, Team2: {Team2Difficulty}");
+                 $"Team1: {Team1Difficulty}, Team2: {Team2Difficulty}, " +
+                 $"Language: {CurrentProgress.selectedLanguage}");
     }
     
     [ContextMenu("Reset All Data")]
@@ -252,7 +313,7 @@ public class GameDataManager : MonoBehaviour
         ResetProgress();
     }
     
-    // NEU: Debug-Methoden für Schwierigkeitsgrade
+    // Debug-Methoden für Schwierigkeitsgrade
     [ContextMenu("Set Both Teams to Kids")]
     void DebugSetKids()
     {
@@ -263,6 +324,19 @@ public class GameDataManager : MonoBehaviour
     void DebugSetMixed()
     {
         SetTeamDifficulties(DifficultyLevel.Kids, DifficultyLevel.Adults);
+    }
+    
+    // NEU: Debug-Methoden für Sprachen
+    [ContextMenu("Set Language to English")]
+    void DebugSetEnglish()
+    {
+        SetLanguage(Language.English_Standard);
+    }
+    
+    [ContextMenu("Set Language to German Simple")]
+    void DebugSetGermanSimple()
+    {
+        SetLanguage(Language.German_Simple);
     }
     
     #endregion

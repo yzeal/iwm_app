@@ -3,8 +3,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Quiz Room", menuName = "Quiz/Room Data")]
 public class QuizRoomData : ScriptableObject
 {
-    [Header("Raum Information")]
-    public string roomName;
+    [Header("Lokalisierte Raum Information")]
+    [SerializeField] private LocalizedText localizedRoomName;
+    
+    [Header("Legacy - Raum Information (DEPRECATED - use LocalizedText)")]
+    [SerializeField] private string roomName; // Für Rückwärtskompatibilität
     public int roomNumber;
     
     [Header("Quiz Fragen nach Schwierigkeitsgrad")]
@@ -18,6 +21,26 @@ public class QuizRoomData : ScriptableObject
     
     [Header("Zeit-Einstellungen (optional)")]
     public DifficultyTimeSettings timeSettings = new DifficultyTimeSettings();
+
+    /// <summary>
+    /// Raum-Name für aktuelle Sprache abrufen
+    /// </summary>
+    public string GetRoomName(Language language = Language.German_Standard)
+    {
+        // Neues Lokalisierungssystem bevorzugen
+        if (localizedRoomName != null)
+        {
+            return localizedRoomName.GetText(language);
+        }
+        
+        // Legacy-Fallback
+        if (!string.IsNullOrEmpty(roomName))
+        {
+            return roomName;
+        }
+        
+        return $"[MISSING ROOM NAME {roomNumber}]";
+    }
     
     /// <summary>
     /// Gibt die Fragen für den angegebenen Schwierigkeitsgrad zurück
@@ -62,15 +85,69 @@ public class QuizRoomData : ScriptableObject
                bigKidsQuestions != null && bigKidsQuestions.Length > 0 &&
                adultsQuestions != null && adultsQuestions.Length > 0;
     }
+
+    /// <summary>
+    /// Prüft ob alle Lokalisierungen vollständig sind
+    /// </summary>
+    public bool HasAllLocalizations()
+    {
+        // Raum-Name prüfen
+        if (localizedRoomName == null || !localizedRoomName.HasAllTranslations())
+            return false;
+
+        // Alle Fragen prüfen - .NET Framework 4.7.1 kompatible Enum-Iteration
+        foreach (DifficultyLevel difficulty in System.Enum.GetValues(typeof(DifficultyLevel)))
+        {
+            var questions = GetQuestionsForDifficulty(difficulty);
+            foreach (var question in questions)
+            {
+                if (!question.HasAllLocalizations())
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    #region Legacy Properties für Rückwärtskompatibilität
+
+    /// <summary>
+    /// Legacy-Property für Rückwärtskompatibilität
+    /// </summary>
+    [System.Obsolete("Use GetRoomName(Language) instead")]
+    public string RoomName => GetRoomName(Language.German_Standard);
+
+    #endregion
     
     #region Editor Helper Methods
     
     [ContextMenu("Validate All Difficulties")]
     private void ValidateQuestions()
     {
-        Debug.Log($"Room {roomName} - Kids: {GetQuestionCountForDifficulty(DifficultyLevel.Kids)}, " +
+        Debug.Log($"Room {GetRoomName()} - Kids: {GetQuestionCountForDifficulty(DifficultyLevel.Kids)}, " +
                  $"BigKids: {GetQuestionCountForDifficulty(DifficultyLevel.BigKids)}, " +
                  $"Adults: {GetQuestionCountForDifficulty(DifficultyLevel.Adults)}");
+    }
+
+    [ContextMenu("Validate All Localizations")]
+    private void ValidateLocalizations()
+    {
+        string status = $"Room '{GetRoomName()}' Localization Status:\n";
+        status += $"Room Name: {(localizedRoomName != null && localizedRoomName.HasAllTranslations() ? "?" : "?")}\n";
+
+        // .NET Framework 4.7.1 kompatible Enum-Iteration
+        foreach (DifficultyLevel difficulty in System.Enum.GetValues(typeof(DifficultyLevel)))
+        {
+            var questions = GetQuestionsForDifficulty(difficulty);
+            int localizedCount = 0;
+            foreach (var question in questions)
+            {
+                if (question.HasAllLocalizations()) localizedCount++;
+            }
+            status += $"{difficulty}: {localizedCount}/{questions.Length} questions localized\n";
+        }
+
+        Debug.Log(status);
     }
     
     #endregion
