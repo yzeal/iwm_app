@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System;
 
 /// <summary>
@@ -28,15 +29,16 @@ public class LanguageRadioGroup : MonoBehaviour
     [SerializeField] private AudioClip selectionSound;
     
     [Header("Debug")]
-    [SerializeField] private bool enableDebugLogs = false;
+    [SerializeField] private bool enableDebugLogs = true; // Auf true gesetzt für Debugging
     
     private Language selectedLanguage = Language.German_Standard;
     private Button[] allButtons;
     
     public event Action<Language> OnLanguageChanged;
     
-    void Awake()
+    void Start()
     {
+        // Button-Array initialisieren
         allButtons = new Button[] 
         { 
             germanStandardButton, 
@@ -45,22 +47,72 @@ public class LanguageRadioGroup : MonoBehaviour
             englishSimpleButton 
         };
         
+        // Validierung
+        ValidateButtonReferences();
+        
+        // Setup durchführen
         SetupButtons();
+        
+        if (enableDebugLogs)
+            Debug.Log("LanguageRadioGroup initialized in Start()");
+    }
+    
+    void ValidateButtonReferences()
+    {
+        if (germanStandardButton == null)
+            Debug.LogError("LanguageRadioGroup: German Standard Button nicht zugewiesen!");
+        if (englishStandardButton == null)
+            Debug.LogError("LanguageRadioGroup: English Standard Button nicht zugewiesen!");
+        if (germanSimpleButton == null)
+            Debug.LogError("LanguageRadioGroup: German Simple Button nicht zugewiesen!");
+        if (englishSimpleButton == null)
+            Debug.LogError("LanguageRadioGroup: English Simple Button nicht zugewiesen!");
+            
+        if (unselectedSprite == null)
+            Debug.LogWarning("LanguageRadioGroup: Unselected Sprite nicht zugewiesen - verwende Color-Fallback");
+        if (selectedSprite == null)
+            Debug.LogWarning("LanguageRadioGroup: Selected Sprite nicht zugewiesen - verwende Color-Fallback");
     }
     
     void SetupButtons()
     {
-        // Event-Listeners hinzufügen
-        if (germanStandardButton) germanStandardButton.onClick.AddListener(() => SelectLanguage(Language.German_Standard));
-        if (englishStandardButton) englishStandardButton.onClick.AddListener(() => SelectLanguage(Language.English_Standard));
-        if (germanSimpleButton) germanSimpleButton.onClick.AddListener(() => SelectLanguage(Language.German_Simple));
-        if (englishSimpleButton) englishSimpleButton.onClick.AddListener(() => SelectLanguage(Language.English_Simple));
+        // Event-Listeners hinzufügen mit Fehlerprüfung
+        if (germanStandardButton != null)
+        {
+            germanStandardButton.onClick.AddListener(() => SelectLanguage(Language.German_Standard));
+            if (enableDebugLogs)
+                Debug.Log("German Standard Button onClick event registered");
+        }
+        
+        if (englishStandardButton != null)
+        {
+            englishStandardButton.onClick.AddListener(() => SelectLanguage(Language.English_Standard));
+            if (enableDebugLogs)
+                Debug.Log("English Standard Button onClick event registered");
+        }
+        
+        if (germanSimpleButton != null)
+        {
+            germanSimpleButton.onClick.AddListener(() => SelectLanguage(Language.German_Simple));
+            if (enableDebugLogs)
+                Debug.Log("German Simple Button onClick event registered");
+        }
+        
+        if (englishSimpleButton != null)
+        {
+            englishSimpleButton.onClick.AddListener(() => SelectLanguage(Language.English_Simple));
+            if (enableDebugLogs)
+                Debug.Log("English Simple Button onClick event registered");
+        }
         
         // Mobile-optimierte Touch-Targets
         AdaptButtonsForMobile();
         
         // Initial Selection
         UpdateButtonVisuals();
+        
+        if (enableDebugLogs)
+            Debug.Log($"LanguageRadioGroup setup complete. Initial language: {selectedLanguage}");
     }
     
     void AdaptButtonsForMobile()
@@ -90,20 +142,37 @@ public class LanguageRadioGroup : MonoBehaviour
     
     public void SelectLanguage(Language language)
     {
+        if (enableDebugLogs)
+            Debug.Log($"SelectLanguage called with: {language}");
+        
         if (selectedLanguage != language)
         {
             selectedLanguage = language;
             UpdateButtonVisuals();
-            OnLanguageChanged?.Invoke(selectedLanguage);
+            
+            // Event auslösen
+            if (OnLanguageChanged != null)
+            {
+                OnLanguageChanged.Invoke(selectedLanguage);
+                if (enableDebugLogs)
+                    Debug.Log($"OnLanguageChanged event invoked with: {selectedLanguage}");
+            }
+            else
+            {
+                if (enableDebugLogs)
+                    Debug.LogWarning("OnLanguageChanged event has no subscribers!");
+            }
             
             // Audio Feedback
             PlaySelectionSound();
             
             // Haptic Feedback für Mobile
             TriggerHapticFeedback();
-            
+        }
+        else
+        {
             if (enableDebugLogs)
-                Debug.Log($"Language selected: {language}");
+                Debug.Log($"Language {language} was already selected - no change");
         }
     }
     
@@ -111,6 +180,9 @@ public class LanguageRadioGroup : MonoBehaviour
     {
         selectedLanguage = language;
         UpdateButtonVisuals();
+        
+        if (enableDebugLogs)
+            Debug.Log($"SetSelectedLanguage (without event): {language}");
     }
     
     public Language GetSelectedLanguage()
@@ -231,6 +303,60 @@ public class LanguageRadioGroup : MonoBehaviour
     void DebugSetEnglish()
     {
         SelectLanguage(Language.English_Standard);
+    }
+    
+    [ContextMenu("Debug Button Setup")]
+    void DebugButtonSetup()
+    {
+        Debug.Log("=== LanguageRadioGroup Debug Info ===");
+        Debug.Log($"German Standard Button: {(germanStandardButton != null ? "OK" : "MISSING")}");
+        Debug.Log($"English Standard Button: {(englishStandardButton != null ? "OK" : "MISSING")}");
+        Debug.Log($"German Simple Button: {(germanSimpleButton != null ? "OK" : "MISSING")}");
+        Debug.Log($"English Simple Button: {(englishSimpleButton != null ? "OK" : "MISSING")}");
+        Debug.Log($"OnLanguageChanged subscribers: {(OnLanguageChanged != null ? OnLanguageChanged.GetInvocationList().Length : 0)}");
+        Debug.Log($"Current selected language: {selectedLanguage}");
+    }
+    
+    [ContextMenu("Test Button Interaction")]
+    void TestButtonInteraction()
+    {
+        Debug.Log("=== Button Interaction Test ===");
+        
+        Button[] buttons = { germanStandardButton, englishStandardButton, germanSimpleButton, englishSimpleButton };
+        string[] names = { "German Standard", "English Standard", "German Simple", "English Simple" };
+        
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] != null)
+            {
+                Debug.Log($"{names[i]}:");
+                Debug.Log($"  - Interactable: {buttons[i].interactable}");
+                Debug.Log($"  - onClick listeners: {buttons[i].onClick.GetPersistentEventCount()}");
+                
+                // Prüfe Raycast Target
+                Image img = buttons[i].GetComponent<Image>();
+                if (img != null)
+                    Debug.Log($"  - Raycast Target: {img.raycastTarget}");
+                
+                // Prüfe CanvasGroup
+                CanvasGroup cg = buttons[i].GetComponent<CanvasGroup>();
+                if (cg != null)
+                    Debug.Log($"  - CanvasGroup blocks raycasts: {cg.blocksRaycasts}, interactable: {cg.interactable}");
+            }
+        }
+        
+        // Prüfe EventSystem
+        UnityEngine.EventSystems.EventSystem eventSystem = UnityEngine.EventSystems.EventSystem.current;
+        Debug.Log($"EventSystem present: {eventSystem != null}");
+        
+        // Prüfe Canvas
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            Debug.Log($"Canvas found: {canvas.name}");
+            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+            Debug.Log($"GraphicRaycaster present: {raycaster != null}");
+        }
     }
     
     #endregion
