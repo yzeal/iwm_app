@@ -31,378 +31,6 @@
 - **UI-Aufteilung**: Jeder Spieler hat eine Bildschirmhälfte, andere Hälfte steht kopf
 - **Anti-Schummel**: Unterschiedliche Fragen pro Team basierend auf Schwierigkeitsgrad + zufällig angeordnete Antworten
 
-### SCHWIERIGKEITSGRADE (NEU IMPLEMENTIERT)
-- **Kids**: Einfachere Sprache, weniger komplexe Fragen
-- **BigKids**: Mittlere Komplexität
-- **Adults**: Vollständige Komplexität
-- **Individuelle Auswahl**: Jedes Team kann unabhängig seinen Schwierigkeitsgrad wählen
-- **Persistente Speicherung**: Einstellungen bleiben für gesamte Führung gespeichert
-
-### PUNKTESYSTEM
-- **Richtige Antwort (Erster)**: 2 Punkte
-- **Richtige Antwort (Zweiter)**: 1 Punkt  
-- **Falsche Antwort**: 0 Punkte
-- **Zeitlimit**: Keines (kann bei Bedarf pro Schwierigkeitsgrad angepasst werden)
-- **Fortschritt**: Touch nach beiden Antworten ? nächste Frage
-
-### SPIELABLAUF
-1. Teams erhalten Fragen basierend auf ihren Schwierigkeitsgraden
-2. 4 Antwortmöglichkeiten (1 richtig, 3 falsch) in unterschiedlicher Reihenfolge
-3. Simultane Antwortphase
-4. Feedback mit Punkteverteilung
-5. Continue per Touch (anywhere auf Screen)
-6. Ergebnisscreen nach letzter Frage
-
-## GAME DESIGN - FOSSILIEN-STIRNRATEN
-
-### KERNMECHANIK
-- **Gameplay**: Heads-Up Style Ratespiel mit Handy an der Stirn
-- **Teams**: 2 Teams spielen abwechselnd (Team 1, dann Team 2) mit individuellen Schwierigkeitsgraden
-- **Rundendauer**: Konfigurierbar mit Zeit-Multiplikatoren pro Schwierigkeitsgrad
-- **Fossilien pro Runde**: Konfigurierbar (Standard: 3-5)
-
-### SCHWIERIGKEITSGRADE (NEU IMPLEMENTIERT)
-- **Kids**: Einfachere Begriffe, länger Zeit (1.5x Multiplikator)
-- **BigKids**: Mittlere Komplexität, etwas länger Zeit (1.2x Multiplikator)
-- **Adults**: Vollständige Komplexität, normale Zeit (1.0x Multiplikator)
-- **Content-Sets**: Separate Fossil-Arrays pro Schwierigkeitsgrad
-
-### STEUERUNG
-- **Accelerometer**: Handy nach vorne neigen = Richtig erraten
-- **Accelerometer**: Handy nach hinten neigen = Überspringen
-- **Touch-Fallback**: Links tippen = Überspringen, Rechts tippen = Richtig
-- **Platform-Detection**: Automatischer Wechsel zwischen Accelerometer und Touch
-- **Haptic Feedback**: Mobile Vibration für bessere UX
-
-### SPIELABLAUF
-1. Explanation Screen mit Regeln, Team-Bild und Schwierigkeitsgrad-Anzeige
-2. 3-2-1-! Countdown mit unterschiedlichen Sound-Effekten
-3. Ratephase mit angepasster Timer-Dauer basierend auf Schwierigkeitsgrad
-4. Team-Wechsel nach 1. Runde
-5. Ergebnisscreen mit Gewinner-Ermittlung
-
-### FEATURES
-- **Fossil-Recycling**: Übersprungene Fossilien kommen später wieder
-- **Timer-Warnung**: Audio-Countdown bei 3-2-1 Sekunden verbleibend
-- **Team-Images**: Visuelle Team-Darstellung statt Text
-- **Score-Tracking**: Einfache X/Y Anzeige während Spiel
-- **Adaptive Zeiten**: Schwierigkeitsgrad-basierte Rundendauer
-
-## AKTUELLE CODE-STRUKTUR
-
-### HAUPTKLASSEN - SCHWIERIGKEITSGRAD-SYSTEM (NEU IMPLEMENTIERT)
-
-**DifficultySystem.cs**
-- Enum DifficultyLevel (Kids, BigKids, Adults)
-- TeamSettings Klasse für persistente Team-Konfiguration
-- DifficultyTimeSettings für schwierigkeitsgrad-basierte Zeitmultiplikatoren
-- Integration in GameDataManager für persistente Speicherung
-
-**TeamSettingsManager.cs**
-- Zentrale UI-Logik für Team-Schwierigkeitsgrad-Auswahl
-- Mobile-optimierte UI mit Safe Area Support
-- Haptic Feedback für iOS/Android
-- Icon-basierte Team-Darstellung
-- Apply/Back Button-System (Reset entfernt)
-
-**DifficultyRadioGroup.cs**
-- Radio-Button-System mit Image-Swapping statt Farbwechsel
-- Checkbox-ähnliche Darstellung für bessere Mobile-UX
-- Individual Sprite-Support pro Button
-- Mobile Touch-Target-Optimierung
-- Haptic Feedback Integration
-
-### HAUPTKLASSEN - SPLIT-SCREEN QUIZ (ERWEITERT FÜR SCHWIERIGKEITSGRADE)
-
-**SplitScreenQuizManager.cs**
-- ERWEITERT: Lädt unterschiedliche Fragen pro Team basierend auf Schwierigkeitsgrad
-- ERWEITERT: LoadQuestionsForTeams() Methode für difficulty-basierte Content-Auswahl
-- Zentrale Spiellogik und UI-Management
-- Punkteberechnung basierend auf Antwortzeit
-- Feedback-System für beide Spieler mit anpassbaren Farben
-- Übergang zwischen Fragen und Ergebnisscreen
-- Integration mit GameDataManager für persistente Speicherung
-
-**TouchInputHandler.cs**  
-- Touch-Eingaben für beide Spielerbereiche
-- Continue-Funktionalität per Touch anywhere
-- Bereichserkennung für Player 1/2 Touch Areas
-
-**QuestionProgressIcons.cs**
-- Icon-basiertes Progress-System (ersetzt Text-Counter)
-- Horizontale Anzeige mit konfigurierbaren Farben
-- Auto-Create Funktionalität für Icons
-- Editor-anpassbare Farben für default/completed States
-
-### HAUPTKLASSEN - FOSSILIEN-STIRNRATEN (ERWEITERT FÜR SCHWIERIGKEITSGRADE)
-
-**FossilGameManager.cs**
-- ERWEITERT: Lädt Fossilien basierend auf Team-Schwierigkeitsgrad
-- ERWEITERT: Angepasste Rundendauer per GetAdjustedRoundDuration()
-- ERWEITERT: Schwierigkeitsgrad-Anzeige im Explanation Screen
-- Zentrale Spiellogik für Heads-Up Style Gameplay
-- Team-basiertes Spiel mit abwechselnden Runden
-- Timer-System mit Audio-Countdown in letzten Sekunden
-- Fossil-Recycling System für übersprungene Begriffe
-- Integration mit GameDataManager für Score-Persistence
-
-**FossilInputHandler.cs**
-- Accelerometer-Eingabe mit neuem Unity Input System
-- Touch-Fallback für Web/Testing
-- Platform-Detection und automatische Input-Methoden-Wahl
-- Tilt-Threshold konfigurierbar im Editor
-
-**FossilData.cs & FossilCollection.cs (ScriptableObject)**
-- ERWEITERT: Separate Arrays für Kids/BigKids/Adults Fossilien
-- ERWEITERT: GetFossilsForDifficulty() und GetRandomFossils(count, difficulty) Methoden
-- ERWEITERT: DifficultyTimeSettings Integration
-- ERWEITERT: Legacy-Support für bestehenden Code
-- Datenstruktur für Fossil-Begriffe und Bilder
-- Team-Images für visuelle Darstellung
-- Konfigurierbare Spieleinstellungen pro Collection
-- Shuffling-System für zufällige Fossil-Auswahl
-
-### SHARED SYSTEMS (MOBILE-OPTIMIERT)
-
-**GameDataManager.cs**
-- ERWEITERT: TeamSettings Speicherung und Verwaltung
-- ERWEITERT: SetTeamDifficulty() und GetTeamDifficulty() Methoden
-- ERWEITERT: Rückwärtskompatibilität für bestehende Saves
-- Plattformunabhängiges Speichersystem (PlayerPrefs-basiert)
-- Singleton-Pattern für globalen Zugriff
-- Speichert Raumergebnisse, Spielerfortschritt, Session-IDs, Team-Einstellungen
-- Backup-System und Error-Handling
-- Funktioniert auf Mobile, Web und Desktop
-
-**QuizRoomData.cs (ScriptableObject)**
-- ERWEITERT: Separate Question-Arrays für Kids/BigKids/Adults
-- ERWEITERT: GetQuestionsForDifficulty() Methode
-- ERWEITERT: DifficultyTimeSettings Integration
-- ERWEITERT: Validation-Methoden für alle Schwierigkeitsgrade
-- Raumspezifische Fragen und Metadaten
-- Modularer Aufbau für verschiedene Museumsräume
-- Einfache Content-Erweiterung
-
-**QuizQuestion.cs**
-- Fragendatenstruktur mit 4 Antworten
-- Automatisches Answer-Shuffling
-- Korrekte Antwort Index-Tracking
-
-**PlayerData.cs**
-- Spielerstate (Name, Score, hasAnswered, etc.)
-- Antwort-Tracking und Score-Management
-
-**SceneNavigator.cs (NEU)**
-- Navigation zwischen Szenen (Settings, MainMenu)
-- Audio-Integration für Navigations-Sounds
-- Fallback-System für Scene-Namen/Indizes
-
-### MOBILE-SPEZIFISCHE FEATURES (NEU IMPLEMENTIERT)
-
-**Mobile UI Optimizations**
-- Safe Area Support für iOS Notch/Android Cutouts
-- Touch-Target-Größen (mindestens 60 Unity Units)
-- Haptic Feedback für alle Interaktionen
-- Platform-Detection (iOS/Android)
-- Canvas Scaler Optimierungen für verschiedene Screen-Ratios
-
-**Input Optimizations**
-- Accelerometer-basierte Steuerung für Mobile
-- Touch-Fallback-Systeme
-- Vibration/Haptic Feedback Integration
-
-## AKTUELLER PROJEKTSTATUS
-
-### ? VOLLSTÄNDIG IMPLEMENTIERT UND FUNKTIONSFÄHIG
-
-#### Schwierigkeitsgrad-System (NEU)
-- Drei Schwierigkeitsgrade (Kids, BigKids, Adults)
-- Individuelle Team-Konfiguration mit persistenter Speicherung
-- Settings-UI mit Radio-Button-System und Image-Swapping
-- Difficulty-basierte Content-Auswahl für Quiz und Fossilien
-- Zeit-Multiplikatoren für verschiedene Schwierigkeitsgrade
-- Mobile-optimierte UI mit Haptic Feedback
-
-#### Split-Screen Quiz (ERWEITERT)
-- Difficulty-basierte Fragen pro Team
-- Split-Screen Quiz-Mechanik
-- Touch-Input System mit fullscreen continue
-- Punkteberechnung (Zeit-basiert)
-- UI-Layout und -Management mit anpassbaren Farben
-- ScriptableObject-basierte Content-Struktur
-- Icon-basiertes Progress-System
-- Feedback-System mit Editor-konfigurierbaren Farben
-
-#### Fossilien-Stirnraten (ERWEITERT)
-- Difficulty-basierte Fossil-Sets pro Team
-- Adaptive Rundendauer basierend auf Schwierigkeitsgrad
-- Heads-Up Style Gameplay mit Accelerometer-Steuerung
-- Team-basiertes Spielsystem mit Rundenwechsel
-- Timer-System mit Audio-Countdown
-- Fossil-Recycling für übersprungene Begriffe
-- Touch-Fallback für Testing
-- Team-Image System statt Text-Labels
-
-#### Shared Systems (MOBILE-OPTIMIERT)
-- Plattformunabhängiges Save-System für Spielerfortschritt und Team-Settings
-- Modular structure für verschiedene Räume
-- Mobile-kompatible Input-Systeme
-- Safe Area Support und Touch-Target-Optimierung
-- Haptic Feedback Integration
-
-### ?? NÄCHSTE ENTWICKLUNGSSCHRITTE (GEPLANT)
-
-#### Übersetzungssystem (NÄCHSTE PRIORITÄT)
-- **Sprachen**: Deutsch (Standard), Englisch, Leichte Sprache Deutsch, Leichte Sprache Englisch
-- **Erweiterbarkeit**: System soll leicht um weitere Sprachen erweiterbar sein
-- **Fallback-System**: Automatische Fallbacks (Englisch ? Deutsch, Leichte Sprache ? Standard)
-- **Implementierung**: Unity Localization Package vs. eigenes ScriptableObject-System evaluieren
-- **Integration**: In bestehende UI-Systeme und Content-ScriptableObjects
-
-#### Content-Integration
-- Echte Museumsfragen und -fossilien integrieren
-- Content-Validierung für alle Schwierigkeitsgrade
-- Qualitätssicherung für verschiedene Sprachniveaus
-
-#### Weitere Entwicklung
-- Integration in größeres Führungssystem
-- Weitere Minispiel-Prototypen
-- Cloud-Save Erweiterung (Firebase/PlayFab)
-- Performance-Optimierung für mobile Geräte
-- UI-Polishing und Animation-System
-
-### ?? PROJEKTSTRUKTUR (AKTUALISIERT)
-Assets/_GAME/
-??? Scripts/
-?   ??? UI/
-?   ?   ??? TouchInputHandler.cs
-?   ?   ??? QuestionProgressIcons.cs
-?   ?   ??? FossilInputHandler.cs
-?   ?   ??? TeamSettingsManager.cs (NEU)
-?   ?   ??? DifficultyRadioGroup.cs (NEU)
-?   ?   ??? SceneNavigator.cs (NEU)
-?   ?   ??? FullscreenManager.cs (DEPRECATED für Mobile)
-?   ?   ??? UniversalFullscreenButton.cs (DEPRECATED für Mobile)
-?   ??? Game/
-?   ?   ??? SplitScreenQuizManager.cs (ERWEITERT)
-?   ?   ??? FossilGameManager.cs (ERWEITERT)
-?   ?   ??? PlayerData.cs
-?   ?   ??? LoadScene.cs
-?   ??? Data/
-?   ?   ??? GameDataManager.cs (ERWEITERT)
-?   ?   ??? QuizRoomData.cs (ERWEITERT)
-?   ?   ??? QuizQuestion.cs
-?   ?   ??? FossilData.cs
-?   ?   ??? FossilCollection.cs (ERWEITERT)
-?   ?   ??? DifficultySystem.cs (NEU)
-?   ??? Notes/
-?       ??? Notes.md
-??? Plugins/
-    ??? FullscreenWebGL.jslib (DEPRECATED für Mobile)
-
-### ?? DEVELOPMENT NOTES
-
-#### Mobile-First Approach (NEU)
-- **Plattform**: iOS/Android primär, WebGL-Features entfernt
-- **UI**: Safe Area Support, Touch-Target-Optimierung
-- **Input**: Accelerometer + Touch-Fallbacks, Haptic Feedback
-- **Performance**: Mobile-optimierte Rendering und Memory-Management
-
-#### Schwierigkeitsgrad-System (NEU)
-- **Modularity**: Jeder Schwierigkeitsgrad hat eigene Content-Sets
-- **Persistence**: Team-Settings bleiben über gesamte Führung erhalten
-- **Flexibility**: Zeit-Multiplikatoren und Content-Anpassungen pro Level
-- **Extensibility**: Einfache Erweiterung um weitere Schwierigkeitsgrade
-
-#### Content Management
-- **ScriptableObjects**: Für einfache Content-Erstellung mit Difficulty-Support
-- **Validation**: Automatische Prüfung ob Content für alle Schwierigkeitsgrade vorhanden
-- **Skalierbarkeit**: System designed für 6 verschiedene Räume
-- **Lokalisierung**: Vorbereitet für Multi-Language-Support
-
-#### Technical Architecture
-- **Input Systems**: Neues Unity Input System + Mobile-Optimierungen
-- **Save System**: Plattformunabhängig mit Backup-Funktionalität und Team-Settings
-- **Error-Handling**: Try-Catch mit Debug-Logging
-- **Platform-Support**: Mobile-First mit Cross-Platform-Kompatibilität
-
-## WICHTIGE IMPLEMENTIERUNGSDETAILS
-
-### SCHWIERIGKEITSGRAD-SYSTEM DETAILS (NEU)
-- **Team-Settings**: Persistent über GameDataManager gespeichert
-- **Content-Loading**: Difficulty-basierte GetQuestionsForDifficulty() / GetFossilsForDifficulty()
-- **UI-System**: Image-Swapping Radio-Buttons für bessere Mobile-UX
-- **Zeit-System**: Multiplikatoren für angepasste Rundendauer
-- **Fallback**: Legacy-Support für bestehende Content-ScriptableObjects
-
-### MOBILE-OPTIMIERUNG DETAILS (NEU)
-- **Safe Area**: Automatische Anpassung an iOS Notch und Android Cutouts
-- **Touch-Targets**: Mindestgröße 60 Unity Units für optimale Bedienbarkeit
-- **Haptic Feedback**: Vibration bei allen wichtigen Interaktionen
-- **Platform-Detection**: Automatische Anpassung iOS vs Android Features
-
-### SPLIT-SCREEN QUIZ DETAILS (ERWEITERT)
-- **Multi-Difficulty**: Teams können unterschiedliche Fragen basierend auf Schwierigkeitsgrad erhalten
-- **Anti-Schummel**: Shuffled answers per QuizQuestion.GetShuffledAnswers()
-- **Timing-System**: Time.time basierte Punkteverteilung
-- **UI-Management**: Disabled-Color System für saubere Button-States
-- **Continue-System**: Touch-anywhere nach Feedback-Phase
-
-### FOSSILIEN-STIRNRATEN DETAILS (ERWEITERT)
-- **Adaptive Zeiten**: GetAdjustedRoundDuration() basierend auf Team-Schwierigkeitsgrad
-- **Content-Sets**: Separate Fossil-Arrays pro Schwierigkeitsgrad
-- **Input-System**: Accelerometer mit Touch-Fallback
-- **Fossil-Management**: Correct = Remove, Skip = Move to End
-- **Timer-Audio**: Countdown-Sounds bei 3-2-1 Sekunden
-- **Team-System**: Image-basierte Darstellung mit ScriptableObject-Config
-
-### SHARED SYSTEM DETAILS (ERWEITERT)
-- **Save-System**: PlayerPrefs + JSON + Backup-Mechanismus + TeamSettings
-- **Mobile-Support**: Platform-Detection und Mobile-spezifische Features
-- **Error-Handling**: Try-Catch mit Debug-Logging
-- **Platform-Support**: Mobile-First mit Cross-Platform-Kompatibilität
-
-### AUDIO-SYSTEM
-- **Split-Screen Quiz**: Continue-Sounds, Feedback-Audio
-- **Fossilien-Stirnraten**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback
-- **Settings-UI**: Button-Click-Sounds, Applied-Feedback-Sounds
-- **Universal**: AudioSource-basiert mit optional AudioClip assignments
-
----
-
-**LETZTER STATUS**: Vollständiges Schwierigkeitsgrad-System implementiert mit Mobile-Optimierungen. Beide Minispiele (Split-Screen Quiz + Fossilien-Stirnraten) unterstützen jetzt individuelle Team-Schwierigkeitsgrade mit persistenter Speicherung. Settings-UI mit Radio-Button-System und Image-Swapping für optimale Mobile-UX erstellt. Nächster Schritt: Multi-Language-System für Deutsch/Englisch und jeweils leichte Sprache.# PROJECT NOTES FÜR GITHUB COPILOT
-## WICHTIGE HINWEISE FÜR ZUKÜNFTIGE CHAT-SESSIONS
-
-**ZWECK DIESER DATEI**: Diese Notizen dienen als Kontext für GitHub Copilot in neuen Chat-Sessions, um nahtlos am Projekt weiterarbeiten zu können ohne Zugriff auf vorherige Chat-Historie.
-
-**FORMATIERUNG**: In dieser Datei KEINE dreifachen Anführungszeichen oder Backticks verwenden - diese beenden den Code-Output im Chat und verhindern direktes Kopieren in Dokumente.
-
----
-
-# MUSEUM QUIZ APP - PROJEKTÜBERSICHT
-
-## PROJEKTBESCHREIBUNG
-- **Ziel**: Mobile Quiz-App für Museum mit Split-Screen Multiplayer
-- **Plattform**: Unity 6.2, Mobile iOS/Android (Portrait-Modus) - UMSTELLUNG AUF MOBILE ERFOLGT
-- **Zielgruppe**: Museumsbesucher, 2 Teams/Spieler pro Handy mit konfigurierbaren Schwierigkeitsgraden
-- **Kontext**: Teil einer virtuellen Führung durch 6 Museumsräume
-
-## TECHNISCHE DETAILS
-- **Unity Version**: 6.2
-- **Input System**: Neues Unity Input System
-- **UI System**: Neues Unity UI System für verschiedene Screen-Ratios + Mobile-Optimierungen
-- **C# Version**: 9.0
-- **Target Framework**: .NET Framework 4.7.1
-- **Platform**: iOS/Android (WebGL-Features entfernt)
-
-## GAME DESIGN - SPLIT-SCREEN QUIZ
-
-### KERNMECHANIK
-- **Layout**: Portrait-Modus, vertikal gespiegelt
-- **Spieler**: 2 Teams an einem Gerät mit individuellen Schwierigkeitsgraden
-- **UI-Aufteilung**: Jeder Spieler hat eine Bildschirmhälfte, andere Hälfte steht kopf
-- **Anti-Schummel**: Unterschiedliche Fragen pro Team basierend auf Schwierigkeitsgrad + zufällig angeordnete Antworten
-
 ### SCHWIERIGKEITSGRADE (IMPLEMENTIERT)
 - **Kids**: Einfachere Sprache, weniger komplexe Fragen
 - **BigKids**: Mittlere Komplexität
@@ -462,7 +90,7 @@ Assets/_GAME/
 
 ## AKTUELLE CODE-STRUKTUR
 
-### HAUPTKLASSEN - MEHRSPRACHIGKEITSSYSTEM (NEU IMPLEMENTIERT)
+### HAUPTKLASSEN - MEHRSPRACHIGKEITSSYSTEM (IMPLEMENTIERT)
 
 **LanguageSystem.cs**
 - Enum Language (German_Standard, English_Standard, German_Simple, English_Simple)
@@ -491,13 +119,15 @@ Assets/_GAME/
 - Mobile Touch-Target-Optimierung
 - Haptic Feedback Integration
 - Event-System für Auswahl-Changes
+- Debug-Methoden für Testing
 
 **LanguageSettingsManager.cs**
-- Vollständige UI für Spracheinstellungen
+- VEREINFACHT: Nur noch LanguageRadioGroup + Back Button
+- ENTFERNT: Apply Button, Current Language Display, Language Icons, Audio-Dopplung
+- Sofortige Sprachwechsel beim Radio-Button-Click
 - Lokalisierte UI-Texte mit Live-Updates
 - Mobile-optimierte Safe Area Unterstützung
 - Integration mit GameDataManager für persistente Speicherung
-- Apply/Back Button-System mit Audio-Feedback
 
 ### HAUPTKLASSEN - SCHWIERIGKEITSGRAD-SYSTEM (IMPLEMENTIERT)
 
@@ -548,15 +178,23 @@ Assets/_GAME/
 - Auto-Create Funktionalität für Icons
 - Editor-anpassbare Farben für default/completed States
 
-### HAUPTKLASSEN - FOSSILIEN-STIRNRATEN (ERWEITERT FÜR LOKALISIERUNG)
+### HAUPTKLASSEN - FOSSILIEN-STIRNRATEN (VOLLSTÄNDIG LOKALISIERT)
 
 **FossilGameManager.cs**
-- ERWEITERT: Vollständige Lokalisierung aller Explanation-Texte
-- ERWEITERT: Verwendet LocalizedText Assets für alle UI-Texte
-- ERWEITERT: GetLocalizedText() Helper-Methode mit Fallback-System
-- ERWEITERT: OnLanguageChanged Event-Handler für Live-Updates
-- ERWEITERT: Fallback-Texte für alle Sprachen und Schwierigkeitsgrade
-- ERWEITERT: UpdateGameplayUI() und UpdateResultsUI() für Language-Updates
+- ERWEITERT: Vollständige Lokalisierung ALLER UI-Texte (keine hardcodierten Strings mehr)
+- ERWEITERT: Neue LocalizedText-Variablen für Anweisungen und Input-Modi
+  - holdPhoneInstructionLocalizedText
+  - teamExplainsInstructionLocalizedText
+  - tiltModeLocalizedText
+  - touchModeLocalizedText
+- ERWEITERT: GetLocalizedInputModeInfo() für dynamische Input-Mode-Texte
+- ERWEITERT: IsUsingAccelerometer() Integration für korrekte Input-Mode-Anzeige
+- ERWEITERT: Fallback-Funktionen für alle neuen lokalisierten Texte
+- ENTFERNT: Hardcodierte GetLocalizedHoldPhoneText() und GetLocalizedTeamExplainsText()
+- Verwendet LocalizedText Assets für alle UI-Texte
+- GetLocalizedText() Helper-Methode mit Fallback-System
+- OnLanguageChanged Event-Handler für Live-Updates
+- UpdateGameplayUI() und UpdateResultsUI() für Language-Updates
 - Lädt Fossilien basierend auf Team-Schwierigkeitsgrad
 - Angepasste Rundendauer per GetAdjustedRoundDuration()
 - Schwierigkeitsgrad-Anzeige im Explanation Screen
@@ -571,6 +209,7 @@ Assets/_GAME/
 - Touch-Fallback für Web/Testing
 - Platform-Detection und automatische Input-Methoden-Wahl
 - Tilt-Threshold konfigurierbar im Editor
+- IsUsingAccelerometer() Methode für externe Abfragen
 
 **FossilData.cs & FossilCollection.cs (ScriptableObject)**
 - ERWEITERT: Lokalisierung für Fossil-Namen und Beschreibungen
@@ -653,13 +292,13 @@ Assets/_GAME/
 
 ### ? VOLLSTÄNDIG IMPLEMENTIERT UND FUNKTIONSFÄHIG
 
-#### Mehrsprachigkeitssystem (NEU IMPLEMENTIERT)
+#### Mehrsprachigkeitssystem (IMPLEMENTIERT + POLISHED)
 - **Vier Sprachen**: Deutsch Standard, Englisch Standard, Deutsch Einfach, Englisch Einfach
 - **Custom ScriptableObject System**: Optimiert für Unity-Workflow
 - **Fallback-Hierarchie**: Automatische Fallbacks bei fehlenden Übersetzungen
-- **Game-Manager Integration**: Beide Hauptspiele vollständig lokalisiert
+- **Game-Manager Integration**: Beide Hauptspiele vollständig lokalisiert (KEINE hardcodierten Strings mehr)
 - **Live Language-Switching**: UI aktualisiert sich automatisch bei Sprachwechsel
-- **Mobile-optimierte Settings-UI**: Radio-Button-System mit Haptic Feedback
+- **Mobile-optimierte Settings-UI**: Vereinfachtes Radio-Button-System mit sofortigem Sprachwechsel
 - **Performance-optimiert**: Sprach-Caching und Event-basierte Updates
 - **Erweiterbar**: Einfache Integration weiterer Sprachen möglich
 - **Legacy-Support**: Bestehende Inhalte funktionieren weiterhin
@@ -686,11 +325,13 @@ Assets/_GAME/
 - Icon-basiertes Progress-System
 - Feedback-System mit Editor-konfigurierbaren Farben
 
-#### Fossilien-Stirnraten (ERWEITERT + LOKALISIERT)
-- **Vollständige Lokalisierung**: Explanation-Screen, alle UI-Texte, Ergebnisse
+#### Fossilien-Stirnraten (VOLLSTÄNDIG LOKALISIERT)
+- **100% Lokalisierung**: ALLE UI-Texte über LocalizedText Assets
+- **Keine hardcodierten Strings mehr**: Explanation-Screen, Input-Modi, Anweisungen
 - **Lokalisierte Fossilien**: Fossil-Namen in gewählter Sprache
 - **Adaptive Schwierigkeitsgrad-Anzeige**: Angepasst an gewählte Sprache
 - **Live Language-Updates**: UI aktualisiert sich automatisch
+- **Dynamische Input-Mode-Texte**: Zeigt korrekte Steuerung basierend auf Platform
 - Difficulty-basierte Fossil-Sets pro Team
 - Adaptive Rundendauer basierend auf Schwierigkeitsgrad
 - Heads-Up Style Gameplay mit Accelerometer-Steuerung
@@ -712,7 +353,11 @@ Assets/_GAME/
 ### ?? NÄCHSTE ENTWICKLUNGSSCHRITTE (GEPLANT)
 
 #### Content-Erstellung (NÄCHSTE PRIORITÄT)
-- **LocalizedText Assets erstellen**: Für alle Standard-UI-Texte
+- **LocalizedText Assets erstellen**: Für FossilGameManager (4 neue Assets benötigt)
+  - HoldPhoneInstruction
+  - TeamExplainsInstruction
+  - TiltModeInstruction
+  - TouchModeInstruction
 - **Beispiel-Content**: Quiz-Fragen und Fossilien in allen 4 Sprachen
 - **Content-Validation**: Prüfung der Übersetzungsqualität
 - **Editor-Workflow**: Optimierung für Content-Creators
@@ -736,12 +381,12 @@ Assets/_GAME/
 ?   ?   ??? SceneNavigator.cs
 ?   ?   ??? LocalizedTextComponent.cs (NEU)
 ?   ?   ??? LanguageRadioGroup.cs (NEU)
-?   ?   ??? LanguageSettingsManager.cs (NEU)
+?   ?   ??? LanguageSettingsManager.cs (NEU - VEREINFACHT)
 ?   ?   ??? FullscreenManager.cs (DEPRECATED für Mobile)
 ?   ?   ??? UniversalFullscreenButton.cs (DEPRECATED für Mobile)
 ?   ??? Game/
 ?   ?   ??? SplitScreenQuizManager.cs (ERWEITERT + LOKALISIERT)
-?   ?   ??? FossilGameManager.cs (ERWEITERT + LOKALISIERT)
+?   ?   ??? FossilGameManager.cs (VOLLSTÄNDIG LOKALISIERT)
 ?   ?   ??? PlayerData.cs
 ?   ?   ??? LoadScene.cs
 ?   ??? Data/
@@ -758,9 +403,9 @@ Assets/_GAME/
 ??? Plugins/
     ??? FullscreenWebGL.jslib (DEPRECATED für Mobile)
 
-### ??? DEVELOPMENT NOTES
+### ?? DEVELOPMENT NOTES
 
-#### Mehrsprachigkeitssystem (NEU)
+#### Mehrsprachigkeitssystem (IMPLEMENTIERT + POLISHED)
 - **Architektur**: Custom ScriptableObject-System statt Unity Localization Package
 - **Performance**: Sprach-Caching und Event-basierte Updates minimieren Overhead
 - **Fallback-Hierarchie**: 
@@ -768,6 +413,8 @@ Assets/_GAME/
   2. Englisch ? Deutsch
   3. Alle ? Deutsch Standard
 - **Mobile-First**: Touch-optimierte Settings-UI mit Haptic Feedback
+- **UI-Vereinfachung**: LanguageSettingsManager stark vereinfacht (Apply Button entfernt)
+- **Sofortige Sprachwechsel**: Radio-Button-Click triggert direkt GameDataManager.SetLanguage()
 - **Extensibility**: Neue Sprachen durch Language-Enum-Erweiterung
 - **.NET Framework 4.7.1 Kompatibilität**: System.Enum.GetValues(typeof()) statt generischer Variante
 
@@ -789,6 +436,7 @@ Assets/_GAME/
 - **Skalierbarkeit**: System designed für 6 verschiedene Räume
 - **Lokalisierung**: Vollständig implementiert mit Fallback-System
 - **Legacy-Support**: Bestehende Inhalte ohne Lokalisierung funktionieren weiterhin
+- **Keine Hardcoding**: FossilGameManager vollständig auf LocalizedText Assets umgestellt
 
 #### Technical Architecture (ERWEITERT)
 - **Localization System**: Event-basiert mit automatischer UI-Aktualisierung
@@ -799,7 +447,7 @@ Assets/_GAME/
 
 ## WICHTIGE IMPLEMENTIERUNGSDETAILS
 
-### MEHRSPRACHIGKEITSSYSTEM DETAILS (NEU IMPLEMENTIERT)
+### MEHRSPRACHIGKEITSSYSTEM DETAILS (IMPLEMENTIERT + POLISHED)
 
 #### Fallback-Hierarchie
 1. **Erste Stufe**: Leichte Sprache ? Standard-Variante (German_Simple ? German_Standard)
@@ -820,6 +468,12 @@ Assets/_GAME/
 - **Rückwärtskompatibilität**: Bestehende Inhalte funktionieren ohne Änderungen
 - **Obsolete-Markierungen**: Sanfte Migration zu neuen lokalisierten Methoden
 - **Fallback-Texte**: Hardcodierte Fallbacks für alle Sprachen als Backup
+
+#### LanguageSettingsManager Vereinfachung (NEU)
+- **Entfernt**: Apply Button, Current Language Display, Language Icons, Audio-Dopplung
+- **Beibehalten**: LanguageRadioGroup, Back Button, Safe Area Support
+- **Verbessert**: Sofortige Sprachwechsel ohne Apply-Step
+- **Reduziert**: Von ~250 auf ~140 Zeilen Code
 
 ### SCHWIERIGKEITSGRAD-SYSTEM DETAILS (IMPLEMENTIERT)
 - **Team-Settings**: Persistent über GameDataManager gespeichert
@@ -844,7 +498,15 @@ Assets/_GAME/
 - **UI-Management**: Disabled-Color System für saubere Button-States
 - **Continue-System**: Touch-anywhere nach Feedback-Phase
 
-### FOSSILIEN-STIRNRATEN DETAILS (ERWEITERT + LOKALISIERT)
+### FOSSILIEN-STIRNRATEN DETAILS (VOLLSTÄNDIG LOKALISIERT)
+- **100% LocalizedText Assets**: ALLE UI-Texte über ScriptableObjects
+- **Neue LocalizedText-Variablen** (benötigt Assets-Erstellung):
+  - holdPhoneInstructionLocalizedText: "Halte das Handy an deine Stirn" etc.
+  - teamExplainsInstructionLocalizedText: "Dein Team erklärt dir das Fossil" etc.
+  - tiltModeLocalizedText: "Neige-Modus - Neige das Handy..." etc.
+  - touchModeLocalizedText: "Touch-Modus - Tippe links..." etc.
+- **Dynamische Input-Mode-Texte**: GetLocalizedInputModeInfo() prüft IsUsingAccelerometer()
+- **Entfernte Hardcoding**: GetLocalizedHoldPhoneText() und GetLocalizedTeamExplainsText() gelöscht
 - **Multi-Language Explanation**: Vollständig lokalisierter Explanation-Screen
 - **Lokalisierte Fossilien**: Fossil-Namen in gewählter Sprache
 - **Adaptive Difficulty-Display**: Schwierigkeitsgrade in passender Sprache angezeigt
@@ -867,11 +529,59 @@ Assets/_GAME/
 ### AUDIO-SYSTEM
 - **Split-Screen Quiz**: Continue-Sounds, Feedback-Audio
 - **Fossilien-Stirnraten**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback
-- **Settings-UI**: Button-Click-Sounds, Applied-Feedback-Sounds, Language-Change-Sounds
+- **Settings-UI**: Button-Click-Sounds entfernt (Dopplung mit LanguageRadioGroup)
 - **Universal**: AudioSource-basiert mit optional AudioClip assignments
 
 ---
 
-**AKTUELLER STATUS**: Vollständiges Mehrsprachigkeitssystem implementiert und funktionsfähig. Beide Hauptspiele (Split-Screen Quiz + Fossilien-Stirnraten) sind vollständig lokalisiert mit Live Language-Switching. Custom ScriptableObject-System mit Fallback-Hierarchie optimiert für Unity-Workflow. GameDataManager erweitert um Sprach-Persistierung. Alle UI-Komponenten mobile-optimiert mit Haptic Feedback. System bereit für Content-Erstellung mit LocalizedText Assets. .NET Framework 4.7.1 Kompatibilität sichergestellt.
+## CHANGELOG - SESSION VOM 14. OKTOBER 2025
 
-**NÄCHSTER SCHRITT**: LocalizedText Assets für Standard-UI-Texte erstellen und Beispiel-Content in allen 4 Sprachen entwickeln (Deutsch Standard, Englisch Standard, Deutsch Einfach, Englisch Einfach).
+### UI-VEREINFACHUNGEN
+- **LanguageSettingsManager stark vereinfacht**:
+  - Apply Button entfernt (sofortige Sprachwechsel)
+  - Current Language Display entfernt (visuelles Feedback durch RadioButton)
+  - Language Icons entfernt (nicht benötigt)
+  - Audio-System entfernt (Dopplung mit LanguageRadioGroup)
+  - Code-Reduktion: ~250 Zeilen ? ~140 Zeilen
+
+### FOSSILIEN-STIRNRATEN VOLLSTÄNDIGE LOKALISIERT
+- **Alle hardcodierten Strings entfernt**:
+  - Input-Mode-Texte (Tilt/Touch) jetzt über LocalizedText
+  - Anweisungs-Texte (Hold Phone, Team Explains) jetzt über LocalizedText
+  - GetLocalizedInputModeInfo() für dynamische Input-Mode-Anzeige
+  - Fallback-Funktionen für alle neuen Texte hinzugefügt
+
+- **Neue LocalizedText-Variablen in FossilGameManager**:
+  - holdPhoneInstructionLocalizedText
+  - teamExplainsInstructionLocalizedText
+  - tiltModeLocalizedText
+  - touchModeLocalizedText
+
+- **Content-Erstellung benötigt** (4 neue LocalizedText Assets):
+  1. HoldPhoneInstruction (DE/EN Standard/Simple)
+  2. TeamExplainsInstruction (DE/EN Standard/Simple)
+  3. TiltModeInstruction (DE/EN Standard/Simple)
+  4. TouchModeInstruction (DE/EN Standard/Simple)
+
+### BUG-FIXES & OPTIMIERUNGEN
+- **LanguageRadioGroup Debug-Logging**:
+  - Awake() ? Start() für bessere Initialisierung
+  - ValidateButtonReferences() für Fehlerprüfung
+  - Debug-Methoden hinzugefügt (TestButtonInteraction, DebugButtonSetup)
+  - Event-Subscriber-Check für OnLanguageChanged
+
+- **UnityEngine.EventSystems Import**:
+  - Fehlende using-Direktive für EventSystem und GraphicRaycaster hinzugefügt
+
+### DOKUMENTATION
+- **LocalizedTextComponent Setup-Anleitung** erstellt:
+  - Step-by-Step Guide für Text-Lokalisierung in Szenen
+  - Erklärung Auto-Detection für Text/TextMeshPro
+  - Context-Menu-Funktionen dokumentiert
+
+---
+
+## WICHTIGE HINWEISE FÜR ZUKÜNFTIGE ENTWICKLUNGSSCHRITTE
+- **KEINE neuen großen Features** ohne vorherige Absprache!
+- **Kleinere Änderungen** und **Content-Erstellung** können gerne eigenständig erfolgen.
+- Bei Unsicherheiten oder Fragen immer zuerst im Team absprechen.
