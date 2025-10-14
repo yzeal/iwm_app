@@ -9,31 +9,31 @@ public class FossilGameManager : MonoBehaviour
 {
     [Header("Game Data")]
     public FossilCollection fossilCollection;
-    
+
     [Header("UI References")]
     public GameObject explanationUI;
     public GameObject countdownUI;
     public GameObject gameplayUI;
     public GameObject resultUI;
-    
+
     [Header("Explanation Screen")]
     public TextMeshProUGUI explanationText;
     public Image currentTeamImageExplanation;
     public Button startButton;
-    
+
     [Header("Countdown")]
     public TextMeshProUGUI countdownText;
-    
+
     [Header("Gameplay UI")]
     public Image fossilImage;
     public TextMeshProUGUI fossilNameText;
     public TextMeshProUGUI timerText;
     public Image currentTeamImage;
     public TextMeshProUGUI scoreText;
-    
+
     [Header("Input")]
     public FossilInputHandler fossilInputHandler;
-    
+
     [Header("Result Screen")]
     public Image team1ImageResult;
     public TextMeshProUGUI team1ScoreText;
@@ -43,7 +43,7 @@ public class FossilGameManager : MonoBehaviour
     public TextMeshProUGUI winnerText;
     public Button playAgainButton;
     public Button backToMenuButton;
-    
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip correctSound;
@@ -51,8 +51,8 @@ public class FossilGameManager : MonoBehaviour
     public AudioClip timeUpSound;
     public AudioClip countdownSound;
     public AudioClip countdownStartSound;
-    
-    [Header("Localized Texts (NEU)")]
+
+    [Header("Localized Texts")]
     [SerializeField] private LocalizedText gameTitleLocalizedText;
     [SerializeField] private LocalizedText howToPlayLocalizedText;
     [SerializeField] private LocalizedText controlsLocalizedText;
@@ -64,7 +64,15 @@ public class FossilGameManager : MonoBehaviour
     [SerializeField] private LocalizedText pointsLocalizedText;
     [SerializeField] private LocalizedText winnerLocalizedText;
     [SerializeField] private LocalizedText tieLocalizedText;
-    
+
+    [Header("Localized Instructions (NEU)")]
+    [SerializeField] private LocalizedText holdPhoneInstructionLocalizedText;
+    [SerializeField] private LocalizedText teamExplainsInstructionLocalizedText;
+
+    [Header("Localized Input Mode Texts (NEU)")]
+    [SerializeField] private LocalizedText tiltModeLocalizedText;
+    [SerializeField] private LocalizedText touchModeLocalizedText;
+
     // Game State
     private List<FossilData> currentRoundFossils;
     private int currentFossilIndex = 0;
@@ -74,56 +82,56 @@ public class FossilGameManager : MonoBehaviour
     private int team1Score = 0;
     private int team2Score = 0;
     private int correctFossilsThisRound = 0;
-    
+
     // Timer-Countdown Sounds
     private bool hasPlayedThreeSecondWarning = false;
     private bool hasPlayedTwoSecondWarning = false;
     private bool hasPlayedOneSecondWarning = false;
-    
-    // NEU: Aktuelle Sprache für Performance
+
+    // Aktuelle Sprache für Performance
     private Language currentLanguage = Language.German_Standard;
-    
+
     void Start()
     {
         InitializeLocalization();
         InitializeGame();
-        
+
         // Event-Listener für Sprachwechsel
         LanguageSystem.OnLanguageChanged += OnLanguageChanged;
     }
-    
+
     void OnDestroy()
     {
         LanguageSystem.OnLanguageChanged -= OnLanguageChanged;
     }
-    
+
     void InitializeLocalization()
     {
-        currentLanguage = LanguageSystem.Instance != null ? 
+        currentLanguage = LanguageSystem.Instance != null ?
             LanguageSystem.Instance.GetCurrentLanguage() : Language.German_Standard;
     }
-    
+
     void OnLanguageChanged(Language newLanguage)
     {
         currentLanguage = newLanguage;
-        
+
         // Aktualisiere UI-Texte basierend auf aktuellem Zustand
         if (explanationUI.activeInHierarchy)
         {
             ShowExplanation();
         }
-        
+
         if (gameplayUI.activeInHierarchy)
         {
             UpdateGameplayUI();
         }
-        
+
         if (resultUI.activeInHierarchy)
         {
             UpdateResultsUI();
         }
     }
-    
+
     void InitializeGame()
     {
         if (fossilCollection == null)
@@ -131,63 +139,64 @@ public class FossilGameManager : MonoBehaviour
             Debug.LogError("No fossil collection assigned!");
             return;
         }
-        
+
         if (!fossilCollection.HasFossilsForAllDifficulties())
         {
             Debug.LogWarning("Not all difficulty levels have fossils assigned!");
         }
-        
+
         if (fossilCollection.team1Image == null || fossilCollection.team2Image == null)
         {
             Debug.LogWarning("Team images not assigned in FossilCollection!");
         }
-        
+
         SetupUI();
         ShowExplanation();
     }
-    
+
     void SetupUI()
     {
         startButton.onClick.AddListener(StartCountdown);
         playAgainButton.onClick.AddListener(RestartGame);
         backToMenuButton.onClick.AddListener(BackToMenu);
-        
+
         SetupInputHandlers();
         SetupTeamImages();
-        
+
         explanationUI.SetActive(true);
         countdownUI.SetActive(false);
         gameplayUI.SetActive(false);
         resultUI.SetActive(false);
     }
-    
+
     void SetupTeamImages()
     {
         if (team1ImageResult && fossilCollection.team1Image)
             team1ImageResult.sprite = fossilCollection.team1Image;
-            
+
         if (team2ImageResult && fossilCollection.team2Image)
             team2ImageResult.sprite = fossilCollection.team2Image;
     }
-    
+
     void SetupInputHandlers()
     {
         fossilInputHandler.OnCorrectInput += OnCorrectFossil;
         fossilInputHandler.OnSkipInput += OnSkipFossil;
     }
-    
+
     void ShowExplanation()
     {
-        string inputInfo = fossilInputHandler.GetInputModeInfo();
-        
+        // NEU: Lokalisierte Input-Mode Info
+        string inputInfo = GetLocalizedInputModeInfo();
+
         DifficultyLevel currentTeamDifficulty = DifficultyLevel.Adults;
         if (GameDataManager.Instance != null)
         {
             currentTeamDifficulty = GameDataManager.Instance.GetTeamDifficulty(currentTeam - 1);
         }
-        
+
         float adjustedDuration = fossilCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
-        
+
         // Lokalisierte Texte verwenden
         string gameTitle = GetLocalizedText(gameTitleLocalizedText, GetDefaultGameTitle);
         string howToPlay = GetLocalizedText(howToPlayLocalizedText, GetDefaultHowToPlay);
@@ -197,48 +206,47 @@ public class FossilGameManager : MonoBehaviour
         string difficulty = GetLocalizedText(difficultyLocalizedText, GetDefaultDifficulty);
         string thisTeamPlaying = GetLocalizedText(thisTeamPlayingLocalizedText, GetDefaultThisTeamPlaying);
         string seconds = GetLocalizedText(secondsLocalizedText, GetDefaultSeconds);
-        
+
+        // NEU: Lokalisierte Anweisungen
+        string holdPhoneInstruction = GetLocalizedText(holdPhoneInstructionLocalizedText, GetDefaultHoldPhoneInstruction);
+        string teamExplainsInstruction = GetLocalizedText(teamExplainsInstructionLocalizedText, GetDefaultTeamExplainsInstruction);
+
         explanationText.text = $"<b>{gameTitle}</b>\n\n" +
                               $"<b>{howToPlay}:</b>\n" +
-                              $"• {GetLocalizedHoldPhoneText()}\n" +
-                              $"• {GetLocalizedTeamExplainsText()}\n\n" +
+                              $"• {holdPhoneInstruction}\n" +
+                              $"• {teamExplainsInstruction}\n\n" +
                               $"<b>{controls}:</b>\n" +
                               $"{inputInfo}\n\n" +
                               $"<b>{timePerRound}:</b> {adjustedDuration:F0} {seconds}\n" +
                               $"<b>{wordsPerRound}:</b> {fossilCollection.fossilsPerRound}\n" +
                               $"<b>{difficulty}:</b> {GetDifficultyDisplayName(currentTeamDifficulty)}\n\n" +
                               $"{thisTeamPlaying}:";
-        
+    
         UpdateCurrentTeamImage(currentTeamImageExplanation);
     }
-    
+
+    /// <summary>
+    /// NEU: Lokalisierte Input-Mode Information
+    /// </summary>
+    string GetLocalizedInputModeInfo()
+    {
+        bool usingAccelerometer = fossilInputHandler.IsUsingAccelerometer();
+
+        if (usingAccelerometer)
+        {
+            return GetLocalizedText(tiltModeLocalizedText, GetDefaultTiltMode);
+        }
+        else
+        {
+            return GetLocalizedText(touchModeLocalizedText, GetDefaultTouchMode);
+        }
+    }
+
     string GetLocalizedText(LocalizedText localizedText, System.Func<Language, string> fallbackFunction)
     {
         return localizedText != null ? localizedText.GetText(currentLanguage) : fallbackFunction(currentLanguage);
     }
-    
-    string GetLocalizedHoldPhoneText()
-    {
-        return currentLanguage switch
-        {
-            Language.English_Standard => "Hold the phone to your forehead",
-            Language.English_Simple => "Put phone on your head",
-            Language.German_Simple => "Handy an die Stirn halten",
-            _ => "Halte das Handy an deine Stirn"
-        };
-    }
-    
-    string GetLocalizedTeamExplainsText()
-    {
-        return currentLanguage switch
-        {
-            Language.English_Standard => "Your team explains the fossil to you",
-            Language.English_Simple => "Your team tells you the word",
-            Language.German_Simple => "Dein Team erklärt dir das Fossil",
-            _ => "Dein Team erklärt dir das Fossil"
-        };
-    }
-    
+
     string GetDifficultyDisplayName(DifficultyLevel difficulty)
     {
         return difficulty switch
@@ -267,8 +275,9 @@ public class FossilGameManager : MonoBehaviour
             _ => "Adults"
         };
     }
-    
-    // Default-Text-Funktionen für Fallbacks
+
+    #region Default Fallback Functions
+
     string GetDefaultGameTitle(Language language)
     {
         return language switch
@@ -279,7 +288,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Fossilien-Stirnraten"
         };
     }
-    
+
     string GetDefaultHowToPlay(Language language)
     {
         return language switch
@@ -290,7 +299,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Wie gespielt wird"
         };
     }
-    
+
     string GetDefaultControls(Language language)
     {
         return language switch
@@ -301,7 +310,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Steuerung"
         };
     }
-    
+
     string GetDefaultTimePerRound(Language language)
     {
         return language switch
@@ -312,7 +321,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Zeit pro Runde"
         };
     }
-    
+
     string GetDefaultWordsPerRound(Language language)
     {
         return language switch
@@ -323,7 +332,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Begriffe pro Runde"
         };
     }
-    
+
     string GetDefaultDifficulty(Language language)
     {
         return language switch
@@ -334,7 +343,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Schwierigkeitsgrad"
         };
     }
-    
+
     string GetDefaultThisTeamPlaying(Language language)
     {
         return language switch
@@ -345,7 +354,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Dieses Team ist jetzt dran"
         };
     }
-    
+
     string GetDefaultSeconds(Language language)
     {
         return language switch
@@ -356,7 +365,7 @@ public class FossilGameManager : MonoBehaviour
             _ => "Sekunden"
         };
     }
-    
+
     string GetDefaultPoints(Language language)
     {
         return language switch
@@ -367,11 +376,81 @@ public class FossilGameManager : MonoBehaviour
             _ => "Punkte"
         };
     }
-    
+
+    string GetDefaultWinner(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "Winner!",
+            Language.English_Simple => "Winner!",
+            Language.German_Simple => "Gewinner!",
+            _ => "Gewinner!"
+        };
+    }
+
+    string GetDefaultTie(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "It's a tie!",
+            Language.English_Simple => "Tie!",
+            Language.German_Simple => "Unentschieden!",
+            _ => "Unentschieden!"
+        };
+    }
+
+    // NEU: Fallback-Funktionen für Anweisungen
+    string GetDefaultHoldPhoneInstruction(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "Hold the phone to your forehead",
+            Language.English_Simple => "Put phone on your head",
+            Language.German_Simple => "Handy an die Stirn halten",
+            _ => "Halte das Handy an deine Stirn"
+        };
+    }
+
+    string GetDefaultTeamExplainsInstruction(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "Your team explains the fossil to you",
+            Language.English_Simple => "Your team tells you the word",
+            Language.German_Simple => "Dein Team erklärt dir das Fossil",
+            _ => "Dein Team erklärt dir das Fossil"
+        };
+    }
+
+    // NEU: Fallback-Funktionen für Input-Modi
+    string GetDefaultTiltMode(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "Tilt mode - Tilt phone forward (correct) or backward (skip)",
+            Language.English_Simple => "Tilt phone forward (correct) or back (skip)",
+            Language.German_Simple => "Kippen-Modus - Handy nach vorne (richtig) oder zurück (überspringen)",
+            _ => "Neige-Modus - Neige das Handy nach vorne (richtig) oder zurück (überspringen)"
+        };
+    }
+
+    string GetDefaultTouchMode(Language language)
+    {
+        return language switch
+        {
+            Language.English_Standard => "Touch mode - Tap left (skip) or right (correct)",
+            Language.English_Simple => "Tap left (skip) or right (correct)",
+            Language.German_Simple => "Touch-Modus - Tippe links (überspringen) oder rechts (richtig)",
+            _ => "Touch-Modus - Tippe links (überspringen) oder rechts (richtig)"
+        };
+    }
+
+    #endregion
+
     void UpdateCurrentTeamImage(Image targetImage)
     {
         if (targetImage == null) return;
-        
+
         if (currentTeam == 1 && fossilCollection.team1Image)
         {
             targetImage.sprite = fossilCollection.team1Image;
@@ -380,25 +459,25 @@ public class FossilGameManager : MonoBehaviour
         {
             targetImage.sprite = fossilCollection.team2Image;
         }
-        
+
         targetImage.gameObject.SetActive(true);
     }
-    
+
     void StartCountdown()
     {
         explanationUI.SetActive(false);
         countdownUI.SetActive(true);
         StartCoroutine(CountdownCoroutine());
     }
-    
+
     IEnumerator CountdownCoroutine()
     {
         string[] countdownTexts = { "3", "2", "1", "!" };
-        
+
         for (int i = 0; i < countdownTexts.Length; i++)
         {
             countdownText.text = countdownTexts[i];
-            
+
             if (audioSource)
             {
                 if (i < 3 && countdownSound)
@@ -410,59 +489,59 @@ public class FossilGameManager : MonoBehaviour
                     audioSource.PlayOneShot(countdownStartSound);
                 }
             }
-            
+
             yield return new WaitForSeconds(1f);
         }
-        
+
         StartRound();
     }
-    
+
     void StartRound()
     {
         countdownUI.SetActive(false);
         gameplayUI.SetActive(true);
-        
+
         correctFossilsThisRound = 0;
-        
+
         DifficultyLevel currentTeamDifficulty = DifficultyLevel.Adults;
         if (GameDataManager.Instance != null)
         {
             currentTeamDifficulty = GameDataManager.Instance.GetTeamDifficulty(currentTeam - 1);
         }
-        
+
         FossilData[] availableFossils = fossilCollection.GetRandomFossils(fossilCollection.fossilsPerRound, currentTeamDifficulty);
         currentRoundFossils = new List<FossilData>(availableFossils);
-        
+
         currentFossilIndex = 0;
         roundTimeLeft = fossilCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
         gameActive = true;
-        
+
         hasPlayedThreeSecondWarning = false;
         hasPlayedTwoSecondWarning = false;
         hasPlayedOneSecondWarning = false;
-        
+
         fossilInputHandler.SetInputEnabled(true);
         fossilInputHandler.CalibrateDevice();
-        
+
         ShowCurrentFossil();
         UpdateGameplayUI();
     }
-    
+
     void Update()
     {
         if (!gameActive) return;
-        
+
         roundTimeLeft -= Time.deltaTime;
         CheckTimerCountdownSounds();
-        
+
         if (roundTimeLeft <= 0)
         {
             EndRound();
         }
-        
+
         UpdateTimerDisplay();
     }
-    
+
     void CheckTimerCountdownSounds()
     {
         if (audioSource && countdownSound)
@@ -484,7 +563,7 @@ public class FossilGameManager : MonoBehaviour
             }
         }
     }
-    
+
     void ShowCurrentFossil()
     {
         if (currentFossilIndex >= currentRoundFossils.Count)
@@ -496,86 +575,84 @@ public class FossilGameManager : MonoBehaviour
             }
             currentFossilIndex = 0;
         }
-        
+
         FossilData fossil = currentRoundFossils[currentFossilIndex];
         fossilImage.sprite = fossil.fossilImage;
-        
-        // NEU: Verwende lokalisierte Fossil-Namen
         fossilNameText.text = fossil.GetFossilName(currentLanguage);
     }
-    
+
     void OnCorrectFossil()
     {
         if (!gameActive) return;
-        
+
         if (audioSource && correctSound)
         {
             audioSource.PlayOneShot(correctSound);
         }
-        
+
         if (currentTeam == 1)
             team1Score++;
         else
             team2Score++;
-        
+
         correctFossilsThisRound++;
         currentRoundFossils.RemoveAt(currentFossilIndex);
-        
+
         if (currentFossilIndex >= currentRoundFossils.Count)
         {
             currentFossilIndex = 0;
         }
-        
+
         if (correctFossilsThisRound >= fossilCollection.fossilsPerRound)
         {
             Debug.Log($"Erreicht! {correctFossilsThisRound}/{fossilCollection.fossilsPerRound} Fossilien erraten.");
             EndRound();
             return;
         }
-        
+
         if (currentRoundFossils.Count == 0)
         {
             Debug.Log("Alle Fossilien erraten! Runde beendet.");
             EndRound();
             return;
         }
-        
+
         ShowCurrentFossil();
         UpdateGameplayUI();
     }
-    
+
     void OnSkipFossil()
     {
         if (!gameActive) return;
-        
+
         if (audioSource && skipSound)
         {
             audioSource.PlayOneShot(skipSound);
         }
-        
+
         FossilData skippedFossil = currentRoundFossils[currentFossilIndex];
         currentRoundFossils.RemoveAt(currentFossilIndex);
         currentRoundFossils.Add(skippedFossil);
-        
+
         if (currentFossilIndex >= currentRoundFossils.Count)
         {
             currentFossilIndex = 0;
         }
-        
+
         ShowCurrentFossil();
         UpdateGameplayUI();
     }
-    
+
     void EndRound()
     {
         gameActive = false;
         fossilInputHandler.SetInputEnabled(false);
-        
+
         if (audioSource && timeUpSound)
         {
             audioSource.PlayOneShot(timeUpSound);
         }
-        
+
         if (currentTeam == 1)
         {
             currentTeam = 2;
@@ -588,7 +665,7 @@ public class FossilGameManager : MonoBehaviour
             ShowResults();
         }
     }
-    
+
     void ShowResults()
     {
         gameplayUI.SetActive(false);
@@ -596,14 +673,14 @@ public class FossilGameManager : MonoBehaviour
         UpdateResultsUI();
         SaveResults();
     }
-    
+
     void UpdateResultsUI()
     {
         string pointsLabel = GetLocalizedText(pointsLocalizedText, GetDefaultPoints);
-        
+
         team1ScoreText.text = $"{team1Score} {pointsLabel}";
         team2ScoreText.text = $"{team2Score} {pointsLabel}";
-        
+
         if (team1Score > team2Score)
         {
             string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
@@ -634,29 +711,7 @@ public class FossilGameManager : MonoBehaviour
             }
         }
     }
-    
-    string GetDefaultWinner(Language language)
-    {
-        return language switch
-        {
-            Language.English_Standard => "Winner!",
-            Language.English_Simple => "Winner!",
-            Language.German_Simple => "Gewinner!",
-            _ => "Gewinner!"
-        };
-    }
-    
-    string GetDefaultTie(Language language)
-    {
-        return language switch
-        {
-            Language.English_Standard => "It's a tie!",
-            Language.English_Simple => "Tie!",
-            Language.German_Simple => "Unentschieden!",
-            _ => "Unentschieden!"
-        };
-    }
-    
+
     void SaveResults()
     {
         if (GameDataManager.Instance != null && fossilCollection != null)
@@ -670,34 +725,34 @@ public class FossilGameManager : MonoBehaviour
             );
         }
     }
-    
+
     void UpdateGameplayUI()
     {
         UpdateCurrentTeamImage(currentTeamImage);
         scoreText.text = $"{correctFossilsThisRound}/{fossilCollection.fossilsPerRound}";
     }
-    
+
     void UpdateTimerDisplay()
     {
         int seconds = Mathf.FloorToInt(roundTimeLeft);
         timerText.text = seconds.ToString();
     }
-    
+
     void RestartGame()
     {
         team1Score = 0;
         team2Score = 0;
         currentTeam = 1;
         correctFossilsThisRound = 0;
-        
+
         hasPlayedThreeSecondWarning = false;
         hasPlayedTwoSecondWarning = false;
         hasPlayedOneSecondWarning = false;
-        
+
         resultUI.SetActive(false);
         ShowExplanation();
     }
-    
+
     void BackToMenu()
     {
         SceneManager.LoadScene(0);
