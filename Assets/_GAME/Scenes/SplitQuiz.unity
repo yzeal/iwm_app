@@ -2229,7 +2229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &827611266
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3442,6 +3442,15 @@ MonoBehaviour:
   finalScoreText: {fileID: 689602444}
   playAgainButton: {fileID: 827611267}
   continueToNextRoomButton: {fileID: 830595836}
+  correctAnswerLocalizedText: {fileID: 11400000, guid: f1285a7792db1f64c8da1d518f08a4eb, type: 2}
+  wrongAnswerLocalizedText: {fileID: 11400000, guid: 0bc50b04448e61c4a903284b72bd4435, type: 2}
+  pointsLabelLocalizedText: {fileID: 11400000, guid: bab46c5d997e55b42ac8ceb1aa7d753c, type: 2}
+  singlePointLocalizedText: {fileID: 11400000, guid: 13405149d7a55f34bbb23826ff567a45, type: 2}
+  multiplePointsLocalizedText: {fileID: 11400000, guid: dbdf004a1a339dc4894d940b61d15b32, type: 2}
+  winnerLocalizedText: {fileID: 11400000, guid: 33599a4221e8a2e4398f95dc89084a47, type: 2}
+  tieLocalizedText: {fileID: 11400000, guid: b17a863d40a4e2a4db2c67719743de72, type: 2}
+  team1NameLocalizedText: {fileID: 11400000, guid: 927a619e1d5a2fc42bf8fb2df3b861e6, type: 2}
+  team2NameLocalizedText: {fileID: 11400000, guid: 495761682cbc66449b7b287e0731ffd9, type: 2}
 --- !u!4 &1040321405
 Transform:
   m_ObjectHideFlags: 0
@@ -4220,6 +4229,7 @@ GameObject:
   - component: {fileID: 1613045600}
   - component: {fileID: 1613045602}
   - component: {fileID: 1613045601}
+  - component: {fileID: 1613045603}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -4345,6 +4355,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1613045599}
   m_CullTransparentMesh: 1
+--- !u!114 &1613045603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1613045599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5171c58126fdb5d499d505097c56783f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedTextComponent
+  localizedText: {fileID: 11400000, guid: 185c3b49ad872f84b85d53123de865e1, type: 2}
+  updateOnLanguageChange: 1
+  targetText: {fileID: 0}
+  targetTextMeshPro: {fileID: 0}
+  enableDebugLogs: 0
 --- !u!1 &1639524256
 GameObject:
   m_ObjectHideFlags: 0
