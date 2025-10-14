@@ -4,8 +4,8 @@ using TMPro;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Manager für Sprachauswahl-Settings
-/// Ähnlich wie TeamSettingsManager aber für Sprachen
+/// Vereinfachter Manager für Sprachauswahl-Settings
+/// Sprache wird sofort bei Auswahl übernommen
 /// </summary>
 public class LanguageSettingsManager : MonoBehaviour
 {
@@ -14,23 +14,8 @@ public class LanguageSettingsManager : MonoBehaviour
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI instructionText;
     
-    [Header("Current Language Display")]
-    public TextMeshProUGUI currentLanguageLabel;
-    public Image languageIcon;
-    
     [Header("Action Buttons")]
-    public Button applyButton;
     public Button backButton;
-    
-    [Header("Language Icons")]
-    public Sprite germanIcon;
-    public Sprite englishIcon;
-    public Sprite simpleLanguageIcon;
-    
-    [Header("Audio")]
-    public AudioSource audioSource;
-    public AudioClip buttonClickSound;
-    public AudioClip appliedSound;
     
     [Header("Mobile UI Settings")]
     [SerializeField] private bool adaptToSafeArea = true;
@@ -38,9 +23,7 @@ public class LanguageSettingsManager : MonoBehaviour
     [Header("Localized UI Texts")]
     [SerializeField] private LocalizedText titleLocalizedText;
     [SerializeField] private LocalizedText instructionLocalizedText;
-    [SerializeField] private LocalizedText applyButtonLocalizedText;
     [SerializeField] private LocalizedText backButtonLocalizedText;
-    [SerializeField] private LocalizedText currentLanguageLabelLocalizedText;
     
     void Start()
     {
@@ -102,7 +85,6 @@ public class LanguageSettingsManager : MonoBehaviour
         
         // Setze UI basierend auf aktueller Sprache
         languageRadioGroup.SetSelectedLanguage(currentLanguage);
-        UpdateCurrentLanguageDisplay(currentLanguage);
         
         Debug.Log($"Language settings loaded: {currentLanguage}");
     }
@@ -110,14 +92,13 @@ public class LanguageSettingsManager : MonoBehaviour
     void SetupUI()
     {
         // Setup Button Events
-        applyButton.onClick.AddListener(ApplySettings);
         backButton.onClick.AddListener(BackToMenu);
         
-        // Setup Language Group Events
+        // Setup Language Group Events - Sprache wird sofort übernommen
         languageRadioGroup.OnLanguageChanged += OnLanguageSelectionChanged;
         
-        // Mobile-optimierte Button-Größen
-        AdaptButtonsForMobile();
+        // Mobile-optimierte Button-Größe
+        AdaptButtonForMobile(backButton);
     }
     
     void UpdateLocalizedTexts()
@@ -131,41 +112,27 @@ public class LanguageSettingsManager : MonoBehaviour
             
         if (instructionLocalizedText && instructionText)
             instructionText.text = instructionLocalizedText.GetText(currentLang);
-            
-        if (applyButtonLocalizedText && applyButton)
-        {
-            TextMeshProUGUI buttonText = applyButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText) buttonText.text = applyButtonLocalizedText.GetText(currentLang);
-        }
         
         if (backButtonLocalizedText && backButton)
         {
             TextMeshProUGUI buttonText = backButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText) buttonText.text = backButtonLocalizedText.GetText(currentLang);
         }
-        
-        if (currentLanguageLabelLocalizedText && currentLanguageLabel)
-            currentLanguageLabel.text = currentLanguageLabelLocalizedText.GetText(currentLang);
     }
     
-    void AdaptButtonsForMobile()
+    void AdaptButtonForMobile(Button button)
     {
-        Button[] buttons = { applyButton, backButton };
-        
-        foreach (Button button in buttons)
+        if (button != null)
         {
-            if (button != null)
+            RectTransform buttonRect = button.GetComponent<RectTransform>();
+            if (buttonRect != null)
             {
-                RectTransform buttonRect = button.GetComponent<RectTransform>();
-                if (buttonRect != null)
+                Vector2 currentSize = buttonRect.sizeDelta;
+                float minHeight = 50f;
+                
+                if (currentSize.y < minHeight)
                 {
-                    Vector2 currentSize = buttonRect.sizeDelta;
-                    float minHeight = 50f;
-                    
-                    if (currentSize.y < minHeight)
-                    {
-                        buttonRect.sizeDelta = new Vector2(currentSize.x, minHeight);
-                    }
+                    buttonRect.sizeDelta = new Vector2(currentSize.x, minHeight);
                 }
             }
         }
@@ -173,135 +140,28 @@ public class LanguageSettingsManager : MonoBehaviour
     
     void OnLanguageSelectionChanged(Language newLanguage)
     {
-        PlayButtonSound();
-        UpdateCurrentLanguageDisplay(newLanguage);
-        TriggerHapticFeedback();
-        
-        Debug.Log($"Language selection changed to: {newLanguage}");
-    }
-    
-    void UpdateCurrentLanguageDisplay(Language language)
-    {
-        // Icon aktualisieren
-        if (languageIcon)
+        // Sprache sofort übernehmen und speichern
+        if (GameDataManager.Instance != null)
         {
-            languageIcon.sprite = GetLanguageIcon(language);
+            GameDataManager.Instance.SetLanguage(newLanguage);
+        }
+        else if (LanguageSystem.Instance != null)
+        {
+            LanguageSystem.Instance.SetLanguage(newLanguage);
         }
         
-        // Label aktualisieren (zeigt gewählte Sprache in dieser Sprache an)
-        if (currentLanguageLabel)
-        {
-            string displayName = LanguageSystem.Instance != null ? 
-                LanguageSystem.Instance.GetLanguageDisplayName(language) : language.ToString();
-            currentLanguageLabel.text = $"Gewählt: {displayName}";
-        }
-    }
-    
-    Sprite GetLanguageIcon(Language language)
-    {
-        return language switch
-        {
-            Language.German_Standard => germanIcon,
-            Language.English_Standard => englishIcon,
-            Language.German_Simple => simpleLanguageIcon ?? germanIcon,
-            Language.English_Simple => simpleLanguageIcon ?? englishIcon,
-            _ => germanIcon
-        };
+        Debug.Log($"Language immediately applied: {newLanguage}");
     }
     
     void OnLanguageChanged(Language newLanguage)
     {
         // UI-Texte aktualisieren wenn Sprache gewechselt wird
         UpdateLocalizedTexts();
-        UpdateCurrentLanguageDisplay(newLanguage);
-    }
-    
-    void ApplySettings()
-    {
-        PlayButtonSound();
-        
-        Language selectedLanguage = languageRadioGroup.GetSelectedLanguage();
-        
-        // Speichere Sprache im GameDataManager (das synchronisiert automatisch mit LanguageSystem)
-        if (GameDataManager.Instance != null)
-        {
-            GameDataManager.Instance.SetLanguage(selectedLanguage);
-        }
-        else if (LanguageSystem.Instance != null)
-        {
-            LanguageSystem.Instance.SetLanguage(selectedLanguage);
-        }
-        
-        Debug.Log($"Language applied: {selectedLanguage}");
-        
-        // Feedback für den Nutzer
-        ShowAppliedFeedback();
-        TriggerHapticFeedback();
-    }
-    
-    void ShowAppliedFeedback()
-    {
-        StartCoroutine(AppliedFeedbackCoroutine());
-        
-        if (audioSource && appliedSound)
-        {
-            audioSource.PlayOneShot(appliedSound);
-        }
-    }
-    
-    System.Collections.IEnumerator AppliedFeedbackCoroutine()
-    {
-        Color originalColor = applyButton.GetComponent<Image>().color;
-        applyButton.GetComponent<Image>().color = Color.green;
-        
-        TextMeshProUGUI buttonText = applyButton.GetComponentInChildren<TextMeshProUGUI>();
-        string originalText = buttonText.text;
-        
-        // Feedback-Text in aktueller Sprache
-        Language currentLang = LanguageSystem.Instance.GetCurrentLanguage();
-        string appliedText = currentLang switch
-        {
-            Language.English_Standard => "Applied!",
-            Language.English_Simple => "Saved!",
-            Language.German_Simple => "Gespeichert!",
-            _ => "Gespeichert!"
-        };
-        
-        buttonText.text = appliedText;
-        
-        yield return new WaitForSeconds(1.5f);
-        
-        applyButton.GetComponent<Image>().color = originalColor;
-        buttonText.text = originalText;
     }
     
     void BackToMenu()
     {
-        PlayButtonSound();
         SceneManager.LoadScene(0);
-    }
-    
-    void PlayButtonSound()
-    {
-        if (audioSource && buttonClickSound)
-        {
-            audioSource.PlayOneShot(buttonClickSound);
-        }
-    }
-    
-    void TriggerHapticFeedback()
-    {
-        #if UNITY_IOS
-        if (UnityEngine.iOS.Device.generation != UnityEngine.iOS.DeviceGeneration.iPhoneUnknown)
-        {
-            Handheld.Vibrate();
-        }
-        #elif UNITY_ANDROID
-        if (SystemInfo.supportsVibration)
-        {
-            Handheld.Vibrate();
-        }
-        #endif
     }
     
     #region Debug Methods
