@@ -7,7 +7,8 @@ public class SplitScreenQuizManager : MonoBehaviour
 {
     [Header("Quiz Data")]
     public QuizRoomData roomData;
-    
+    [SerializeField] private string nextScene = "Auswahl";
+
     [Header("UI References")]
     public GameObject gameplayUI;
     public GameObject resultUI;
@@ -625,6 +626,6 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void ContinueToNextRoom()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(nextScene);
     }
 }

@@ -14,6 +14,7 @@ public class TabuGameManager : MonoBehaviour
 {
     [Header("Game Data")]
     [SerializeField] private TabuCollection tabuCollection;
+    [SerializeField] private string nextScene = "Auswahl";
 
     [Header("UI References - Explanation Screen")]
     [SerializeField] private GameObject explanationScreen;
@@ -571,7 +572,7 @@ public class TabuGameManager : MonoBehaviour
     {
         PlayHapticFeedback();
         // Navigation zurück zum Hauptmenü (analog zu FossilGameManager)
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(nextScene);
     }
 
     // ==================== HELPER METHODS ====================

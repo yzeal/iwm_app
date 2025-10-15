@@ -57,7 +57,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3be9d5b762e97364491d9b899f0f5b01, type: 2}
   - {fileID: 11400000, guid: 0c84095a72023144db4aedb0706fec05, type: 2}
   termsPerRound: 5
-  roundDuration: 15
+  roundDuration: 60
   timeSettings:
     kidsTimeMultiplier: 2
     bigKidsTimeMultiplier: 1.2

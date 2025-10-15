@@ -9,6 +9,7 @@ public class FossilGameManager : MonoBehaviour
 {
     [Header("Game Data")]
     public FossilCollection fossilCollection;
+    [SerializeField] private string nextScene = "Auswahl";
 
     [Header("UI References")]
     public GameObject explanationUI;
@@ -755,6 +756,6 @@ public class FossilGameManager : MonoBehaviour
 
     void BackToMenu()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(nextScene);
     }
 }
