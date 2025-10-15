@@ -34,7 +34,7 @@ public class LocalizedText : ScriptableObject
     /// <summary>
     /// Text für angegebene Sprache abrufen mit Fallback-System
     /// </summary>
-    public string GetText(Language language = Language.German_Standard)
+    public string GetText(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         string text = GetDirectText(language);
         
@@ -55,14 +55,14 @@ public class LocalizedText : ScriptableObject
     /// <summary>
     /// Direkten Text für Sprache abrufen (ohne Fallback)
     /// </summary>
-    private string GetDirectText(Language language)
+    private string GetDirectText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.German_Standard => germanStandard,
-            Language.English_Standard => englishStandard,
-            Language.German_Simple => germanSimple,
-            Language.English_Simple => englishSimple,
+            LanguageSystem.Language.German_Standard => germanStandard,
+            LanguageSystem.Language.English_Standard => englishStandard,
+            LanguageSystem.Language.German_Simple => germanSimple,
+            LanguageSystem.Language.English_Simple => englishSimple,
             _ => germanStandard
         };
     }
@@ -70,12 +70,12 @@ public class LocalizedText : ScriptableObject
     /// <summary>
     /// Fallback-System durchlaufen
     /// </summary>
-    private string TryFallback(Language originalLanguage)
+    private string TryFallback(LanguageSystem.Language originalLanguage)
     {
         // Erste Fallback-Stufe: Standard-Variante der Sprache
         if (LanguageSystem.Instance.IsSimpleLanguage(originalLanguage))
         {
-            Language standardVariant = LanguageSystem.Instance.GetStandardVariant(originalLanguage);
+            LanguageSystem.Language standardVariant = LanguageSystem.Instance.GetStandardVariant(originalLanguage);
             string standardText = GetDirectText(standardVariant);
             if (!string.IsNullOrEmpty(standardText))
             {
@@ -86,7 +86,7 @@ public class LocalizedText : ScriptableObject
         }
 
         // Zweite Fallback-Stufe: Allgemeine Fallback-Sprache
-        Language fallbackLanguage = LanguageSystem.Instance.GetFallbackLanguage(originalLanguage);
+        LanguageSystem.Language fallbackLanguage = LanguageSystem.Instance.GetFallbackLanguage(originalLanguage);
         if (fallbackLanguage != originalLanguage)
         {
             string fallbackText = GetDirectText(fallbackLanguage);
@@ -99,9 +99,9 @@ public class LocalizedText : ScriptableObject
         }
 
         // Letzte Fallback-Stufe: Immer Deutsch Standard
-        if (originalLanguage != Language.German_Standard)
+        if (originalLanguage != LanguageSystem.Language.German_Standard)
         {
-            string germanText = GetDirectText(Language.German_Standard);
+            string germanText = GetDirectText(LanguageSystem.Language.German_Standard);
             if (!string.IsNullOrEmpty(germanText))
             {
                 if (enableDebugLogs)
@@ -116,7 +116,7 @@ public class LocalizedText : ScriptableObject
     /// <summary>
     /// Prüft ob für eine Sprache eine Übersetzung vorhanden ist
     /// </summary>
-    public bool HasTranslation(Language language)
+    public bool HasTranslation(LanguageSystem.Language language)
     {
         return !string.IsNullOrEmpty(GetDirectText(language));
     }
@@ -126,10 +126,10 @@ public class LocalizedText : ScriptableObject
     /// </summary>
     public bool HasAllTranslations()
     {
-        return HasTranslation(Language.German_Standard) &&
-               HasTranslation(Language.English_Standard) &&
-               HasTranslation(Language.German_Simple) &&
-               HasTranslation(Language.English_Simple);
+        return HasTranslation(LanguageSystem.Language.German_Standard) &&
+               HasTranslation(LanguageSystem.Language.English_Standard) &&
+               HasTranslation(LanguageSystem.Language.German_Simple) &&
+               HasTranslation(LanguageSystem.Language.English_Simple);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public class LocalizedText : ScriptableObject
     private void ValidateTranslations()
     {
         // .NET Framework 4.7.1 kompatible Enum-Iteration
-        foreach (Language lang in System.Enum.GetValues(typeof(Language)))
+        foreach (LanguageSystem.Language lang in System.Enum.GetValues(typeof(LanguageSystem.Language)))
         {
             bool hasTranslation = HasTranslation(lang);
             Debug.Log($"'{textKey}' - {lang}: {(hasTranslation ? "?" : "?")}");

@@ -64,7 +64,7 @@ public class LocalizedTextComponent : MonoBehaviour
             return;
         }
 
-        Language currentLanguage = LanguageSystem.Instance.GetCurrentLanguage();
+        LanguageSystem.Language currentLanguage = LanguageSystem.Instance.GetCurrentLanguage();
         string translatedText = localizedText.GetText(currentLanguage);
 
         SetText(translatedText);
@@ -100,7 +100,7 @@ public class LocalizedTextComponent : MonoBehaviour
     /// <summary>
     /// Event-Handler für Sprachwechsel
     /// </summary>
-    private void OnLanguageChanged(Language newLanguage)
+    private void OnLanguageChanged(LanguageSystem.Language newLanguage)
     {
         UpdateText();
     }

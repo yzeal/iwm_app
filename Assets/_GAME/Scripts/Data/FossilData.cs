@@ -40,7 +40,7 @@ public class FossilData
     /// <summary>
     /// Fossil-Name für aktuelle Sprache abrufen
     /// </summary>
-    public string GetFossilName(Language language = Language.German_Standard)
+    public string GetFossilName(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         // Neues Lokalisierungssystem bevorzugen
         if (localizedFossilName != null)
@@ -60,7 +60,7 @@ public class FossilData
     /// <summary>
     /// Fossil-Beschreibung für aktuelle Sprache abrufen
     /// </summary>
-    public string GetDescription(Language language = Language.German_Standard)
+    public string GetDescription(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         // Neues Lokalisierungssystem bevorzugen
         if (localizedDescription != null)
@@ -106,7 +106,7 @@ public class FossilData
     /// Legacy-Property für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetFossilName(Language) instead")]
-    public string FossilName => GetFossilName(Language.German_Standard);
+    public string FossilName => GetFossilName(LanguageSystem.Language.German_Standard);
 
     #endregion
 

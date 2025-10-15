@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7d9fa19185dee44390d7674e7cd05bf, type: 3}
+  m_Name: TabuCollection_Test
+  m_EditorClassIdentifier: Assembly-CSharp::TabuCollection
+  localizedCollectionName: {fileID: 11400000, guid: 0347b1827ae2f20438e2165daaecb14e, type: 2}
+  collectionName: Test-Collection
+  roomNumber: 0
+  team1Image: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}
+  team2Image: {fileID: 21300000, guid: 92ba78a3ad14fa94a8288756fc8dae5d, type: 3}
+  kidsTerms:
+  - {fileID: 11400000, guid: 3cba6ac60947e1a4c82b50c763acca4a, type: 2}
+  - {fileID: 11400000, guid: 9146d51cadfe6774dae660b23e4bfd8e, type: 2}
+  - {fileID: 11400000, guid: d0dcf1ccffd4fda438879aff49ef0009, type: 2}
+  - {fileID: 11400000, guid: f045c96c2a2440046a33137b69377210, type: 2}
+  - {fileID: 11400000, guid: 5180f7e1244241d4d83bb7382630eedc, type: 2}
+  - {fileID: 11400000, guid: b5707281114c57c4a8219eb251e69360, type: 2}
+  - {fileID: 11400000, guid: ce61f46c9390c804796951e57f8a9e6c, type: 2}
+  - {fileID: 11400000, guid: f6cac2d8d128f9d4abf27bec8e605b81, type: 2}
+  - {fileID: 11400000, guid: b73446cac433edc4ebda3f9581b4f37f, type: 2}
+  - {fileID: 11400000, guid: c7f13e47d0f7c6a488eff0e314540ddd, type: 2}
+  - {fileID: 11400000, guid: 3be9d5b762e97364491d9b899f0f5b01, type: 2}
+  - {fileID: 11400000, guid: 0c84095a72023144db4aedb0706fec05, type: 2}
+  bigKidsTerms:
+  - {fileID: 11400000, guid: 3cba6ac60947e1a4c82b50c763acca4a, type: 2}
+  - {fileID: 11400000, guid: 9146d51cadfe6774dae660b23e4bfd8e, type: 2}
+  - {fileID: 11400000, guid: d0dcf1ccffd4fda438879aff49ef0009, type: 2}
+  - {fileID: 11400000, guid: f045c96c2a2440046a33137b69377210, type: 2}
+  - {fileID: 11400000, guid: 5180f7e1244241d4d83bb7382630eedc, type: 2}
+  - {fileID: 11400000, guid: b5707281114c57c4a8219eb251e69360, type: 2}
+  - {fileID: 11400000, guid: ce61f46c9390c804796951e57f8a9e6c, type: 2}
+  - {fileID: 11400000, guid: f6cac2d8d128f9d4abf27bec8e605b81, type: 2}
+  - {fileID: 11400000, guid: b73446cac433edc4ebda3f9581b4f37f, type: 2}
+  - {fileID: 11400000, guid: c7f13e47d0f7c6a488eff0e314540ddd, type: 2}
+  - {fileID: 11400000, guid: 3be9d5b762e97364491d9b899f0f5b01, type: 2}
+  - {fileID: 11400000, guid: 0c84095a72023144db4aedb0706fec05, type: 2}
+  adultsTerms:
+  - {fileID: 11400000, guid: 3cba6ac60947e1a4c82b50c763acca4a, type: 2}
+  - {fileID: 11400000, guid: 9146d51cadfe6774dae660b23e4bfd8e, type: 2}
+  - {fileID: 11400000, guid: d0dcf1ccffd4fda438879aff49ef0009, type: 2}
+  - {fileID: 11400000, guid: f045c96c2a2440046a33137b69377210, type: 2}
+  - {fileID: 11400000, guid: 5180f7e1244241d4d83bb7382630eedc, type: 2}
+  - {fileID: 11400000, guid: b5707281114c57c4a8219eb251e69360, type: 2}
+  - {fileID: 11400000, guid: ce61f46c9390c804796951e57f8a9e6c, type: 2}
+  - {fileID: 11400000, guid: f6cac2d8d128f9d4abf27bec8e605b81, type: 2}
+  - {fileID: 11400000, guid: b73446cac433edc4ebda3f9581b4f37f, type: 2}
+  - {fileID: 11400000, guid: c7f13e47d0f7c6a488eff0e314540ddd, type: 2}
+  - {fileID: 11400000, guid: 3be9d5b762e97364491d9b899f0f5b01, type: 2}
+  - {fileID: 11400000, guid: 0c84095a72023144db4aedb0706fec05, type: 2}
+  termsPerRound: 5
+  roundDuration: 15
+  timeSettings:
+    kidsTimeMultiplier: 2
+    bigKidsTimeMultiplier: 1.2
+    adultsTimeMultiplier: 1

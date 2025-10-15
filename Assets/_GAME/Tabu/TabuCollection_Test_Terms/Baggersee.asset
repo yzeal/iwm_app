@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9fcc4a80234edc4daee3fc65ec62c8c, type: 3}
+  m_Name: Baggersee
+  m_EditorClassIdentifier: Assembly-CSharp::TabuTerm
+  mainTermGermanStandard: Baggersee
+  mainTermEnglishStandard: Quarry lake
+  mainTermGermanSimple: Bagger-See
+  mainTermEnglishSimple: Quarry lake
+  tabuWordsGermanStandard:
+  - Wasser
+  - Grube
+  - "f\xFCllen"
+  - Tiefe
+  - nass
+  tabuWordsEnglishStandard:
+  - water
+  - pit
+  - fill
+  - depth
+  - wet
+  tabuWordsGermanSimple:
+  - Wasser
+  - Grube
+  - "f\xFCllen"
+  - ' '
+  - ' '
+  tabuWordsEnglishSimple:
+  - water
+  - pit
+  - fill
+  - ' '
+  - ' '
+  termImage: {fileID: 0}

@@ -89,7 +89,7 @@ public class FossilGameManager : MonoBehaviour
     private bool hasPlayedOneSecondWarning = false;
 
     // Aktuelle Sprache für Performance
-    private Language currentLanguage = Language.German_Standard;
+    private LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
 
     void Start()
     {
@@ -108,10 +108,10 @@ public class FossilGameManager : MonoBehaviour
     void InitializeLocalization()
     {
         currentLanguage = LanguageSystem.Instance != null ?
-            LanguageSystem.Instance.GetCurrentLanguage() : Language.German_Standard;
+            LanguageSystem.Instance.GetCurrentLanguage() : LanguageSystem.Language.German_Standard;
     }
 
-    void OnLanguageChanged(Language newLanguage)
+    void OnLanguageChanged(LanguageSystem.Language newLanguage)
     {
         currentLanguage = newLanguage;
 
@@ -242,7 +242,7 @@ public class FossilGameManager : MonoBehaviour
         }
     }
 
-    string GetLocalizedText(LocalizedText localizedText, System.Func<Language, string> fallbackFunction)
+    string GetLocalizedText(LocalizedText localizedText, System.Func<LanguageSystem.Language, string> fallbackFunction)
     {
         return localizedText != null ? localizedText.GetText(currentLanguage) : fallbackFunction(currentLanguage);
     }
@@ -253,23 +253,23 @@ public class FossilGameManager : MonoBehaviour
         {
             DifficultyLevel.Kids => currentLanguage switch
             {
-                Language.English_Standard => "Kids",
-                Language.English_Simple => "Easy",
-                Language.German_Simple => "Einfach",
+                LanguageSystem.Language.English_Standard => "Kids",
+                LanguageSystem.Language.English_Simple => "Easy",
+                LanguageSystem.Language.German_Simple => "Einfach",
                 _ => "Kids"
             },
             DifficultyLevel.BigKids => currentLanguage switch
             {
-                Language.English_Standard => "Big Kids",
-                Language.English_Simple => "Medium",
-                Language.German_Simple => "Mittel",
+                LanguageSystem.Language.English_Standard => "Big Kids",
+                LanguageSystem.Language.English_Simple => "Medium",
+                LanguageSystem.Language.German_Simple => "Mittel",
                 _ => "BigKids"
             },
             DifficultyLevel.Adults => currentLanguage switch
             {
-                Language.English_Standard => "Adults",
-                Language.English_Simple => "Hard",
-                Language.German_Simple => "Schwer",
+                LanguageSystem.Language.English_Standard => "Adults",
+                LanguageSystem.Language.English_Simple => "Hard",
+                LanguageSystem.Language.German_Simple => "Schwer",
                 _ => "Adults"
             },
             _ => "Adults"
@@ -278,169 +278,169 @@ public class FossilGameManager : MonoBehaviour
 
     #region Default Fallback Functions
 
-    string GetDefaultGameTitle(Language language)
+    string GetDefaultGameTitle(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Fossil Charades",
-            Language.English_Simple => "Fossil Game",
-            Language.German_Simple => "Fossil-Raten",
+            LanguageSystem.Language.English_Standard => "Fossil Charades",
+            LanguageSystem.Language.English_Simple => "Fossil Game",
+            LanguageSystem.Language.German_Simple => "Fossil-Raten",
             _ => "Fossilien-Stirnraten"
         };
     }
 
-    string GetDefaultHowToPlay(Language language)
+    string GetDefaultHowToPlay(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "How to play",
-            Language.English_Simple => "How to play",
-            Language.German_Simple => "So wird gespielt",
+            LanguageSystem.Language.English_Standard => "How to play",
+            LanguageSystem.Language.English_Simple => "How to play",
+            LanguageSystem.Language.German_Simple => "So wird gespielt",
             _ => "Wie gespielt wird"
         };
     }
 
-    string GetDefaultControls(Language language)
+    string GetDefaultControls(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Controls",
-            Language.English_Simple => "Controls",
-            Language.German_Simple => "Steuerung",
+            LanguageSystem.Language.English_Standard => "Controls",
+            LanguageSystem.Language.English_Simple => "Controls",
+            LanguageSystem.Language.German_Simple => "Steuerung",
             _ => "Steuerung"
         };
     }
 
-    string GetDefaultTimePerRound(Language language)
+    string GetDefaultTimePerRound(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Time per round",
-            Language.English_Simple => "Time",
-            Language.German_Simple => "Zeit pro Runde",
+            LanguageSystem.Language.English_Standard => "Time per round",
+            LanguageSystem.Language.English_Simple => "Time",
+            LanguageSystem.Language.German_Simple => "Zeit pro Runde",
             _ => "Zeit pro Runde"
         };
     }
 
-    string GetDefaultWordsPerRound(Language language)
+    string GetDefaultWordsPerRound(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Words per round",
-            Language.English_Simple => "Words",
-            Language.German_Simple => "Wörter pro Runde",
+            LanguageSystem.Language.English_Standard => "Words per round",
+            LanguageSystem.Language.English_Simple => "Words",
+            LanguageSystem.Language.German_Simple => "Wörter pro Runde",
             _ => "Begriffe pro Runde"
         };
     }
 
-    string GetDefaultDifficulty(Language language)
+    string GetDefaultDifficulty(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Difficulty",
-            Language.English_Simple => "Level",
-            Language.German_Simple => "Schwierigkeit",
+            LanguageSystem.Language.English_Standard => "Difficulty",
+            LanguageSystem.Language.English_Simple => "Level",
+            LanguageSystem.Language.German_Simple => "Schwierigkeit",
             _ => "Schwierigkeitsgrad"
         };
     }
 
-    string GetDefaultThisTeamPlaying(Language language)
+    string GetDefaultThisTeamPlaying(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "This team is playing now",
-            Language.English_Simple => "This team plays now",
-            Language.German_Simple => "Dieses Team ist dran",
+            LanguageSystem.Language.English_Standard => "This team is playing now",
+            LanguageSystem.Language.English_Simple => "This team plays now",
+            LanguageSystem.Language.German_Simple => "Dieses Team ist dran",
             _ => "Dieses Team ist jetzt dran"
         };
     }
 
-    string GetDefaultSeconds(Language language)
+    string GetDefaultSeconds(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "seconds",
-            Language.English_Simple => "seconds",
-            Language.German_Simple => "Sekunden",
+            LanguageSystem.Language.English_Standard => "seconds",
+            LanguageSystem.Language.English_Simple => "seconds",
+            LanguageSystem.Language.German_Simple => "Sekunden",
             _ => "Sekunden"
         };
     }
 
-    string GetDefaultPoints(Language language)
+    string GetDefaultPoints(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Points",
-            Language.English_Simple => "Points",
-            Language.German_Simple => "Punkte",
+            LanguageSystem.Language.English_Standard => "Points",
+            LanguageSystem.Language.English_Simple => "Points",
+            LanguageSystem.Language.German_Simple => "Punkte",
             _ => "Punkte"
         };
     }
 
-    string GetDefaultWinner(Language language)
+    string GetDefaultWinner(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Winner!",
-            Language.English_Simple => "Winner!",
-            Language.German_Simple => "Gewinner!",
+            LanguageSystem.Language.English_Standard => "Winner!",
+            LanguageSystem.Language.English_Simple => "Winner!",
+            LanguageSystem.Language.German_Simple => "Gewinner!",
             _ => "Gewinner!"
         };
     }
 
-    string GetDefaultTie(Language language)
+    string GetDefaultTie(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "It's a tie!",
-            Language.English_Simple => "Tie!",
-            Language.German_Simple => "Unentschieden!",
+            LanguageSystem.Language.English_Standard => "It's a tie!",
+            LanguageSystem.Language.English_Simple => "Tie!",
+            LanguageSystem.Language.German_Simple => "Unentschieden!",
             _ => "Unentschieden!"
         };
     }
 
     // NEU: Fallback-Funktionen für Anweisungen
-    string GetDefaultHoldPhoneInstruction(Language language)
+    string GetDefaultHoldPhoneInstruction(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Hold the phone to your forehead",
-            Language.English_Simple => "Put phone on your head",
-            Language.German_Simple => "Handy an die Stirn halten",
+            LanguageSystem.Language.English_Standard => "Hold the phone to your forehead",
+            LanguageSystem.Language.English_Simple => "Put phone on your head",
+            LanguageSystem.Language.German_Simple => "Handy an die Stirn halten",
             _ => "Halte das Handy an deine Stirn"
         };
     }
 
-    string GetDefaultTeamExplainsInstruction(Language language)
+    string GetDefaultTeamExplainsInstruction(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Your team explains the fossil to you",
-            Language.English_Simple => "Your team tells you the word",
-            Language.German_Simple => "Dein Team erklärt dir das Fossil",
+            LanguageSystem.Language.English_Standard => "Your team explains the fossil to you",
+            LanguageSystem.Language.English_Simple => "Your team tells you the word",
+            LanguageSystem.Language.German_Simple => "Dein Team erklärt dir das Fossil",
             _ => "Dein Team erklärt dir das Fossil"
         };
     }
 
     // NEU: Fallback-Funktionen für Input-Modi
-    string GetDefaultTiltMode(Language language)
+    string GetDefaultTiltMode(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Tilt mode - Tilt phone forward (correct) or backward (skip)",
-            Language.English_Simple => "Tilt phone forward (correct) or back (skip)",
-            Language.German_Simple => "Kippen-Modus - Handy nach vorne (richtig) oder zurück (überspringen)",
+            LanguageSystem.Language.English_Standard => "Tilt mode - Tilt phone forward (correct) or backward (skip)",
+            LanguageSystem.Language.English_Simple => "Tilt phone forward (correct) or back (skip)",
+            LanguageSystem.Language.German_Simple => "Kippen-Modus - Handy nach vorne (richtig) oder zurück (überspringen)",
             _ => "Neige-Modus - Neige das Handy nach vorne (richtig) oder zurück (überspringen)"
         };
     }
 
-    string GetDefaultTouchMode(Language language)
+    string GetDefaultTouchMode(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Touch mode - Tap left (skip) or right (correct)",
-            Language.English_Simple => "Tap left (skip) or right (correct)",
-            Language.German_Simple => "Touch-Modus - Tippe links (überspringen) oder rechts (richtig)",
+            LanguageSystem.Language.English_Standard => "Touch mode - Tap left (skip) or right (correct)",
+            LanguageSystem.Language.English_Simple => "Tap left (skip) or right (correct)",
+            LanguageSystem.Language.German_Simple => "Touch-Modus - Tippe links (überspringen) oder rechts (richtig)",
             _ => "Touch-Modus - Tippe links (überspringen) oder rechts (richtig)"
         };
     }

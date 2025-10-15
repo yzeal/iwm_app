@@ -1,21 +1,24 @@
 using UnityEngine;
 using System;
 
-[System.Serializable]
-public enum Language
-{
-    German_Standard,    // Default
-    English_Standard,
-    German_Simple,
-    English_Simple
-}
-
 /// <summary>
 /// Zentrale Verwaltung der Mehrsprachigkeit mit Fallback-System
 /// Singleton-Pattern für globalen Zugriff
 /// </summary>
 public class LanguageSystem : MonoBehaviour
 {
+    /// <summary>
+    /// Verfügbare Sprachen im System
+    /// </summary>
+    [System.Serializable]
+    public enum Language
+    {
+        German_Standard,    // Default
+        English_Standard,
+        German_Simple,
+        English_Simple
+    }
+
     private static LanguageSystem instance;
     public static LanguageSystem Instance
     {
@@ -23,7 +26,7 @@ public class LanguageSystem : MonoBehaviour
         {
             if (instance == null)
             {
-                instance = FindObjectOfType<LanguageSystem>();
+                instance = FindFirstObjectByType<LanguageSystem>();
                 if (instance == null)
                 {
                     GameObject go = new GameObject("LanguageSystem");

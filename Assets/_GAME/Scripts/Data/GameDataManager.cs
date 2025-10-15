@@ -11,14 +11,14 @@ public class GameProgressData
     public DateTime lastPlayedTime;
     public string sessionId;
     public TeamSettings teamSettings = new TeamSettings(); // Team-Schwierigkeitsgrade
-    public Language selectedLanguage = Language.German_Standard; // NEU: Sprache speichern
+    public LanguageSystem.Language selectedLanguage = LanguageSystem.Language.German_Standard; // NEU: Sprache speichern
     
     public GameProgressData()
     {
         sessionId = System.Guid.NewGuid().ToString();
         lastPlayedTime = DateTime.Now;
         teamSettings = new TeamSettings();
-        selectedLanguage = Language.German_Standard; // Standard-Sprache
+        selectedLanguage = LanguageSystem.Language.German_Standard; // Standard-Sprache
     }
 }
 
@@ -53,7 +53,7 @@ public class GameDataManager : MonoBehaviour
     public DifficultyLevel Team2Difficulty => CurrentProgress.teamSettings.team2Difficulty;
     
     // NEU: Properties für Sprach-Zugriff
-    public Language CurrentLanguage => CurrentProgress.selectedLanguage;
+    public LanguageSystem.Language CurrentLanguage => CurrentProgress.selectedLanguage;
     
     void Awake()
     {
@@ -78,7 +78,7 @@ public class GameDataManager : MonoBehaviour
     /// <summary>
     /// Sprache setzen und mit LanguageSystem synchronisieren
     /// </summary>
-    public void SetLanguage(Language language)
+    public void SetLanguage(LanguageSystem.Language language)
     {
         if (CurrentProgress.selectedLanguage != language)
         {
@@ -104,7 +104,7 @@ public class GameDataManager : MonoBehaviour
         if (LanguageSystem.Instance != null)
         {
             // Wenn LanguageSystem eine andere Sprache hat, diese übernehmen
-            Language systemLanguage = LanguageSystem.Instance.GetCurrentLanguage();
+            LanguageSystem.Language systemLanguage = LanguageSystem.Instance.GetCurrentLanguage();
             if (systemLanguage != CurrentProgress.selectedLanguage)
             {
                 CurrentProgress.selectedLanguage = systemLanguage;
@@ -195,7 +195,7 @@ public class GameDataManager : MonoBehaviour
     
     public void ResetProgress()
     {
-        Language currentLang = CurrentProgress.selectedLanguage; // Sprache beibehalten
+        LanguageSystem.Language currentLang = CurrentProgress.selectedLanguage; // Sprache beibehalten
         CurrentProgress = new GameProgressData();
         CurrentProgress.selectedLanguage = currentLang; // Sprache wiederherstellen
         SaveGameData();
@@ -330,13 +330,13 @@ public class GameDataManager : MonoBehaviour
     [ContextMenu("Set Language to English")]
     void DebugSetEnglish()
     {
-        SetLanguage(Language.English_Standard);
+        SetLanguage(LanguageSystem.Language.English_Standard);
     }
     
     [ContextMenu("Set Language to German Simple")]
     void DebugSetGermanSimple()
     {
-        SetLanguage(Language.German_Simple);
+        SetLanguage(LanguageSystem.Language.German_Simple);
     }
     
     #endregion

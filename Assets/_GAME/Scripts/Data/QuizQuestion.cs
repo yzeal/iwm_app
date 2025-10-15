@@ -19,7 +19,7 @@ public class QuizQuestion
     /// <summary>
     /// Frage-Text für aktuelle Sprache abrufen
     /// </summary>
-    public string GetQuestionText(Language language = Language.German_Standard)
+    public string GetQuestionText(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         // Neues Lokalisierungssystem bevorzugen
         if (localizedQuestionText != null)
@@ -39,7 +39,7 @@ public class QuizQuestion
     /// <summary>
     /// Korrekte Antwort für aktuelle Sprache abrufen
     /// </summary>
-    public string GetCorrectAnswer(Language language = Language.German_Standard)
+    public string GetCorrectAnswer(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         return GetAnswer(0, language);
     }
@@ -47,7 +47,7 @@ public class QuizQuestion
     /// <summary>
     /// Antwort an bestimmtem Index für aktuelle Sprache abrufen
     /// </summary>
-    public string GetAnswer(int index, Language language = Language.German_Standard)
+    public string GetAnswer(int index, LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         if (index < 0 || index >= 4) return "[INVALID INDEX]";
 
@@ -71,7 +71,7 @@ public class QuizQuestion
     /// <summary>
     /// Alle Antworten gemischt für aktuelle Sprache abrufen
     /// </summary>
-    public string[] GetShuffledAnswers(Language language = Language.German_Standard)
+    public string[] GetShuffledAnswers(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         string[] allAnswers = new string[4];
         for (int i = 0; i < 4; i++)
@@ -92,7 +92,7 @@ public class QuizQuestion
     /// <summary>
     /// Index der korrekten Antwort in gemischtem Array finden
     /// </summary>
-    public int GetCorrectAnswerIndex(string[] shuffledAnswers, Language language = Language.German_Standard)
+    public int GetCorrectAnswerIndex(string[] shuffledAnswers, LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         string correctAnswer = GetCorrectAnswer(language);
         for (int i = 0; i < shuffledAnswers.Length; i++)
@@ -109,19 +109,19 @@ public class QuizQuestion
     /// Legacy-Methode für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetCorrectAnswer(Language) instead")]
-    public string GetCorrectAnswer() => GetCorrectAnswer(Language.German_Standard);
+    public string GetCorrectAnswer() => GetCorrectAnswer(LanguageSystem.Language.German_Standard);
 
     /// <summary>
     /// Legacy-Methode für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetShuffledAnswers(Language) instead")]
-    public string[] GetShuffledAnswers() => GetShuffledAnswers(Language.German_Standard);
+    public string[] GetShuffledAnswers() => GetShuffledAnswers(LanguageSystem.Language.German_Standard);
 
     /// <summary>
     /// Legacy-Methode für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetCorrectAnswerIndex(shuffledAnswers, Language) instead")]
-    public int GetCorrectAnswerIndex(string[] shuffledAnswers) => GetCorrectAnswerIndex(shuffledAnswers, Language.German_Standard);
+    public int GetCorrectAnswerIndex(string[] shuffledAnswers) => GetCorrectAnswerIndex(shuffledAnswers, LanguageSystem.Language.German_Standard);
 
     #endregion
 

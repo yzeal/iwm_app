@@ -68,7 +68,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     private float questionStartTime;
     
     // NEU: Aktuelle Sprache für Performance
-    private Language currentLanguage = Language.German_Standard;
+    private LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
     
     void Start()
     {
@@ -87,7 +87,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     void InitializeLocalization()
     {
         currentLanguage = LanguageSystem.Instance != null ? 
-            LanguageSystem.Instance.GetCurrentLanguage() : Language.German_Standard;
+            LanguageSystem.Instance.GetCurrentLanguage() : LanguageSystem.Language.German_Standard;
         
         UpdateLocalizedPlayerNames();
     }
@@ -105,18 +105,18 @@ public class SplitScreenQuizManager : MonoBehaviour
             player2.playerName = GetDefaultTeamName(2, currentLanguage);
     }
     
-    string GetDefaultTeamName(int teamNumber, Language language)
+    string GetDefaultTeamName(int teamNumber, LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => $"Team {teamNumber}",
-            Language.English_Simple => $"Team {teamNumber}",
-            Language.German_Simple => $"Team {teamNumber}",
+            LanguageSystem.Language.English_Standard => $"Team {teamNumber}",
+            LanguageSystem.Language.English_Simple => $"Team {teamNumber}",
+            LanguageSystem.Language.German_Simple => $"Team {teamNumber}",
             _ => $"Team {teamNumber}"
         };
     }
     
-    void OnLanguageChanged(Language newLanguage)
+    void OnLanguageChanged(LanguageSystem.Language newLanguage)
     {
         currentLanguage = newLanguage;
         UpdateLocalizedPlayerNames();
@@ -471,46 +471,46 @@ public class SplitScreenQuizManager : MonoBehaviour
     }
     
     // Default-Texte als Fallback
-    string GetDefaultCorrectText(Language language)
+    string GetDefaultCorrectText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Correct!",
-            Language.English_Simple => "Right!",
-            Language.German_Simple => "Richtig!",
+            LanguageSystem.Language.English_Standard => "Correct!",
+            LanguageSystem.Language.English_Simple => "Right!",
+            LanguageSystem.Language.German_Simple => "Richtig!",
             _ => "Richtig!"
         };
     }
     
-    string GetDefaultWrongText(Language language)
+    string GetDefaultWrongText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Wrong!",
-            Language.English_Simple => "Wrong!",
-            Language.German_Simple => "Falsch!",
+            LanguageSystem.Language.English_Standard => "Wrong!",
+            LanguageSystem.Language.English_Simple => "Wrong!",
+            LanguageSystem.Language.German_Simple => "Falsch!",
             _ => "Leider falsch!"
         };
     }
     
-    string GetDefaultSinglePointText(Language language)
+    string GetDefaultSinglePointText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Point",
-            Language.English_Simple => "Point",
-            Language.German_Simple => "Punkt",
+            LanguageSystem.Language.English_Standard => "Point",
+            LanguageSystem.Language.English_Simple => "Point",
+            LanguageSystem.Language.German_Simple => "Punkt",
             _ => "Punkt"
         };
     }
     
-    string GetDefaultMultiplePointsText(Language language)
+    string GetDefaultMultiplePointsText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Points",
-            Language.English_Simple => "Points",
-            Language.German_Simple => "Punkte",
+            LanguageSystem.Language.English_Standard => "Points",
+            LanguageSystem.Language.English_Simple => "Points",
+            LanguageSystem.Language.German_Simple => "Punkte",
             _ => "Punkte"
         };
     }
@@ -524,13 +524,13 @@ public class SplitScreenQuizManager : MonoBehaviour
         player2ScoreText.text = $"{pointsLabel}: {player2.score}";
     }
     
-    string GetDefaultPointsLabel(Language language)
+    string GetDefaultPointsLabel(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "Points",
-            Language.English_Simple => "Points",
-            Language.German_Simple => "Punkte",
+            LanguageSystem.Language.English_Standard => "Points",
+            LanguageSystem.Language.English_Simple => "Points",
+            LanguageSystem.Language.German_Simple => "Punkte",
             _ => "Punkte"
         };
     }
@@ -580,24 +580,24 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
     }
     
-    string GetDefaultWinnerText(Language language)
+    string GetDefaultWinnerText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "{0} wins!",
-            Language.English_Simple => "{0} wins!",
-            Language.German_Simple => "{0} gewinnt!",
+            LanguageSystem.Language.English_Standard => "{0} wins!",
+            LanguageSystem.Language.English_Simple => "{0} wins!",
+            LanguageSystem.Language.German_Simple => "{0} gewinnt!",
             _ => "{0} gewinnt!"
         };
     }
     
-    string GetDefaultTieText(Language language)
+    string GetDefaultTieText(LanguageSystem.Language language)
     {
         return language switch
         {
-            Language.English_Standard => "It's a tie!",
-            Language.English_Simple => "Tie!",
-            Language.German_Simple => "Unentschieden!",
+            LanguageSystem.Language.English_Standard => "It's a tie!",
+            LanguageSystem.Language.English_Simple => "Tie!",
+            LanguageSystem.Language.German_Simple => "Unentschieden!",
             _ => "Unentschieden!"
         };
     }

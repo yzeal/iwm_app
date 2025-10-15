@@ -31,7 +31,7 @@ public class FossilCollection : ScriptableObject
     /// <summary>
     /// Collection-Name für aktuelle Sprache abrufen
     /// </summary>
-    public string GetCollectionName(Language language = Language.German_Standard)
+    public string GetCollectionName(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         // Neues Lokalisierungssystem bevorzugen
         if (localizedCollectionName != null)
@@ -142,7 +142,7 @@ public class FossilCollection : ScriptableObject
     /// Legacy-Property für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetCollectionName(Language) instead")]
-    public string CollectionName => GetCollectionName(Language.German_Standard);
+    public string CollectionName => GetCollectionName(LanguageSystem.Language.German_Standard);
     
     /// <summary>
     /// Legacy-Methode für Rückwärtskompatibilität - verwendet Adults-Fossilien

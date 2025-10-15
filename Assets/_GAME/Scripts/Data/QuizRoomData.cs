@@ -25,7 +25,7 @@ public class QuizRoomData : ScriptableObject
     /// <summary>
     /// Raum-Name für aktuelle Sprache abrufen
     /// </summary>
-    public string GetRoomName(Language language = Language.German_Standard)
+    public string GetRoomName(LanguageSystem.Language language = LanguageSystem.Language.German_Standard)
     {
         // Neues Lokalisierungssystem bevorzugen
         if (localizedRoomName != null)
@@ -115,7 +115,7 @@ public class QuizRoomData : ScriptableObject
     /// Legacy-Property für Rückwärtskompatibilität
     /// </summary>
     [System.Obsolete("Use GetRoomName(Language) instead")]
-    public string RoomName => GetRoomName(Language.German_Standard);
+    public string RoomName => GetRoomName(LanguageSystem.Language.German_Standard);
 
     #endregion
     

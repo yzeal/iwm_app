@@ -31,10 +31,10 @@ public class LanguageRadioGroup : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool enableDebugLogs = true; // Auf true gesetzt für Debugging
     
-    private Language selectedLanguage = Language.German_Standard;
+    private LanguageSystem.Language selectedLanguage = LanguageSystem.Language.German_Standard;
     private Button[] allButtons;
     
-    public event Action<Language> OnLanguageChanged;
+    public event Action<LanguageSystem.Language> OnLanguageChanged;
     
     void Start()
     {
@@ -79,28 +79,28 @@ public class LanguageRadioGroup : MonoBehaviour
         // Event-Listeners hinzufügen mit Fehlerprüfung
         if (germanStandardButton != null)
         {
-            germanStandardButton.onClick.AddListener(() => SelectLanguage(Language.German_Standard));
+            germanStandardButton.onClick.AddListener(() => SelectLanguage(LanguageSystem.Language.German_Standard));
             if (enableDebugLogs)
                 Debug.Log("German Standard Button onClick event registered");
         }
         
         if (englishStandardButton != null)
         {
-            englishStandardButton.onClick.AddListener(() => SelectLanguage(Language.English_Standard));
+            englishStandardButton.onClick.AddListener(() => SelectLanguage(LanguageSystem.Language.English_Standard));
             if (enableDebugLogs)
                 Debug.Log("English Standard Button onClick event registered");
         }
         
         if (germanSimpleButton != null)
         {
-            germanSimpleButton.onClick.AddListener(() => SelectLanguage(Language.German_Simple));
+            germanSimpleButton.onClick.AddListener(() => SelectLanguage(LanguageSystem.Language.German_Simple));
             if (enableDebugLogs)
                 Debug.Log("German Simple Button onClick event registered");
         }
         
         if (englishSimpleButton != null)
         {
-            englishSimpleButton.onClick.AddListener(() => SelectLanguage(Language.English_Simple));
+            englishSimpleButton.onClick.AddListener(() => SelectLanguage(LanguageSystem.Language.English_Simple));
             if (enableDebugLogs)
                 Debug.Log("English Simple Button onClick event registered");
         }
@@ -140,7 +140,7 @@ public class LanguageRadioGroup : MonoBehaviour
         }
     }
     
-    public void SelectLanguage(Language language)
+    public void SelectLanguage(LanguageSystem.Language language)
     {
         if (enableDebugLogs)
             Debug.Log($"SelectLanguage called with: {language}");
@@ -176,7 +176,7 @@ public class LanguageRadioGroup : MonoBehaviour
         }
     }
     
-    public void SetSelectedLanguage(Language language)
+    public void SetSelectedLanguage(LanguageSystem.Language language)
     {
         selectedLanguage = language;
         UpdateButtonVisuals();
@@ -185,17 +185,17 @@ public class LanguageRadioGroup : MonoBehaviour
             Debug.Log($"SetSelectedLanguage (without event): {language}");
     }
     
-    public Language GetSelectedLanguage()
+    public LanguageSystem.Language GetSelectedLanguage()
     {
         return selectedLanguage;
     }
     
     void UpdateButtonVisuals()
     {
-        UpdateButtonVisual(germanStandardButton, selectedLanguage == Language.German_Standard);
-        UpdateButtonVisual(englishStandardButton, selectedLanguage == Language.English_Standard);
-        UpdateButtonVisual(germanSimpleButton, selectedLanguage == Language.German_Simple);
-        UpdateButtonVisual(englishSimpleButton, selectedLanguage == Language.English_Simple);
+        UpdateButtonVisual(germanStandardButton, selectedLanguage == LanguageSystem.Language.German_Standard);
+        UpdateButtonVisual(englishStandardButton, selectedLanguage == LanguageSystem.Language.English_Standard);
+        UpdateButtonVisual(germanSimpleButton, selectedLanguage == LanguageSystem.Language.German_Simple);
+        UpdateButtonVisual(englishSimpleButton, selectedLanguage == LanguageSystem.Language.English_Simple);
     }
     
     void UpdateButtonVisual(Button button, bool isSelected)
@@ -244,14 +244,14 @@ public class LanguageRadioGroup : MonoBehaviour
     /// <summary>
     /// Aktiviert/Deaktiviert bestimmte Sprachen (z.B. wenn nicht alle verfügbar sind)
     /// </summary>
-    public void SetLanguageAvailability(Language language, bool available)
+    public void SetLanguageAvailability(LanguageSystem.Language language, bool available)
     {
         Button targetButton = language switch
         {
-            Language.German_Standard => germanStandardButton,
-            Language.English_Standard => englishStandardButton,
-            Language.German_Simple => germanSimpleButton,
-            Language.English_Simple => englishSimpleButton,
+            LanguageSystem.Language.German_Standard => germanStandardButton,
+            LanguageSystem.Language.English_Standard => englishStandardButton,
+            LanguageSystem.Language.German_Simple => germanSimpleButton,
+            LanguageSystem.Language.English_Simple => englishSimpleButton,
             _ => null
         };
         
@@ -273,7 +273,7 @@ public class LanguageRadioGroup : MonoBehaviour
     /// </summary>
     public void EnableAllLanguages()
     {
-        foreach (Language lang in System.Enum.GetValues(typeof(Language)))
+        foreach (LanguageSystem.Language lang in System.Enum.GetValues(typeof(LanguageSystem.Language)))
         {
             SetLanguageAvailability(lang, true);
         }
@@ -286,7 +286,7 @@ public class LanguageRadioGroup : MonoBehaviour
     [ContextMenu("Test All Languages")]
     void TestAllLanguages()
     {
-        foreach (Language lang in System.Enum.GetValues(typeof(Language)))
+        foreach (LanguageSystem.Language lang in System.Enum.GetValues(typeof(LanguageSystem.Language)))
         {
             Debug.Log($"Testing language: {lang}");
             SelectLanguage(lang);
@@ -296,13 +296,13 @@ public class LanguageRadioGroup : MonoBehaviour
     [ContextMenu("Set to German")]
     void DebugSetGerman()
     {
-        SelectLanguage(Language.German_Standard);
+        SelectLanguage(LanguageSystem.Language.German_Standard);
     }
     
     [ContextMenu("Set to English")]
     void DebugSetEnglish()
     {
-        SelectLanguage(Language.English_Standard);
+        SelectLanguage(LanguageSystem.Language.English_Standard);
     }
     
     [ContextMenu("Debug Button Setup")]

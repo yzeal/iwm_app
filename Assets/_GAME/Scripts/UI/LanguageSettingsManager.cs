@@ -72,7 +72,7 @@ public class LanguageSettingsManager : MonoBehaviour
     void InitializeSettings()
     {
         // Lade aktuelle Sprache
-        Language currentLanguage = Language.German_Standard;
+        LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
         
         if (GameDataManager.Instance != null)
         {
@@ -103,8 +103,8 @@ public class LanguageSettingsManager : MonoBehaviour
     
     void UpdateLocalizedTexts()
     {
-        Language currentLang = LanguageSystem.Instance != null ? 
-            LanguageSystem.Instance.GetCurrentLanguage() : Language.German_Standard;
+        LanguageSystem.Language currentLang = LanguageSystem.Instance != null ? 
+            LanguageSystem.Instance.GetCurrentLanguage() : LanguageSystem.Language.German_Standard;
         
         // UI-Texte aktualisieren
         if (titleLocalizedText && titleText)
@@ -138,7 +138,7 @@ public class LanguageSettingsManager : MonoBehaviour
         }
     }
     
-    void OnLanguageSelectionChanged(Language newLanguage)
+    void OnLanguageSelectionChanged(LanguageSystem.Language newLanguage)
     {
         // Sprache sofort übernehmen und speichern
         if (GameDataManager.Instance != null)
@@ -153,7 +153,7 @@ public class LanguageSettingsManager : MonoBehaviour
         Debug.Log($"Language immediately applied: {newLanguage}");
     }
     
-    void OnLanguageChanged(Language newLanguage)
+    void OnLanguageChanged(LanguageSystem.Language newLanguage)
     {
         // UI-Texte aktualisieren wenn Sprache gewechselt wird
         UpdateLocalizedTexts();
@@ -169,8 +169,8 @@ public class LanguageSettingsManager : MonoBehaviour
     [ContextMenu("Test Language Switch")]
     void TestLanguageSwitch()
     {
-        Language[] languages = { Language.German_Standard, Language.English_Standard, Language.German_Simple, Language.English_Simple };
-        foreach (Language lang in languages)
+        LanguageSystem.Language[] languages = { LanguageSystem.Language.German_Standard, LanguageSystem.Language.English_Standard, LanguageSystem.Language.German_Simple, LanguageSystem.Language.English_Simple };
+        foreach (LanguageSystem.Language lang in languages)
         {
             languageRadioGroup.SelectLanguage(lang);
             Debug.Log($"Switched to: {lang}");
