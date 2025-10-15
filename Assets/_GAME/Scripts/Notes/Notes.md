@@ -88,17 +88,66 @@
 - **Score-Tracking**: Einfache X/Y Anzeige während Spiel
 - **Adaptive Zeiten**: Schwierigkeitsgrad-basierte Rundendauer
 
+## GAME DESIGN - TABU-MINISPIEL (NEU - IMPLEMENTIERT)
+
+### KERNMECHANIK
+- **Gameplay**: Tabu-Style Erklärsystem - Begriffe erklären ohne Tabu-Wörter zu verwenden
+- **Teams**: 2 Teams spielen abwechselnd (Team 1, dann Team 2) mit individuellen Schwierigkeitsgraden
+- **Rundendauer**: Konfigurierbar mit Zeit-Multiplikatoren pro Schwierigkeitsgrad (Standard: 60 Sekunden)
+- **Begriffe pro Runde**: Konfigurierbar (Standard: 5)
+- **Layout**: Portrait-Vollbild (KEIN Split-Screen), Teams spielen nacheinander
+
+### SCHWIERIGKEITSGRADE (IMPLEMENTIERT)
+- **Kids**: Einfachere Begriffe, weniger/einfachere Tabu-Wörter, länger Zeit (1.5x Multiplikator)
+- **BigKids**: Mittlere Komplexität, moderate Tabu-Wörter, etwas länger Zeit (1.2x Multiplikator)
+- **Adults**: Vollständige Komplexität, viele Tabu-Wörter, normale Zeit (1.0x Multiplikator)
+- **Content-Sets**: Separate Term-Arrays pro Schwierigkeitsgrad
+
+### STEUERUNG
+- **Button-basiert**: "Richtig" (rechts) und "Überspringen" (links) Buttons
+- **Haptic Feedback**: Mobile Vibration bei Button-Klicks
+- **Touch-Targets**: Mobile-optimierte Button-Größen
+
+### SPIELABLAUF
+1. Explanation Screen mit Regeln, Team-Bild und Schwierigkeitsgrad-Anzeige
+2. 3-2-1-! Countdown mit unterschiedlichen Sound-Effekten
+3. Erklärungs-Phase:
+   - Hauptbegriff oben (groß)
+   - Tabu-Wörter darunter (dynamische Anzahl)
+   - Timer-Countdown oben
+   - Score-Anzeige (X/Y Format)
+   - Richtig/Überspringen Buttons unten
+4. Team-Wechsel nach 1. Runde
+5. Ergebnisscreen mit Gewinner-Ermittlung und Gewinner-Icon
+
+### FEATURES
+- **Begriff-Recycling**: Übersprungene Begriffe kommen ans Ende der Queue zurück
+- **Timer-Warnung**: Audio-Countdown bei letzten 3 Sekunden
+- **Team-Images**: Visuelle Team-Darstellung auf allen Screens
+- **Gewinner-Icon**: Gewinner-Team-Image wird auf Results Screen angezeigt
+- **Dynamische Tabu-Wörter**: Variable Anzahl pro Begriff (im ScriptableObject definiert)
+- **Adaptive Zeiten**: Schwierigkeitsgrad-basierte Rundendauer
+- **Team-Exklusion**: Team 2 bekommt (wenn möglich) andere Begriffe als Team 1
+
+### PUNKTESYSTEM
+- **Richtig erraten**: +1 Punkt
+- **Überspringen**: 0 Punkte (Begriff kommt zurück in Queue)
+- **Zeit abgelaufen**: Runde endet
+- **Alle Begriffe durch**: Runde endet
+
 ## AKTUELLE CODE-STRUKTUR
 
 ### HAUPTKLASSEN - MEHRSPRACHIGKEITSSYSTEM (IMPLEMENTIERT)
 
 **LanguageSystem.cs**
 - Enum Language (German_Standard, English_Standard, German_Simple, English_Simple)
+- WICHTIG: Enum ist INNERHALB der LanguageSystem Klasse (Zugriff via LanguageSystem.Language)
 - Singleton-Pattern für globalen Zugriff
 - Fallback-System: Englisch ? Deutsch, Leichte Sprache ? Standard-Variante ? Deutsch
 - Persistente Speicherung in PlayerPrefs
 - Events für Sprachwechsel (OnLanguageChanged)
 - Mobile-kompatible Implementierung
+- FindFirstObjectByType statt FindObjectOfType (Unity 6.2 kompatibel)
 
 **LocalizedText.cs (ScriptableObject)**
 - Container für lokalisierte Texte mit 4 Sprach-Varianten
@@ -132,7 +181,7 @@
 ### HAUPTKLASSEN - SCHWIERIGKEITSGRAD-SYSTEM (IMPLEMENTIERT)
 
 **DifficultySystem.cs**
-- Enum DifficultyLevel (Kids, BigKids, Adults)
+- Enum DifficultyLevel (Kids, BigKids, Adults) - DIREKT im globalen Namespace (NICHT in Klasse!)
 - TeamSettings Klasse für persistente Team-Konfiguration
 - DifficultyTimeSettings für schwierigkeitsgrad-basierte Zeitmultiplikatoren
 - Integration in GameDataManager für persistente Speicherung
@@ -225,6 +274,54 @@
 - Konfigurierbare Spieleinstellungen pro Collection
 - Shuffling-System für zufällige Fossil-Auswahl
 
+### HAUPTKLASSEN - TABU-MINISPIEL (NEU - VOLLSTÄNDIG IMPLEMENTIERT + LOKALISIERT)
+
+**TabuGameManager.cs**
+- NEU: Vollständige Implementierung des Tabu-Minispiels
+- Analog zu FossilGameManager strukturiert für Konsistenz
+- Vollständig lokalisiert (12 LocalizedText Assets benötigt)
+- Vier Screens: Explanation, Countdown, Gameplay, Results
+- Button-basierte Steuerung (Richtig/Überspringen)
+- Timer-System mit Audio-Countdown bei letzten 3 Sekunden
+- Schwierigkeitsgrad-basierte Rundendauer
+- Begriff-Recycling für übersprungene Begriffe (ans Ende der Queue)
+- Team-Exklusions-System (Team 2 bekommt andere Begriffe wenn möglich)
+- Dynamische Tabu-Wörter-Anzeige (UI-Pool-System)
+- Gewinner-Icon auf Results Screen (wie bei FossilGameManager)
+- OnLanguageChanged Event-Handler für Live-Updates
+- GetLocalizedText() Helper-Methode mit Fallback-System
+- Haptic Feedback bei Button-Klicks
+- Integration mit GameDataManager für Team-Schwierigkeitsgrade
+
+**TabuTerm.cs (ScriptableObject)**
+- NEU: Datenstruktur für einzelne Tabu-Begriffe
+- Vollständig lokalisiert (4 Sprachen)
+- Hauptbegriff in allen 4 Sprachen
+- Tabu-Wörter-Arrays in allen 4 Sprachen (dynamische Länge)
+- Optional: Sprite für Begriff-Bild
+- GetMainTerm(Language) Methode mit Fallback-Hierarchie
+- GetTabuWords(Language) Methode mit Fallback-Hierarchie
+- HasAllLocalizations() für Content-Validation
+- ValidateLocalizations() Context-Menu für Editor
+- CreateAssetMenu Integration
+
+**TabuCollection.cs (ScriptableObject)**
+- NEU: Container für Tabu-Begriffe mit Schwierigkeitsgrad-Sets
+- Analog zu FossilCollection strukturiert
+- Lokalisierter Collection-Name über LocalizedText
+- Separate Term-Arrays für Kids/BigKids/Adults
+- Team-Images für visuelle Darstellung
+- Konfigurierbare Spieleinstellungen (termsPerRound, roundDuration)
+- DifficultyTimeSettings Integration
+- GetTermsForDifficulty(DifficultyLevel) Methode
+- GetRandomTerms(count, difficulty) Methode
+- GetRandomTermsExcluding(count, difficulty, excludeList) für Team 2
+- GetAdjustedRoundDuration(difficulty) für angepasste Zeiten
+- HasTermsForAllDifficulties() Validation
+- HasAllLocalizations() für Content-Validation
+- Context-Menu Validierungs-Tools
+- CreateAssetMenu Integration
+
 ### SHARED SYSTEMS (MOBILE-OPTIMIERT + LOKALISIERT)
 
 **GameDataManager.cs**
@@ -284,7 +381,8 @@
 - Canvas Scaler Optimierungen für verschiedene Screen-Ratios
 
 **Input Optimizations**
-- Accelerometer-basierte Steuerung für Mobile
+- Accelerometer-basierte Steuerung für Mobile (Fossil-Stirnraten)
+- Button-basierte Steuerung für Mobile (Tabu)
 - Touch-Fallback-Systeme
 - Vibration/Haptic Feedback Integration
 
@@ -296,7 +394,7 @@
 - **Vier Sprachen**: Deutsch Standard, Englisch Standard, Deutsch Einfach, Englisch Einfach
 - **Custom ScriptableObject System**: Optimiert für Unity-Workflow
 - **Fallback-Hierarchie**: Automatische Fallbacks bei fehlenden Übersetzungen
-- **Game-Manager Integration**: Beide Hauptspiele vollständig lokalisiert (KEINE hardcodierten Strings mehr)
+- **Game-Manager Integration**: Alle drei Hauptspiele vollständig lokalisiert (KEINE hardcodierten Strings mehr)
 - **Live Language-Switching**: UI aktualisiert sich automatisch bei Sprachwechsel
 - **Mobile-optimierte Settings-UI**: Vereinfachtes Radio-Button-System mit sofortigem Sprachwechsel
 - **Performance-optimiert**: Sprach-Caching und Event-basierte Updates
@@ -308,7 +406,7 @@
 - Drei Schwierigkeitsgrade (Kids, BigKids, Adults)
 - Individuelle Team-Konfiguration mit persistenter Speicherung
 - Settings-UI mit Radio-Button-System und Image-Swapping
-- Difficulty-basierte Content-Auswahl für Quiz und Fossilien
+- Difficulty-basierte Content-Auswahl für Quiz, Fossilien und Tabu
 - Zeit-Multiplikatoren für verschiedene Schwierigkeitsgrade
 - Mobile-optimierte UI mit Haptic Feedback
 
@@ -341,6 +439,21 @@
 - Touch-Fallback für Testing
 - Team-Image System statt Text-Labels
 
+#### Tabu-Minispiel (NEU - VOLLSTÄNDIG IMPLEMENTIERT + LOKALISIERT)
+- **100% Lokalisierung**: ALLE UI-Texte über LocalizedText Assets (12 Assets benötigt)
+- **Vollständige Code-Implementierung**: TabuGameManager, TabuTerm, TabuCollection
+- **Button-basierte Steuerung**: Richtig/Überspringen Buttons mit Haptic Feedback
+- **Difficulty-basierte Begriff-Sets**: Separate Term-Arrays pro Schwierigkeitsgrad
+- **Adaptive Rundendauer**: Schwierigkeitsgrad-basierte Zeitmultiplikatoren
+- **Team-Exklusion**: Team 2 bekommt andere Begriffe (wenn möglich)
+- **Begriff-Recycling**: Übersprungene Begriffe kommen zurück in Queue
+- **Timer-System**: Audio-Countdown bei letzten 3 Sekunden
+- **Dynamische Tabu-Wörter**: Variable Anzahl pro Begriff mit UI-Pool-System
+- **Gewinner-Icon**: Gewinner-Team-Image auf Results Screen
+- **Live Language-Updates**: UI aktualisiert sich automatisch bei Sprachwechsel
+- **Mobile-optimiert**: Touch-Targets, Haptic Feedback, Portrait-Vollbild
+- **ScriptableObject-basiert**: Einfache Content-Erstellung mit Validation-Tools
+
 #### Shared Systems (MOBILE-OPTIMIERT + LOKALISIERT)
 - **Sprach-persistente Speicherung**: Gewählte Sprache bleibt gespeichert
 - **Cross-System-Synchronisation**: GameDataManager ? LanguageSystem
@@ -352,15 +465,32 @@
 
 ### ?? NÄCHSTE ENTWICKLUNGSSCHRITTE (GEPLANT)
 
-#### Content-Erstellung (NÄCHSTE PRIORITÄT)
-- **LocalizedText Assets erstellen**: Für FossilGameManager (4 neue Assets benötigt)
-  - HoldPhoneInstruction
-  - TeamExplainsInstruction
-  - TiltModeInstruction
-  - TouchModeInstruction
-- **Beispiel-Content**: Quiz-Fragen und Fossilien in allen 4 Sprachen
-- **Content-Validation**: Prüfung der Übersetzungsqualität
-- **Editor-Workflow**: Optimierung für Content-Creators
+#### Content-Erstellung (HÖCHSTE PRIORITÄT)
+- **LocalizedText Assets für Tabu-Minispiel** (12 neue Assets benötigt):
+  1. Tabu_ExplanationTitle
+  2. Tabu_ExplanationRules
+  3. Tabu_StartButton
+  4. Tabu_TimerLabel
+  5. Tabu_TabuWordsHeader
+  6. Tabu_CorrectButton
+  7. Tabu_SkipButton
+  8. Tabu_ResultsTeam1Label
+  9. Tabu_ResultsTeam2Label
+  10. Tabu_ResultsWinner
+  11. Tabu_ResultsTie
+  12. Tabu_BackButton
+
+- **Tabu-Begriff Content erstellen**:
+  - TabuTerm ScriptableObjects für alle Schwierigkeitsgrade
+  - Mindestens 10-15 Begriffe pro Schwierigkeitsgrad
+  - Vollständige Lokalisierung (4 Sprachen)
+  - TabuCollection ScriptableObject anlegen
+
+- **UI-Setup für Tabu-Minispiel**:
+  - Scene erstellen (analog zu Fossil-Stirnraten)
+  - UI-Hierarchie aufbauen (4 Screens)
+  - TabuWordText Prefab erstellen (TextMeshProUGUI)
+  - Alle Referenzen im TabuGameManager zuweisen
 
 #### Weitere Entwicklung
 - Integration in größeres Führungssystem
@@ -379,14 +509,15 @@ Assets/_GAME/
 ?   ?   ??? TeamSettingsManager.cs
 ?   ?   ??? DifficultyRadioGroup.cs
 ?   ?   ??? SceneNavigator.cs
-?   ?   ??? LocalizedTextComponent.cs (NEU)
-?   ?   ??? LanguageRadioGroup.cs (NEU)
-?   ?   ??? LanguageSettingsManager.cs (NEU - VEREINFACHT)
+?   ?   ??? LocalizedTextComponent.cs
+?   ?   ??? LanguageRadioGroup.cs
+?   ?   ??? LanguageSettingsManager.cs
 ?   ?   ??? FullscreenManager.cs (DEPRECATED für Mobile)
 ?   ?   ??? UniversalFullscreenButton.cs (DEPRECATED für Mobile)
 ?   ??? Game/
 ?   ?   ??? SplitScreenQuizManager.cs (ERWEITERT + LOKALISIERT)
 ?   ?   ??? FossilGameManager.cs (VOLLSTÄNDIG LOKALISIERT)
+?   ?   ??? TabuGameManager.cs (NEU - VOLLSTÄNDIG LOKALISIERT)
 ?   ?   ??? PlayerData.cs
 ?   ?   ??? LoadScene.cs
 ?   ??? Data/
@@ -395,9 +526,11 @@ Assets/_GAME/
 ?   ?   ??? QuizQuestion.cs (ERWEITERT + LOKALISIERT)
 ?   ?   ??? FossilData.cs (ERWEITERT + LOKALISIERT)
 ?   ?   ??? FossilCollection.cs (ERWEITERT + LOKALISIERT)
+?   ?   ??? TabuTerm.cs (NEU - VOLLSTÄNDIG LOKALISIERT)
+?   ?   ??? TabuCollection.cs (NEU - VOLLSTÄNDIG LOKALISIERT)
 ?   ?   ??? DifficultySystem.cs
-?   ?   ??? LanguageSystem.cs (NEU)
-?   ?   ??? LocalizedText.cs (NEU)
+?   ?   ??? LanguageSystem.cs
+?   ?   ??? LocalizedText.cs
 ?   ??? Notes/
 ?       ??? Notes.md
 ??? Plugins/
@@ -433,10 +566,10 @@ Assets/_GAME/
 #### Content Management (ERWEITERT)
 - **ScriptableObjects**: Für einfache Content-Erstellung mit Difficulty + Language-Support
 - **Validation**: Automatische Prüfung ob Content für alle Schwierigkeitsgrade und Sprachen vorhanden
-- **Skalierbarkeit**: System designed für 6 verschiedene Räume
+- **Skalierbarkeit**: System designed für 6 verschiedene Räume + mehrere Minispiele
 - **Lokalisierung**: Vollständig implementiert mit Fallback-System
 - **Legacy-Support**: Bestehende Inhalte ohne Lokalisierung funktionieren weiterhin
-- **Keine Hardcoding**: FossilGameManager vollständig auf LocalizedText Assets umgestellt
+- **Keine Hardcoding**: Alle Game-Manager vollständig auf LocalizedText Assets umgestellt
 
 #### Technical Architecture (ERWEITERT)
 - **Localization System**: Event-basiert mit automatischer UI-Aktualisierung
@@ -444,6 +577,7 @@ Assets/_GAME/
 - **Save System**: Plattformunabhängig mit Backup-Funktionalität, Team-Settings und Sprache
 - **Error-Handling**: Try-Catch mit Debug-Logging
 - **Platform-Support**: Mobile-First mit Cross-Platform-Kompatibilität
+- **Enum-Namespace**: DifficultyLevel global, LanguageSystem.Language in Klasse (WICHTIG für Kompatibilität!)
 
 ## WICHTIGE IMPLEMENTIERUNGSDETAILS
 
@@ -477,7 +611,7 @@ Assets/_GAME/
 
 ### SCHWIERIGKEITSGRAD-SYSTEM DETAILS (IMPLEMENTIERT)
 - **Team-Settings**: Persistent über GameDataManager gespeichert
-- **Content-Loading**: Difficulty-basierte GetQuestionsForDifficulty() / GetFossilsForDifficulty()
+- **Content-Loading**: Difficulty-basierte GetQuestionsForDifficulty() / GetFossilsForDifficulty() / GetTermsForDifficulty()
 - **UI-System**: Image-Swapping Radio-Buttons für bessere Mobile-UX
 - **Zeit-System**: Multiplikatoren für angepasste Rundendauer
 - **Fallback**: Legacy-Support für bestehende Content-ScriptableObjects
@@ -518,6 +652,40 @@ Assets/_GAME/
 - **Timer-Audio**: Countdown-Sounds bei 3-2-1 Sekunden
 - **Team-System**: Image-basierte Darstellung mit ScriptableObject-Config
 
+### TABU-MINISPIEL DETAILS (NEU - VOLLSTÄNDIG IMPLEMENTIERT)
+
+#### Architektur
+- **Analog zu FossilGameManager**: Konsistente Struktur für einfache Wartung
+- **Vier Screens**: Explanation, Countdown, Gameplay, Results (wie Fossil-Stirnraten)
+- **Portrait-Vollbild**: Kein Split-Screen, Teams spielen nacheinander
+- **Button-basiert**: Keine Accelerometer-Steuerung, nur Touch-Buttons
+
+#### Lokalisierung
+- **12 LocalizedText Assets benötigt**: Alle UI-Texte vollständig lokalisierbar
+- **Keine hardcodierten Strings**: Alle Texte über LocalizedText Assets
+- **Live Language-Updates**: OnLanguageChanged Event-Handler implementiert
+- **GetLocalizedText() Helper**: Zentrale Methode mit Fallback-System
+
+#### Gameplay-Features
+- **Begriff-Recycling**: Übersprungene Begriffe kommen ans Ende der Queue zurück
+- **Team-Exklusion**: GetRandomTermsExcluding() für unterschiedliche Begriffe pro Team
+- **Dynamische Tabu-Wörter**: UI-Pool-System für variable Anzahl Tabu-Wörter
+- **Timer-System**: Countdown mit Audio-Warnung bei letzten 3 Sekunden
+- **Adaptive Zeiten**: DifficultyTimeSettings für schwierigkeitsgrad-basierte Rundendauer
+- **Gewinner-Icon**: winnerTeamImage zeigt Gewinner-Team-Sprite auf Results Screen
+
+#### ScriptableObjects
+- **TabuTerm**: Einzelner Begriff mit lokalisierten Hauptbegriffen und Tabu-Wörtern
+- **TabuCollection**: Container mit Schwierigkeitsgrad-Sets und Spieleinstellungen
+- **Validation-Tools**: Context-Menu-Funktionen für Content-Prüfung
+- **Fallback-System**: Automatische Fallbacks bei fehlenden Lokalisierungen
+
+#### Mobile-Optimierung
+- **Haptic Feedback**: Bei allen Button-Klicks (Correct, Skip, Start, Back)
+- **Touch-Targets**: Mobile-optimierte Button-Größen
+- **Portrait-Layout**: Optimiert für mobile Geräte
+- **Safe Area Support**: Automatische Anpassung an Notch/Cutouts (wenn TabuGameManager Scene erstellt)
+
 ### SHARED SYSTEM DETAILS (ERWEITERT + LOKALISIERT)
 - **Language-Persistence**: Gewählte Sprache wird dauerhaft gespeichert
 - **Cross-System-Sync**: GameDataManager synchronisiert automatisch mit LanguageSystem
@@ -529,55 +697,102 @@ Assets/_GAME/
 ### AUDIO-SYSTEM
 - **Split-Screen Quiz**: Continue-Sounds, Feedback-Audio
 - **Fossilien-Stirnraten**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback
+- **Tabu-Minispiel**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback (Audio-Clips im Inspector zuweisbar)
 - **Settings-UI**: Button-Click-Sounds entfernt (Dopplung mit LanguageRadioGroup)
 - **Universal**: AudioSource-basiert mit optional AudioClip assignments
 
 ---
 
-## CHANGELOG - SESSION VOM 14. OKTOBER 2025
+## CHANGELOG - SESSION VOM 15. OKTOBER 2025
 
-### UI-VEREINFACHUNGEN
-- **LanguageSettingsManager stark vereinfacht**:
-  - Apply Button entfernt (sofortige Sprachwechsel)
-  - Current Language Display entfernt (visuelles Feedback durch RadioButton)
-  - Language Icons entfernt (nicht benötigt)
-  - Audio-System entfernt (Dopplung mit LanguageRadioGroup)
-  - Code-Reduktion: ~250 Zeilen ? ~140 Zeilen
+### TABU-MINISPIEL VOLLSTÄNDIG IMPLEMENTIERT (NEU)
 
-### FOSSILIEN-STIRNRATEN VOLLSTÄNDIGE LOKALISIERT
-- **Alle hardcodierten Strings entfernt**:
-  - Input-Mode-Texte (Tilt/Touch) jetzt über LocalizedText
-  - Anweisungs-Texte (Hold Phone, Team Explains) jetzt über LocalizedText
-  - GetLocalizedInputModeInfo() für dynamische Input-Mode-Anzeige
-  - Fallback-Funktionen für alle neuen Texte hinzugefügt
+#### Code-Implementierung
+- **TabuTerm.cs erstellt**:
+  - ScriptableObject für einzelne Tabu-Begriffe
+  - Vollständig lokalisiert (4 Sprachen)
+  - Hauptbegriff + Tabu-Wörter-Arrays pro Sprache
+  - Fallback-Hierarchie implementiert
+  - Validation-Tools (HasAllLocalizations, Context-Menu)
+  - CreateAssetMenu Integration
 
-- **Neue LocalizedText-Variablen in FossilGameManager**:
-  - holdPhoneInstructionLocalizedText
-  - teamExplainsInstructionLocalizedText
-  - tiltModeLocalizedText
-  - touchModeLocalizedText
+- **TabuCollection.cs erstellt**:
+  - ScriptableObject Container für Tabu-Begriffe
+  - Separate Term-Arrays für Kids/BigKids/Adults
+  - Team-Images für visuelle Darstellung
+  - DifficultyTimeSettings Integration
+  - GetRandomTerms() und GetRandomTermsExcluding() Methoden
+  - Validation-Tools und Editor-Helpers
+  - CreateAssetMenu Integration
 
-- **Content-Erstellung benötigt** (4 neue LocalizedText Assets):
-  1. HoldPhoneInstruction (DE/EN Standard/Simple)
-  2. TeamExplainsInstruction (DE/EN Standard/Simple)
-  3. TiltModeInstruction (DE/EN Standard/Simple)
-  4. TouchModeInstruction (DE/EN Standard/Simple)
+- **TabuGameManager.cs erstellt**:
+  - Vollständige Spiellogik implementiert
+  - Vier Screens: Explanation, Countdown, Gameplay, Results
+  - Button-basierte Steuerung (Correct/Skip)
+  - Timer-System mit Audio-Countdown
+  - Begriff-Recycling (Queue-System)
+  - Team-Exklusion für unterschiedliche Begriffe
+  - Dynamische Tabu-Wörter-Anzeige (UI-Pool)
+  - Gewinner-Icon auf Results Screen
+  - Vollständig lokalisiert (12 LocalizedText Assets benötigt)
+  - OnLanguageChanged Event-Handler
+  - Haptic Feedback Integration
+  - Mobile-optimiert
 
-### BUG-FIXES & OPTIMIERUNGEN
-- **LanguageRadioGroup Debug-Logging**:
-  - Awake() ? Start() für bessere Initialisierung
-  - ValidateButtonReferences() für Fehlerprüfung
-  - Debug-Methoden hinzugefügt (TestButtonInteraction, DebugButtonSetup)
-  - Event-Subscriber-Check für OnLanguageChanged
+#### Bugfixes & Optimierungen
+- **Enum-Namespace-Fehler behoben**:
+  - LanguageSystem.Language statt Language (Enum ist IN Klasse)
+  - DifficultyLevel direkt (Enum ist NICHT in Klasse)
+  - Alle Dateien entsprechend korrigiert
 
-- **UnityEngine.EventSystems Import**:
-  - Fehlende using-Direktive für EventSystem und GraphicRaycaster hinzugefügt
+- **LanguageSystem.cs aktualisiert**:
+  - FindFirstObjectByType statt FindObjectOfType (Unity 6.2)
+  - Enum innerhalb der Klasse verschoben für besseres Namespacing
 
-### DOKUMENTATION
-- **LocalizedTextComponent Setup-Anleitung** erstellt:
-  - Step-by-Step Guide für Text-Lokalisierung in Szenen
-  - Erklärung Auto-Detection für Text/TextMeshPro
-  - Context-Menu-Funktionen dokumentiert
+- **TabuCollection.cs Fehlerkorrektur**:
+  - Alle DifficultySystem.DifficultyLevel zu DifficultyLevel geändert
+  - DifficultySystem.DifficultyTimeSettings zu DifficultyTimeSettings geändert
+
+- **TabuGameManager.cs Gewinner-Icon hinzugefügt**:
+  - winnerTeamImage Variable hinzugefügt
+  - UpdateResultsUI() erweitert für Gewinner-Icon-Anzeige
+  - Analog zu FossilGameManager implementiert
+
+#### Dokumentation
+- **LocalizedText Assets Liste erstellt**:
+  - 12 benötigte Assets mit allen 4 Sprachen dokumentiert
+  - Texte für Explanation, Gameplay und Results Screen
+  - Deutsche und englische Übersetzungen (Standard + Einfach)
+
+- **Game Design Dokumentation**:
+  - Vollständige Beschreibung des Tabu-Minispiels
+  - Kernmechanik, Schwierigkeitsgrade, Steuerung
+  - Spielablauf, Features, Punktesystem
+
+### NÄCHSTE SCHRITTE (PRIORISIERT)
+
+#### Content-Erstellung (HÖCHSTE PRIORITÄT)
+1. **12 LocalizedText Assets für Tabu erstellen** (siehe Tabelle oben)
+2. **TabuTerm ScriptableObjects erstellen**:
+   - Mindestens 10-15 Begriffe pro Schwierigkeitsgrad
+   - Vollständige Lokalisierung (4 Sprachen)
+   - Variable Anzahl Tabu-Wörter pro Begriff
+3. **TabuCollection ScriptableObject erstellen**:
+   - Term-Arrays zuweisen
+   - Team-Images zuweisen
+   - Spieleinstellungen konfigurieren
+
+#### UI-Setup (NÄCHSTE PRIORITÄT)
+1. **TabuGame Scene erstellen**:
+   - Analog zu Fossil-Stirnraten strukturieren
+   - 4 Screen-Hierarchie aufbauen
+2. **TabuWordText Prefab erstellen**:
+   - TextMeshProUGUI Komponente
+   - Style für Tabu-Wörter-Anzeige
+3. **TabuGameManager zuweisen**:
+   - Alle UI-Referenzen im Inspector
+   - LocalizedText Assets verlinken
+   - Audio-Clips zuweisen
 
 ---
 
@@ -585,3 +800,4 @@ Assets/_GAME/
 - **KEINE neuen großen Features** ohne vorherige Absprache!
 - **Kleinere Änderungen** und **Content-Erstellung** können gerne eigenständig erfolgen.
 - Bei Unsicherheiten oder Fragen immer zuerst im Team absprechen.
+- **Enum-Namespace beachten**: DifficultyLevel global, LanguageSystem.Language in Klasse!
