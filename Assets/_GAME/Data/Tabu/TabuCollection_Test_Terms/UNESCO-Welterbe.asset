@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: UNESCO-Welterbe
   m_EditorClassIdentifier: Assembly-CSharp::TabuTerm
   mainTermGermanStandard: UNESCO-Welterbe
-  mainTermEnglishStandard: Volcano
+  mainTermEnglishStandard: UNESCO World Heritage
   mainTermGermanSimple: UNESCO-Welt-Erbe
-  mainTermEnglishSimple: Volcano
+  mainTermEnglishSimple: UNESCO World Heritage
   tabuWordsGermanStandard:
   - Schutz
   - Kultur
