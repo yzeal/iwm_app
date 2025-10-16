@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af40366185bc634894ba02806dd990b, type: 3}
+  m_Name: PuzzleCollection_Test
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleCollection
+  collectionName: {fileID: 11400000, guid: 49f916af1d4ba3849b2829debb323009, type: 2}
+  roundsPerTeam: 2
+  startingPoints: 3
+  hintPenalty: 1
+  roundDuration: 120
+  timeSettings:
+    kidsTimeMultiplier: 1.5
+    bigKidsTimeMultiplier: 1.2
+    adultsTimeMultiplier: 1
+  useTimerForKids: 0
+  useTimerForBigKids: 1
+  useTimerForAdults: 1
+  kidsPuzzles:
+  - {fileID: 11400000, guid: 1ecc957c3840d2145b128b5820530ba7, type: 2}
+  - {fileID: 11400000, guid: a96b5f0e7268d4b41a258ad98135f47b, type: 2}
+  - {fileID: 11400000, guid: 551113d7688ed5740abdff705e345e42, type: 2}
+  - {fileID: 11400000, guid: 8d7995e71df84ed4daa24d2d6cdf38a7, type: 2}
+  - {fileID: 11400000, guid: e956a0dc5f57dd34e898d0896285351c, type: 2}
+  - {fileID: 11400000, guid: 5eff2c87974c62840be730eb16fa8670, type: 2}
+  bigKidsPuzzles:
+  - {fileID: 11400000, guid: 1ecc957c3840d2145b128b5820530ba7, type: 2}
+  - {fileID: 11400000, guid: a96b5f0e7268d4b41a258ad98135f47b, type: 2}
+  - {fileID: 11400000, guid: 551113d7688ed5740abdff705e345e42, type: 2}
+  - {fileID: 11400000, guid: 8d7995e71df84ed4daa24d2d6cdf38a7, type: 2}
+  - {fileID: 11400000, guid: e956a0dc5f57dd34e898d0896285351c, type: 2}
+  - {fileID: 11400000, guid: 5eff2c87974c62840be730eb16fa8670, type: 2}
+  adultsPuzzles:
+  - {fileID: 11400000, guid: 1ecc957c3840d2145b128b5820530ba7, type: 2}
+  - {fileID: 11400000, guid: a96b5f0e7268d4b41a258ad98135f47b, type: 2}
+  - {fileID: 11400000, guid: 551113d7688ed5740abdff705e345e42, type: 2}
+  - {fileID: 11400000, guid: 8d7995e71df84ed4daa24d2d6cdf38a7, type: 2}
+  - {fileID: 11400000, guid: e956a0dc5f57dd34e898d0896285351c, type: 2}
+  - {fileID: 11400000, guid: 5eff2c87974c62840be730eb16fa8670, type: 2}
+  team1Image: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}
+  team2Image: {fileID: 21300000, guid: 92ba78a3ad14fa94a8288756fc8dae5d, type: 3}

@@ -7131,8 +7131,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 120, y: 34}
-  m_SizeDelta: {x: 256.96802, y: 256.96802}
+  m_AnchoredPosition: {x: 244, y: -16}
+  m_SizeDelta: {x: 130, y: 130}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1892270972
 MonoBehaviour:
@@ -7156,7 +7156,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 04a4ec97e9e50f341b5c02b73fe2c574, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -8092,7 +8092,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9c8201e9147c4145a9d0507d23cdecd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleGameManager
-  puzzleCollection: {fileID: 0}
+  puzzleCollection: {fileID: 11400000, guid: a764d04b43c3e6a49b0878625b227d22, type: 2}
+  nextScene: Auswahl
   explanationScreen: {fileID: 2107524641}
   countdownScreen: {fileID: 333924895}
   gameplayScreen: {fileID: 1725218809}
@@ -8142,23 +8143,27 @@ MonoBehaviour:
   foundSound: {fileID: 8300000, guid: 02e6883f615d7844697821c9937c29ee, type: 3}
   hintSound: {fileID: 8300000, guid: 02e6883f615d7844697821c9937c29ee, type: 3}
   giveUpSound: {fileID: 8300000, guid: 6143a29cd93c5964d9dfe456291dc5ec, type: 3}
-  explanationTitleLocalizedText: {fileID: 0}
-  explanationRulesLocalizedText: {fileID: 0}
+  explanationTitleLocalizedText: {fileID: 11400000, guid: 78d453951b3e2fe4a8de4c3872bd3cfc, type: 2}
+  explanationRulesLocalizedText: {fileID: 11400000, guid: 1a07ab6f1e0bdfc48902fe6e84f01f82, type: 2}
   startButtonLocalizedText: {fileID: 11400000, guid: 03cd605ba9bc5f84c98163a52cb1fe24, type: 2}
-  roundCounterLocalizedText: {fileID: 0}
+  roundCounterLocalizedText: {fileID: 11400000, guid: f2ff37995c3ab3f4da14cdaa72871320, type: 2}
   timerLabelLocalizedText: {fileID: 11400000, guid: b504598e963b5d547b350091d45f265b, type: 2}
-  possiblePointsLocalizedText: {fileID: 0}
-  foundButtonLocalizedText: {fileID: 0}
-  hintButtonLocalizedText: {fileID: 0}
-  allHintsUsedLocalizedText: {fileID: 0}
-  giveUpButtonLocalizedText: {fileID: 0}
-  giveUpPopupLocalizedText: {fileID: 0}
-  timeUpPopupLocalizedText: {fileID: 0}
-  earnedPointsLocalizedText: {fileID: 0}
-  nextTeamButtonLocalizedText: {fileID: 0}
+  possiblePointsLocalizedText: {fileID: 11400000, guid: aed5ba9d8fbbf754ba362a299370cb21, type: 2}
+  foundButtonLocalizedText: {fileID: 11400000, guid: 16f9aa3002190184c9426d32abb7f42d, type: 2}
+  hintButtonLocalizedText: {fileID: 11400000, guid: 34f765165b4000643924a0a75f9501cc, type: 2}
+  hintButtonLabelLocalizedText: {fileID: 11400000, guid: a30d0b1f159316247852b21c3debb354, type: 2}
+  allHintsUsedLocalizedText: {fileID: 11400000, guid: f9b3fcd4e1c080e47aa6ba361a3f01bf, type: 2}
+  giveUpButtonLocalizedText: {fileID: 11400000, guid: 3d498650cf7b81942b5144e16a94d383, type: 2}
+  giveUpPopupLocalizedText: {fileID: 11400000, guid: 86e5309405ebd2b41a5bb49cf4f18b1f, type: 2}
+  timeUpPopupLocalizedText: {fileID: 11400000, guid: a109ee87c88fd70418c1cd6ede7d27d7, type: 2}
+  earnedPointsLocalizedText: {fileID: 11400000, guid: df0504663e52ba947b10bb09712b2d4f, type: 2}
+  nextTeamButtonLocalizedText: {fileID: 11400000, guid: e2bc371ca15382e46b7c2c83dd23506f, type: 2}
   resultsWinnerLocalizedText: {fileID: 11400000, guid: 6cd3a3eab6bb9cb4fbc22a3cb5148dec, type: 2}
   resultsTieLocalizedText: {fileID: 11400000, guid: d32590617aaa27045b7960f551c2e90d, type: 2}
   backButtonLocalizedText: {fileID: 11400000, guid: e2bc371ca15382e46b7c2c83dd23506f, type: 2}
+  giveUpConfirmButtonLocalizedText: {fileID: 11400000, guid: 3d498650cf7b81942b5144e16a94d383, type: 2}
+  giveUpCancelButtonLocalizedText: {fileID: 11400000, guid: e2bc371ca15382e46b7c2c83dd23506f, type: 2}
+  timeUpContinueButtonLocalizedText: {fileID: 11400000, guid: e2bc371ca15382e46b7c2c83dd23506f, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: ExplanationRules
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: puzzle_explanationrules
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Finde das Exponat im Raum anhand des Bildausschnitts!\\n\\n\u2022
+    Du kannst 2x einen Hinweis anfordern (gr\xF6\xDFerer Bildausschnitt)\\n\u2022
+    Jeder Hinweis kostet 1 Punkt\\n\u2022 Maximal 3 Punkte pro R\xE4tsel"
+  englishStandard: "Find the exhibit in the room based on the image excerpt!\\n\\n\u2022
+    You can request 2 hints (larger image excerpt)\\n\u2022 Each hint costs 1 point\\n\u2022
+    Maximum 3 points per puzzle"
+  germanSimple: "Finde das Ding im Raum!\\n\\n\u2022 Du kannst 2 mal um Hilfe bitten\\n\u2022
+    Jede Hilfe kostet 1 Punkt\\n\u2022 H\xF6chstens 3 Punkte"
+  englishSimple: "Find the thing in the room!\\n\\n\u2022 You can ask for help 2
+    times\\n\u2022 Each help costs 1 point\\n\u2022 Maximum 3 points"
+  enableDebugLogs: 0
