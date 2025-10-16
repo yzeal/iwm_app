@@ -737,6 +737,93 @@ Assets/_GAME/
 - **Mobile-Test**: Haptic Feedback, Touch-Targets, Safe Area funktionieren
 - **Audio-Test**: Alle Sound-Effekte spielen korrekt ab
 
+### BILDERRÄTSEL-MINISPIEL CODE-IMPLEMENTIERUNG (16. OKTOBER 2025)
+
+#### ScriptableObject-System (ABGESCHLOSSEN)
+- **PuzzlePiece.cs erstellt**:
+  - 3 Hinweis-Bilder (hintImage0, hintImage1, hintImage2)
+  - 1 Solution-Bild (solutionImage)
+  - Lokalisierter Exponat-Name (exhibitName: LocalizedText)
+  - Optionale lokalisierte Beschreibung (exhibitDescription: LocalizedText)
+  - GetHintImage(level), GetExhibitName(Language), GetExhibitDescription(Language)
+  - Validation-Methoden: HasAllHintImages(), HasSolutionImage(), IsValid()
+  - Context-Menu "Validate Puzzle Piece"
+  - CreateAssetMenu Integration
+
+- **PuzzleCollection.cs erstellt**:
+  - Separate Puzzle-Arrays für Kids/BigKids/Adults
+  - Konfigurierbare Punktevergabe (startingPoints: 3, hintPenalty: 1)
+  - Timer-Toggle pro Schwierigkeitsgrad (useTimerForKids: false, useTimerForBigKids/Adults: true)
+  - GetPuzzlesForDifficulty(), GetRandomPuzzles(), GetRandomPuzzlesExcluding()
+  - GetAdjustedRoundDuration() mit Timer-Check (gibt 0 zurück wenn deaktiviert)
+  - UseTimerForDifficulty() Methode
+  - HasEnoughPuzzles() Validation für alle Schwierigkeitsgrade
+  - Context-Menu "Validate Puzzle Collection"
+
+#### Game Manager (ABGESCHLOSSEN)
+- **PuzzleGameManager.cs erstellt**:
+  - Fünf Screens: Explanation, Countdown, Gameplay, Solution, Results
+  - Button-basierte Steuerung (Gefunden, Hinweis anzeigen, Aufgeben)
+  - Hinweis-System mit 3 Bildern und dynamischer Punktevergabe
+  - Timer-System mit vollständiger Deaktivierungs-Option (UI wird ausgeblendet)
+  - Team-Exklusions-System (Team 2 bekommt andere Rätsel)
+  - Popups: Aufgeben-Bestätigung, Zeit-vorbei-Nachricht
+  - WaitForEndOfFrame() Pattern für Race-Condition-Fixes
+  - OnLanguageChanged Event-Handler für Live-Updates
+  - GetLocalizedText() Helper-Methode mit Fallback-System
+  - Haptic Feedback bei allen Interaktionen
+  - Integration mit GameDataManager für Team-Schwierigkeitsgrade
+
+#### Race-Condition-Fixes (KRITISCH)
+- **Problem identifiziert**: LocalizedTextComponent.OnEnable() setzt Text vor manueller Aktualisierung
+- **Lösung implementiert**: WaitForEndOfFrame() Pattern für alle Screen-Updates
+  - UpdateExplanationUIDelayed()
+  - UpdateGameplayUIDelayed()
+  - UpdateSolutionUIDelayed()
+  - UpdateResultsUIDelayed()
+  - UpdateGiveUpPopupTextDelayed() (inkl. Button-Texte)
+  - UpdateTimeUpPopupTextDelayed() (inkl. Button-Text)
+
+#### Popup-Button-Lokalisierung (ERWEITERT)
+- **Problem**: Popup-Buttons zeigten falschen Text ("Continue" statt korrekter Lokalisierung)
+- **Ursache**: Nur Popup-Nachrichten wurden aktualisiert, nicht die Button-Texte
+- **Lösung**: 3 zusätzliche LocalizedText Assets benötigt (Gesamt: 21 statt 18)
+  - Puzzle_GiveUpConfirmButton ("Ja, aufgeben" / "Yes, give up")
+  - Puzzle_GiveUpCancelButton ("Abbrechen" / "Cancel")
+  - Puzzle_TimeUpContinueButton ("Weiter" / "Continue")
+- **Button-Texte** werden jetzt in Delayed-Coroutines explizit gesetzt
+
+#### Lokalisierung (21 LOCALIZEDTEXT ASSETS BENÖTIGT)
+1. Puzzle_ExplanationTitle
+2. Puzzle_ExplanationRules (mit Variablen: {0}=Hinweise, {1}=Penalty, {2}=Start-Punkte)
+3. Puzzle_StartButton
+4. Puzzle_RoundCounter
+5. Puzzle_TimerLabel
+6. Puzzle_PossiblePoints
+7. Puzzle_FoundButton
+8. Puzzle_HintButton (Button-Text: "Hinweis anzeigen")
+9. Puzzle_HintButtonLabel (Label: "{0} verfügbar, -{1} Punkt")
+10. Puzzle_AllHintsUsed
+11. Puzzle_GiveUpButton
+12. Puzzle_GiveUpPopup
+13. Puzzle_GiveUpConfirmButton (NEU)
+14. Puzzle_GiveUpCancelButton (NEU)
+15. Puzzle_TimeUpPopup
+16. Puzzle_TimeUpContinueButton (NEU)
+17. Puzzle_EarnedPoints
+18. Puzzle_NextTeamButton
+19. Puzzle_ResultsWinner
+20. Puzzle_ResultsTie
+21. Puzzle_BackButton
+
+#### Nächste Schritte (AUSSTEHEND)
+- [ ] 21 LocalizedText Assets erstellen (alle 4 Sprachen)
+- [ ] PuzzleGame Scene aufbauen (5 Screen-Hierarchie)
+- [ ] PuzzleGameManager Referenzen zuweisen (Inspector)
+- [ ] PuzzlePiece Content erstellen (10-15 pro Schwierigkeitsgrad)
+- [ ] PuzzleCollection Asset konfigurieren
+- [ ] Testing: Funktionalität, Lokalisierung, Timer-Toggle, Mobile
+
 ---
 
 ## WICHTIGE HINWEISE FÜR ZUKÜNFTIGE ENTWICKLUNGSSCHRITTE
