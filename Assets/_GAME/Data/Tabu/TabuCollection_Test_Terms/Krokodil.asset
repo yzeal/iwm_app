@@ -26,14 +26,14 @@ MonoBehaviour:
   - animal
   - Messel
   - water
-  - ' '
-  - ' '
+  - swim
+  - aligator
   tabuWordsGermanSimple:
   - Tier
   - Messel
   - Wasser
-  - schwimmen
-  - Aligator
+  - ' '
+  - ' '
   tabuWordsEnglishSimple:
   - animal
   - Messel

@@ -30,6 +30,7 @@ public class TabuGameManager : MonoBehaviour
 
     [Header("UI References - Gameplay Screen")]
     [SerializeField] private GameObject gameplayScreen;
+    [SerializeField] private Image currentTeamImage; // NEU: Team-Icon im Gameplay
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private TextMeshProUGUI mainTermText;
     [SerializeField] private TextMeshProUGUI tabuWordsHeaderText;
@@ -46,7 +47,7 @@ public class TabuGameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultsWinnerText;
     [SerializeField] private Image resultsTeam1Image;
     [SerializeField] private Image resultsTeam2Image;
-    [SerializeField] private Image winnerTeamImage; // NEU: Gewinner-Icon
+    [SerializeField] private Image winnerTeamImage;
     [SerializeField] private Button resultsBackButton;
 
     [Header("Audio")]
@@ -386,6 +387,9 @@ public class TabuGameManager : MonoBehaviour
 
     private void UpdateGameplayUI()
     {
+        // NEU: Team-Image aktualisieren
+        UpdateCurrentTeamImage();
+
         // Score Display
         int currentScore = currentTeam == 1 ? team1Score : team2Score;
         int maxTerms = tabuCollection.TermsPerRound;
@@ -410,6 +414,26 @@ public class TabuGameManager : MonoBehaviour
             var buttonText = skipButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
                 buttonText.text = GetLocalizedText(skipButtonLocalizedText, "Überspringen ?");
+        }
+    }
+
+    /// <summary>
+    /// NEU: Team-Image im Gameplay Screen aktualisieren
+    /// </summary>
+    private void UpdateCurrentTeamImage()
+    {
+        if (currentTeamImage == null) return;
+
+        Sprite teamSprite = currentTeam == 1 ? tabuCollection.Team1Image : tabuCollection.Team2Image;
+
+        if (teamSprite != null)
+        {
+            currentTeamImage.sprite = teamSprite;
+            currentTeamImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            currentTeamImage.gameObject.SetActive(false);
         }
     }
 
@@ -519,7 +543,7 @@ public class TabuGameManager : MonoBehaviour
         if (resultsTeam2Image != null && tabuCollection.Team2Image != null)
             resultsTeam2Image.sprite = tabuCollection.Team2Image;
 
-        // Winner (NEU: mit Gewinner-Icon)
+        // Winner (mit Gewinner-Icon)
         if (resultsWinnerText != null)
         {
             if (team1Score > team2Score)

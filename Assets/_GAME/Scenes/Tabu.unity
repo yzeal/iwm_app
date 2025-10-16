@@ -5050,6 +5050,7 @@ MonoBehaviour:
   countdownScreen: {fileID: 333924895}
   countdownText: {fileID: 677701639}
   gameplayScreen: {fileID: 1725218809}
+  currentTeamImage: {fileID: 1892270972}
   timerText: {fileID: 1217238680}
   mainTermText: {fileID: 1680651710}
   tabuWordsHeaderText: {fileID: 49789150}
