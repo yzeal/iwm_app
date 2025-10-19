@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8094aabba4ec4bd4495113a93763ea2b, type: 3}
   m_Name: TestPuzzlePiece_3
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
-  hintImage0: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
-  hintImage1: {fileID: 21300000, guid: bb02f93290bb9d843a7d5791eb4cf4a0, type: 3}
-  hintImage2: {fileID: 21300000, guid: b6115086057657945a508c5d160603ca, type: 3}
-  solutionImage: {fileID: 21300000, guid: c9f945eb0a4f5ab46a4fbac23d49ffb0, type: 3}
-  exhibitName: {fileID: 11400000, guid: b504598e963b5d547b350091d45f265b, type: 2}
-  exhibitDescription: {fileID: 11400000, guid: eb7275ba61be51d4c9c7e0e7c3dfa25f, type: 2}
+  hintImage0: {fileID: -8092648678112207678, guid: e21bd36ddad5c4749926ebcc439ee6ad, type: 3}
+  hintImage1: {fileID: 6040380465655141182, guid: c7659010a99c33e4bbda214946d13c7d, type: 3}
+  hintImage2: {fileID: -3552091134495240935, guid: f6ff9ede59843234faae531a78681e15, type: 3}
+  solutionImage: {fileID: -3552091134495240935, guid: f6ff9ede59843234faae531a78681e15, type: 3}
+  exhibitName: {fileID: 11400000, guid: f9e8c19b6908e5443924964d4e2cb482, type: 2}
+  exhibitDescription: {fileID: 11400000, guid: 8081bb5f3a3ed084d9ddeb16e3a03523, type: 2}
