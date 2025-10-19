@@ -281,48 +281,48 @@ public class FossilInputHandler : MonoBehaviour
     {
         Debug.Log($"[FossilInputHandler] TriggerCorrect() called - inputEnabled: {inputEnabled}, cooldown: {Time.time - lastInputTime}");
         
-        // KRITISCH: Cooldown-Check VOR Ausführung
         if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN) 
         {
             Debug.Log("[FossilInputHandler] Input BLOCKED - cooldown active or input disabled");
-            return; // ? Frühes Return OHNE weitere Aktionen
+            return;
         }
         
         Debug.Log("[FossilInputHandler] CORRECT! - Processing input");
         lastInputTime = Time.time;
         
-        // Event auslösen
-        OnCorrectInput?.Invoke();
-        
-        // ? HAPTIC wird nur bei erfolgreichem Input ausgelöst
+        // ? HAPTIC VOR DisableInputTemporarily
         Debug.Log("[FossilInputHandler] Triggering haptic feedback");
         TriggerHapticFeedback();
         
+        // ? DisableInputTemporarily VOR Event!
         DisableInputTemporarily(0.5f);
+        
+        // ? Event als LETZTES auslösen
+        OnCorrectInput?.Invoke();
     }
     
     public void TriggerSkip()
     {
         Debug.Log($"[FossilInputHandler] TriggerSkip() called - inputEnabled: {inputEnabled}, cooldown: {Time.time - lastInputTime}");
         
-        // KRITISCH: Cooldown-Check VOR Ausführung
         if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN)
         {
             Debug.Log("[FossilInputHandler] Input BLOCKED - cooldown active or input disabled");
-            return; // ? Frühes Return OHNE weitere Aktionen
+            return;
         }
         
         Debug.Log("[FossilInputHandler] SKIP! - Processing input");
         lastInputTime = Time.time;
         
-        // Event auslösen
-        OnSkipInput?.Invoke();
-        
-        // ? HAPTIC wird nur bei erfolgreichem Input ausgelöst
+        // ? HAPTIC VOR DisableInputTemporarily
         Debug.Log("[FossilInputHandler] Triggering haptic feedback");
         TriggerHapticFeedback();
         
+        // ? DisableInputTemporarily VOR Event!
         DisableInputTemporarily(0.5f);
+        
+        // ? Event als LETZTES auslösen
+        OnSkipInput?.Invoke();
     }
     
     void TriggerHapticFeedback()
@@ -360,6 +360,9 @@ public class FossilInputHandler : MonoBehaviour
     public void SetInputEnabled(bool enabled)
     {
         Debug.Log($"[FossilInputHandler] SetInputEnabled({enabled})");
+        
+        // ? NEU: Cancel alle geplanten EnableInput() Callbacks!
+        CancelInvoke(nameof(EnableInput));
         
         inputEnabled = enabled;
         SetButtonsInteractable(enabled);
