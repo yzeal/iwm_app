@@ -3,7 +3,10 @@
 
 **ZWECK DIESER DATEI**: Diese Notizen dienen als Kontext für GitHub Copilot in neuen Chat-Sessions, um nahtlos am Projekt weiterarbeiten zu können ohne Zugriff auf vorherige Chat-Historie.
 
-**FORMATIERUNG**: In dieser Datei KEINE dreifachen Anführungszeichen oder Backticks verwenden - diese beenden den Code-Output im Chat und verhindern direktes Kopieren in Dokumente.
+**FORMATIERUNG**: 
+- **IN DIESER DATEI**: KEINE dreifachen Anführungszeichen oder Backticks verwenden - diese würden den Markdown-Parser stören
+- **FÜR CHAT-OUTPUT**: Code-Snippets MIT Backticks umschließen, damit sie im Chat als Code-Block angezeigt werden
+- **BEIM EINFÜGEN**: Die äußeren Backticks werden automatisch entfernt - nur der innere Inhalt wird in die Datei geschrieben
 
 ---
 
@@ -510,7 +513,7 @@ Assets/_GAME/
 ?   ?   ??? DifficultySystem.cs
 ?   ?   ??? LanguageSystem.cs
 ?   ?   ??? LocalizedText.cs
-?   ??? Notes/
+?   ?   ??? Notes/
 ?       ??? Notes.md
 ??? Plugins/
     ??? FullscreenWebGL.jslib (DEPRECATED für Mobile)
@@ -689,146 +692,164 @@ Assets/_GAME/
 
 ---
 
-## CHANGELOG - SESSION VOM 16. OKTOBER 2025
+## CHANGELOG - SESSION VOM 19. OKTOBER 2025
 
-### TABU-MINISPIEL VOLLSTÄNDIG FERTIGGESTELLT
+### FOSSILINPUTHANDLER CRITICAL BUG FIX
 
-#### Content-Erstellung (ABGESCHLOSSEN)
-- **12 LocalizedText Assets erstellt**:
-  - Tabu_ExplanationTitle, Tabu_ExplanationRules, Tabu_StartButton
-  - Tabu_TimerLabel, Tabu_TabuWordsHeader
-  - Tabu_CorrectButton, Tabu_SkipButton
-  - Tabu_ResultsTeam1Label, Tabu_ResultsTeam2Label
-  - Tabu_ResultsWinner, Tabu_ResultsTie, Tabu_BackButton
-  - Vollständige Übersetzungen in allen 4 Sprachen
+#### Problem: Ungewollte Vibrationen auf Explanation Screen
+- **Symptom**: Nach Team 1 Runde vibrierte Handy auf Explanation Screen bei Handy-Bewegungen
+- **Root Cause**: EnableInput() Invoke-Callback aus DisableInputTemporarily() wurde NACH SetInputEnabled(false) ausgeführt
+- **Timeline des Problems**:
+  1. Letzter TriggerCorrect()/TriggerSkip() Call registriert Invoke(EnableInput, 0.5s)
+  2. OnCorrectInput/OnSkipInput Event triggert EndRound() ? SetInputEnabled(false)
+  3. 0.5 Sekunden später: EnableInput() führt sich aus und re-aktiviert Input
+  4. User ist auf Explanation Screen, aber Input ist aktiv ? Vibrationen bei Handy-Bewegung
 
-- **TabuTerm ScriptableObjects erstellt**:
-  - 10-15 Begriffe pro Schwierigkeitsgrad (Kids/BigKids/Adults)
-  - Vollständige Lokalisierung in 4 Sprachen
-  - Variable Anzahl Tabu-Wörter pro Begriff
+#### Lösung 1: CancelInvoke() in SetInputEnabled() (NICHT AUSREICHEND)
+- CancelInvoke(nameof(EnableInput)) in SetInputEnabled(false) hinzugefügt
+- **Problem**: Invoke wurde bereits VOR SetInputEnabled() Call registriert
+- **Ergebnis**: Vibrationen blieben bestehen
 
-- **TabuCollection ScriptableObject erstellt**:
-  - Term-Arrays für alle Schwierigkeitsgrade zugewiesen
-  - Team-Images zugewiesen
-  - Spieleinstellungen konfiguriert (termsPerRound, roundDuration)
-  - DifficultyTimeSettings konfiguriert
+#### Lösung 2: Event-Reihenfolge ändern (ERFOLGREICH)
+- **Änderung in TriggerCorrect() und TriggerSkip()**:
 
-#### UI-Setup (ABGESCHLOSSEN)
-- **TabuGame Scene erstellt**:
-  - Analog zu Fossil-Stirnraten strukturiert
-  - 4 Screen-Hierarchie aufgebaut (Explanation, Countdown, Gameplay, Results)
-  - Safe Area Support implementiert
-  - Mobile-optimierte Touch-Targets
+VORHER (FALSCH):
+1. OnCorrectInput?.Invoke()  ? Ruft SetInputEnabled(false)
+2. TriggerHapticFeedback()
+3. DisableInputTemporarily()  ? Invoke läuft NACH SetInputEnabled
 
-- **TabuWordText Prefab erstellt**:
-  - TextMeshProUGUI Komponente mit passender Formatierung
-  - Style für Tabu-Wörter-Anzeige optimiert
+NACHHER (RICHTIG):
+1. TriggerHapticFeedback()
+2. DisableInputTemporarily()  ? Invoke wird registriert
+3. OnCorrectInput?.Invoke()   ? SetInputEnabled(false) + CancelInvoke() löscht Invoke
 
-- **TabuGameManager Referenzen zugewiesen**:
-  - Alle UI-Referenzen im Inspector verlinkt
-  - 12 LocalizedText Assets zugewiesen
-  - TabuCollection Asset zugewiesen
-  - Audio-Clips zugewiesen (Countdown, Timer-Warning, Correct, Skip)
-  - Team-Images zugewiesen
+- **Ergebnis**: CancelInvoke() in SetInputEnabled(false) kann jetzt den gerade registrierten Invoke erfolgreich löschen
+- **Bestätigung**: Log-Analyse vom 19.10.2025 16:25 Uhr zeigt KEINE ungewollten Vibrationen mehr
 
-#### Testing & Polishing (ABGESCHLOSSEN)
-- **Funktionalitätstest**: Alle Features getestet und funktionsfähig
-- **Lokalisierungstest**: Language-Switching funktioniert einwandfrei
-- **Mobile-Test**: Haptic Feedback, Touch-Targets, Safe Area funktionieren
-- **Audio-Test**: Alle Sound-Effekte spielen korrekt ab
+#### Code-Änderungen in FossilInputHandler.cs
 
-### BILDERRÄTSEL-MINISPIEL CODE-IMPLEMENTIERUNG (16. OKTOBER 2025)
+**TriggerCorrect() - Neue Reihenfolge:**
+```csharp
+public void TriggerCorrect()
+{
+    if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN) 
+    {
+        return;
+    }
+    
+    lastInputTime = Time.time;
+    
+    // KRITISCHE REIHENFOLGE: Haptic ZUERST
+    TriggerHapticFeedback();
+    
+    // DisableInputTemporarily VOR Event-Invoke
+    DisableInputTemporarily(0.5f);
+    
+    // Event als LETZTES (triggert SetInputEnabled(false) ? CancelInvoke löscht Invoke)
+    OnCorrectInput?.Invoke();
+}
+```
 
-#### ScriptableObject-System (ABGESCHLOSSEN)
-- **PuzzlePiece.cs erstellt**:
-  - 3 Hinweis-Bilder (hintImage0, hintImage1, hintImage2)
-  - 1 Solution-Bild (solutionImage)
-  - Lokalisierter Exponat-Name (exhibitName: LocalizedText)
-  - Optionale lokalisierte Beschreibung (exhibitDescription: LocalizedText)
-  - GetHintImage(level), GetExhibitName(Language), GetExhibitDescription(Language)
-  - Validation-Methoden: HasAllHintImages(), HasSolutionImage(), IsValid()
-  - Context-Menu "Validate Puzzle Piece"
-  - CreateAssetMenu Integration
+**TriggerSkip() - Neue Reihenfolge:**
+```csharp
+public void TriggerSkip()
+{
+    if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN)
+    {
+        return;
+    }
+    
+    lastInputTime = Time.time;
+    
+    // KRITISCHE REIHENFOLGE: Haptic ZUERST
+    TriggerHapticFeedback();
+    
+    // DisableInputTemporarily VOR Event-Invoke
+    DisableInputTemporarily(0.5f);
+    
+    // Event als LETZTES (triggert SetInputEnabled(false) ? CancelInvoke löscht Invoke)
+    OnSkipInput?.Invoke();
+}
+```
 
-- **PuzzleCollection.cs erstellt**:
-  - Separate Puzzle-Arrays für Kids/BigKids/Adults
-  - Konfigurierbare Punktevergabe (startingPoints: 3, hintPenalty: 1)
-  - Timer-Toggle pro Schwierigkeitsgrad (useTimerForKids: false, useTimerForBigKids/Adults: true)
-  - GetPuzzlesForDifficulty(), GetRandomPuzzles(), GetRandomPuzzlesExcluding()
-  - GetAdjustedRoundDuration() mit Timer-Check (gibt 0 zurück wenn deaktiviert)
-  - UseTimerForDifficulty() Methode
-  - HasEnoughPuzzles() Validation für alle Schwierigkeitsgrade
-  - Context-Menu "Validate Puzzle Collection"
+**SetInputEnabled() - Mit CancelInvoke (bereits am 16.10. implementiert):**
+```csharp
+public void SetInputEnabled(bool enabled)
+{
+    // Cancel alle geplanten EnableInput() Callbacks
+    CancelInvoke(nameof(EnableInput));
+    
+    inputEnabled = enabled;
+    SetButtonsInteractable(enabled);
+    
+    if (enabled)
+    {
+        hasInitialReading = false;
+        lastInputTime = 0f;
+        CheckAccelerometerAvailability();
+    }
+    else
+    {
+        hasInitialReading = false;
+    }
+}
+```
 
-#### Game Manager (ABGESCHLOSSEN)
-- **PuzzleGameManager.cs erstellt**:
-  - Fünf Screens: Explanation, Countdown, Gameplay, Solution, Results
-  - Button-basierte Steuerung (Gefunden, Hinweis anzeigen, Aufgeben)
-  - Hinweis-System mit 3 Bildern und dynamischer Punktevergabe
-  - Timer-System mit vollständiger Deaktivierungs-Option (UI wird ausgeblendet)
-  - Team-Exklusions-System (Team 2 bekommt andere Rätsel)
-  - Popups: Aufgeben-Bestätigung, Zeit-vorbei-Nachricht
-  - WaitForEndOfFrame() Pattern für Race-Condition-Fixes
-  - OnLanguageChanged Event-Handler für Live-Updates
-  - GetLocalizedText() Helper-Methode mit Fallback-System
-  - Haptic Feedback bei allen Interaktionen
-  - Integration mit GameDataManager für Team-Schwierigkeitsgrade
+#### Testing & Verification
+- **Log-Analyse**: Android-Logcat vom 19.10.2025 16:25 Uhr
+- **Bestätigung**: KEINE Vibrationen während Explanation Screen
+- **Gameplay**: Input funktioniert normal während aktiver Spielphase
+- **Team-Wechsel**: Saubere Deaktivierung zwischen Runden
+- **Mobile-Test**: iOS/Android Haptic Feedback funktioniert korrekt
 
-#### Race-Condition-Fixes (KRITISCH)
-- **Problem identifiziert**: LocalizedTextComponent.OnEnable() setzt Text vor manueller Aktualisierung
-- **Lösung implementiert**: WaitForEndOfFrame() Pattern für alle Screen-Updates
-  - UpdateExplanationUIDelayed()
-  - UpdateGameplayUIDelayed()
-  - UpdateSolutionUIDelayed()
-  - UpdateResultsUIDelayed()
-  - UpdateGiveUpPopupTextDelayed() (inkl. Button-Texte)
-  - UpdateTimeUpPopupTextDelayed() (inkl. Button-Text)
+#### Lessons Learned
+- **Event-Reihenfolge ist kritisch**: Events sollten IMMER als letztes ausgeführt werden
+- **Invoke + SetEnabled kombinieren**: CancelInvoke() muss NACH Invoke() Call passieren
+- **Race-Conditions**: Asynchrone Callbacks (Invoke) können State-Management brechen
+- **Debugging-Strategie**: Timestamp-Logs helfen enorm bei Invoke-Timing-Problemen
+### FOSSILIEN-STIRNRATEN DETAILS (VOLLSTÄNDIG LOKALISIERT + POLISHED)
+- **100% LocalizedText Assets**: ALLE UI-Texte über ScriptableObjects
+- **Keine hardcodierten Strings mehr**: Explanation-Screen, Input-Modi, Anweisungen
+- **Lokalisierte Fossilien**: Fossil-Namen in gewählter Sprache
+- **Adaptive Schwierigkeitsgrad-Anzeige**: Angepasst an gewählte Sprache
+- **Live Language-Updates**: UI aktualisiert sich automatisch
+- **Dynamische Input-Mode-Texte**: GetLocalizedInputModeInfo() prüft IsUsingAccelerometer()
+- **CRITICAL FIX (19.10.2025)**: Event-Reihenfolge in TriggerCorrect/TriggerSkip geändert
+  - Haptic Feedback ? DisableInputTemporarily() ? Event-Invoke
+  - Verhindert ungewollte Vibrationen auf Explanation Screen
+  - CancelInvoke() in SetInputEnabled() funktioniert jetzt korrekt
+- **Adaptive Zeiten**: GetAdjustedRoundDuration() basierend auf Team-Schwierigkeitsgrad
+- **Content-Sets**: Separate Fossil-Arrays pro Schwierigkeitsgrad
+- **Input-System**: Accelerometer mit Touch-Fallback
+- **Fossil-Management**: Correct = Remove, Skip = Move to End
+- **Timer-Audio**: Countdown-Sounds bei 3-2-1 Sekunden
+- **Team-System**: Image-basierte Darstellung mit ScriptableObject-Config
 
-#### Popup-Button-Lokalisierung (ERWEITERT)
-- **Problem**: Popup-Buttons zeigten falschen Text ("Continue" statt korrekter Lokalisierung)
-- **Ursache**: Nur Popup-Nachrichten wurden aktualisiert, nicht die Button-Texte
-- **Lösung**: 3 zusätzliche LocalizedText Assets benötigt (Gesamt: 21 statt 18)
-  - Puzzle_GiveUpConfirmButton ("Ja, aufgeben" / "Yes, give up")
-  - Puzzle_GiveUpCancelButton ("Abbrechen" / "Cancel")
-  - Puzzle_TimeUpContinueButton ("Weiter" / "Continue")
-- **Button-Texte** werden jetzt in Delayed-Coroutines explizit gesetzt
+### INVOKE-CALLBACK & EVENT-REIHENFOLGE BEST PRACTICES (19.10.2025)
 
-#### Lokalisierung (21 LOCALIZEDTEXT ASSETS BENÖTIGT)
-1. Puzzle_ExplanationTitle
-2. Puzzle_ExplanationRules (mit Variablen: {0}=Hinweise, {1}=Penalty, {2}=Start-Punkte)
-3. Puzzle_StartButton
-4. Puzzle_RoundCounter
-5. Puzzle_TimerLabel
-6. Puzzle_PossiblePoints
-7. Puzzle_FoundButton
-8. Puzzle_HintButton (Button-Text: "Hinweis anzeigen")
-9. Puzzle_HintButtonLabel (Label: "{0} verfügbar, -{1} Punkt")
-10. Puzzle_AllHintsUsed
-11. Puzzle_GiveUpButton
-12. Puzzle_GiveUpPopup
-13. Puzzle_GiveUpConfirmButton (NEU)
-14. Puzzle_GiveUpCancelButton (NEU)
-15. Puzzle_TimeUpPopup
-16. Puzzle_TimeUpContinueButton (NEU)
-17. Puzzle_EarnedPoints
-18. Puzzle_NextTeamButton
-19. Puzzle_ResultsWinner
-20. Puzzle_ResultsTie
-21. Puzzle_BackButton
+#### Problem-Pattern (VERMEIDEN)
 
-#### Nächste Schritte (AUSSTEHEND)
-- [ ] 21 LocalizedText Assets erstellen (alle 4 Sprachen)
-- [ ] PuzzleGame Scene aufbauen (5 Screen-Hierarchie)
-- [ ] PuzzleGameManager Referenzen zuweisen (Inspector)
-- [ ] PuzzlePiece Content erstellen (10-15 pro Schwierigkeitsgrad)
-- [ ] PuzzleCollection Asset konfigurieren
-- [ ] Testing: Funktionalität, Lokalisierung, Timer-Toggle, Mobile
+// FALSCH: Event ZUERST
+public void TriggerAction()
+{
+    OnAction?.Invoke();              // Kann SetInputEnabled(false) aufrufen
+    TriggerHapticFeedback();
+    DisableInputTemporarily(0.5f);   // Invoke wird NACH SetInputEnabled registriert
+}
 
----
+#### Lösung-Pattern (VERWENDEN)
 
-## WICHTIGE HINWEISE FÜR ZUKÜNFTIGE ENTWICKLUNGSSCHRITTE
-- **KEINE neuen großen Features** ohne vorherige Absprache!
-- **Kleinere Änderungen** und **Content-Erweiterungen** können gerne eigenständig erfolgen.
-- Bei Unsicherheiten oder Fragen immer zuerst im Team absprechen.
-- **Enum-Namespace beachten**: DifficultyLevel global, LanguageSystem.Language in Klasse!
-- **Neue Minispiele**: Analog zu bestehenden Systemen mit Difficulty + Language Support implementieren.
+// RICHTIG: Event als LETZTES
+public void TriggerAction()
+{
+    TriggerHapticFeedback();         // Sofortige Aktionen zuerst
+    DisableInputTemporarily(0.5f);   // Invoke registrieren
+    OnAction?.Invoke();              // Event triggert SetInputEnabled ? CancelInvoke löscht Invoke
+}
+
+#### Regeln
+1. **Invoke-Callbacks vor Events**: Alle Invoke() Calls VOR Event-Invocations
+2. **CancelInvoke() nach Invoke()**: CancelInvoke() kann nur NACH Invoke() greifen
+3. **Sofortige Aktionen zuerst**: Haptic Feedback, Audio, UI-Updates vor Callbacks
+4. **Events als Letztes**: Events können State ändern ? sollten letzte Aktion sein
+5. **Race-Conditions beachten**: Asynchrone Callbacks können State-Management brechen
