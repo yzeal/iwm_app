@@ -35,9 +35,13 @@ public class FossilInputHandler : MonoBehaviour
     // Für direkte Accelerometer-Abfrage als Fallback
     private bool useDirectAccelerometer = false;
     
-    // NEU: Globaler Input-Cooldown für ALLE Input-Methoden
+    // Globaler Input-Cooldown für ALLE Input-Methoden
     private float lastInputTime = 0f;
     private const float INPUT_COOLDOWN = 0.5f;
+    
+    // NEU: Tracking für "neutrale" Position
+    private bool isInNeutralZone = true;
+    private const float NEUTRAL_ZONE_THRESHOLD = 0.15f; // Kleinerer Threshold für "zurück zur Mitte"
     
     void Start()
     {
@@ -45,6 +49,8 @@ public class FossilInputHandler : MonoBehaviour
         SetupButtons();
         CheckAccelerometerAvailability();
         EnableAccelerometerSensor();
+        
+        Debug.Log($"[FossilInputHandler] Started - inputEnabled: {inputEnabled}");
     }
     
     void SetupButtons()
@@ -53,7 +59,7 @@ public class FossilInputHandler : MonoBehaviour
         if (leftButton != null)
         {
             leftButton.onClick.AddListener(() => {
-                if (debugMode) Debug.Log("LEFT BUTTON - Skip");
+                Debug.Log("[FossilInputHandler] LEFT BUTTON clicked");
                 TriggerSkip();
             });
         }
@@ -61,15 +67,12 @@ public class FossilInputHandler : MonoBehaviour
         if (rightButton != null)
         {
             rightButton.onClick.AddListener(() => {
-                if (debugMode) Debug.Log("RIGHT BUTTON - Correct");
+                Debug.Log("[FossilInputHandler] RIGHT BUTTON clicked");
                 TriggerCorrect();
             });
         }
         
-        if (debugMode)
-        {
-            Debug.Log("Touch buttons setup - always active");
-        }
+        Debug.Log("[FossilInputHandler] Touch buttons setup - always active");
     }
     
     void SetupInputActions()
@@ -82,12 +85,12 @@ public class FossilInputHandler : MonoBehaviour
             if (accelerometerAction != null)
             {
                 accelerometerAction.Enable();
-                Debug.Log("Accelerometer action enabled");
+                Debug.Log("[FossilInputHandler] Accelerometer action enabled");
             }
         }
         else
         {
-            Debug.LogWarning("No Input Actions assigned! Using button fallback only.");
+            Debug.LogWarning("[FossilInputHandler] No Input Actions assigned! Using button fallback only.");
         }
     }
     
@@ -101,21 +104,21 @@ public class FossilInputHandler : MonoBehaviour
             
             if (Accelerometer.current != null)
             {
-                Debug.Log("Accelerometer device found and enabled");
+                Debug.Log("[FossilInputHandler] Accelerometer device found and enabled");
                 
                 if (Accelerometer.current.samplingFrequency > 0)
                 {
-                    Debug.Log($"Accelerometer sampling frequency: {Accelerometer.current.samplingFrequency} Hz");
+                    Debug.Log($"[FossilInputHandler] Accelerometer sampling frequency: {Accelerometer.current.samplingFrequency} Hz");
                 }
             }
             else
             {
-                Debug.LogWarning("Accelerometer.current is null - device may not support accelerometer");
+                Debug.LogWarning("[FossilInputHandler] Accelerometer.current is null - device may not support accelerometer");
             }
         }
         else
         {
-            Debug.LogWarning("Device does not support accelerometer according to SystemInfo");
+            Debug.LogWarning("[FossilInputHandler] Device does not support accelerometer according to SystemInfo");
         }
 #endif
     }
@@ -130,7 +133,7 @@ public class FossilInputHandler : MonoBehaviour
             
             if (debugMode)
             {
-                Debug.Log($"Input Action test reading: {testReading}");
+                Debug.Log($"[FossilInputHandler] Input Action test reading: {testReading}");
             }
         }
         
@@ -142,7 +145,7 @@ public class FossilInputHandler : MonoBehaviour
             {
                 useDirectAccelerometer = true;
                 accelerometerAvailable = true;
-                Debug.Log("Using direct Accelerometer access as fallback");
+                Debug.Log("[FossilInputHandler] Using direct Accelerometer access as fallback");
             }
         }
         
@@ -152,15 +155,12 @@ public class FossilInputHandler : MonoBehaviour
             Invoke(nameof(CheckLegacyAccelerometer), 0.5f);
         }
         
-        if (debugMode)
-        {
-            Debug.Log($"Platform: {Application.platform}");
-            Debug.Log($"SystemInfo.supportsAccelerometer: {SystemInfo.supportsAccelerometer}");
-            Debug.Log($"Accelerometer available: {accelerometerAvailable}");
-            Debug.Log($"Using direct accelerometer: {useDirectAccelerometer}");
-            Debug.Log($"Force touch mode: {forceTouchMode}");
-            Debug.Log($"Allow dual input: {allowDualInput}");
-        }
+        Debug.Log($"[FossilInputHandler] Platform: {Application.platform}");
+        Debug.Log($"[FossilInputHandler] SystemInfo.supportsAccelerometer: {SystemInfo.supportsAccelerometer}");
+        Debug.Log($"[FossilInputHandler] Accelerometer available: {accelerometerAvailable}");
+        Debug.Log($"[FossilInputHandler] Using direct accelerometer: {useDirectAccelerometer}");
+        Debug.Log($"[FossilInputHandler] Force touch mode: {forceTouchMode}");
+        Debug.Log($"[FossilInputHandler] Allow dual input: {allowDualInput}");
     }
     
     void CheckLegacyAccelerometer()
@@ -168,7 +168,7 @@ public class FossilInputHandler : MonoBehaviour
 #pragma warning disable CS0618 // Type or member is obsolete
         if (!accelerometerAvailable && Input.acceleration != Vector3.zero)
         {
-            Debug.Log("Legacy Input.acceleration available - using as fallback");
+            Debug.Log("[FossilInputHandler] Legacy Input.acceleration available - using as fallback");
             accelerometerAvailable = true;
             useDirectAccelerometer = true;
         }
@@ -177,10 +177,14 @@ public class FossilInputHandler : MonoBehaviour
     
     void Update()
     {
-        if (!inputEnabled) return;
+        // KRITISCH: Prüfe Accelerometer nur wenn Input auch ENABLED ist
+        if (!inputEnabled)
+        {
+            // WICHTIG: Kein Accelerometer-Check wenn disabled!
+            return;
+        }
         
-        // NEU: Prüfe Accelerometer nur wenn verfügbar UND nicht im Force-Touch-Modus
-        // Touch-Buttons funktionieren IMMER parallel (wenn allowDualInput = true)
+        // Prüfe Accelerometer nur wenn verfügbar UND nicht im Force-Touch-Modus
         if (accelerometerAvailable && !forceTouchMode)
         {
             CheckTiltInput();
@@ -189,7 +193,7 @@ public class FossilInputHandler : MonoBehaviour
     
     void CheckTiltInput()
     {
-        // NEU: Globaler Cooldown-Check (gilt für ALLE Input-Arten)
+        // Globaler Cooldown-Check
         if (Time.time - lastInputTime < INPUT_COOLDOWN)
         {
             return;
@@ -219,7 +223,7 @@ public class FossilInputHandler : MonoBehaviour
         {
             if (debugMode)
             {
-                Debug.LogWarning("Zero acceleration reading");
+                Debug.LogWarning("[FossilInputHandler] Zero acceleration reading");
             }
             return;
         }
@@ -228,10 +232,11 @@ public class FossilInputHandler : MonoBehaviour
         {
             initialAcceleration = acceleration;
             hasInitialReading = true;
+            isInNeutralZone = true; // ? NEU: Starte in neutraler Zone
             
             if (debugMode)
             {
-                Debug.Log($"Initial acceleration set: {initialAcceleration}");
+                Debug.Log($"[FossilInputHandler] Initial acceleration set: {initialAcceleration}");
             }
             return;
         }
@@ -240,36 +245,57 @@ public class FossilInputHandler : MonoBehaviour
         
         if (debugMode)
         {
-            Debug.Log($"Acceleration: {acceleration} | Delta Z: {deltaAccel.z:F2} | Threshold: {tiltThreshold}");
+            Debug.Log($"[FossilInputHandler] Acceleration: {acceleration} | Delta Z: {deltaAccel.z:F2} | Threshold: {tiltThreshold} | Neutral: {isInNeutralZone}");
+        }
+        
+        // ? NEU: Prüfe ob wir in der neutralen Zone sind
+        if (Mathf.Abs(deltaAccel.z) < NEUTRAL_ZONE_THRESHOLD)
+        {
+            isInNeutralZone = true;
+        }
+        
+        // ? NEU: Input nur triggern wenn wir AUS der neutralen Zone kommen
+        if (!isInNeutralZone)
+        {
+            // Handy ist bereits gekippt - warte bis es zurück kommt
+            return;
         }
         
         // Nach vorne neigen (Handy von Stirn weg) = Richtig
         if (deltaAccel.z > tiltThreshold)
         {
-            if (debugMode) Debug.Log("TILT FORWARD - Correct!");
+            Debug.Log("[FossilInputHandler] TILT FORWARD detected!");
+            isInNeutralZone = false; // ? NEU: Verlasse neutrale Zone
             TriggerCorrect();
         }
         // Nach hinten neigen (Handy zur Stirn hin) = Überspringen  
         else if (deltaAccel.z < -tiltThreshold)
         {
-            if (debugMode) Debug.Log("TILT BACKWARD - Skip!");
+            Debug.Log("[FossilInputHandler] TILT BACKWARD detected!");
+            isInNeutralZone = false; // ? NEU: Verlasse neutrale Zone
             TriggerSkip();
         }
     }
     
     public void TriggerCorrect()
     {
-        // NEU: Cooldown-Check VOR Ausführung (gilt für Touch UND Tilt)
+        Debug.Log($"[FossilInputHandler] TriggerCorrect() called - inputEnabled: {inputEnabled}, cooldown: {Time.time - lastInputTime}");
+        
+        // KRITISCH: Cooldown-Check VOR Ausführung
         if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN) 
         {
-            if (debugMode) Debug.Log("Input blocked - cooldown active");
-            return;
+            Debug.Log("[FossilInputHandler] Input BLOCKED - cooldown active or input disabled");
+            return; // ? Frühes Return OHNE weitere Aktionen
         }
         
-        Debug.Log("CORRECT!");
-        lastInputTime = Time.time; // NEU: Setze Cooldown-Timer
+        Debug.Log("[FossilInputHandler] CORRECT! - Processing input");
+        lastInputTime = Time.time;
         
+        // Event auslösen
         OnCorrectInput?.Invoke();
+        
+        // ? HAPTIC wird nur bei erfolgreichem Input ausgelöst
+        Debug.Log("[FossilInputHandler] Triggering haptic feedback");
         TriggerHapticFeedback();
         
         DisableInputTemporarily(0.5f);
@@ -277,17 +303,23 @@ public class FossilInputHandler : MonoBehaviour
     
     public void TriggerSkip()
     {
-        // NEU: Cooldown-Check VOR Ausführung (gilt für Touch UND Tilt)
+        Debug.Log($"[FossilInputHandler] TriggerSkip() called - inputEnabled: {inputEnabled}, cooldown: {Time.time - lastInputTime}");
+        
+        // KRITISCH: Cooldown-Check VOR Ausführung
         if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN)
         {
-            if (debugMode) Debug.Log("Input blocked - cooldown active");
-            return;
+            Debug.Log("[FossilInputHandler] Input BLOCKED - cooldown active or input disabled");
+            return; // ? Frühes Return OHNE weitere Aktionen
         }
         
-        Debug.Log("SKIP!");
-        lastInputTime = Time.time; // NEU: Setze Cooldown-Timer
+        Debug.Log("[FossilInputHandler] SKIP! - Processing input");
+        lastInputTime = Time.time;
         
+        // Event auslösen
         OnSkipInput?.Invoke();
+        
+        // ? HAPTIC wird nur bei erfolgreichem Input ausgelöst
+        Debug.Log("[FossilInputHandler] Triggering haptic feedback");
         TriggerHapticFeedback();
         
         DisableInputTemporarily(0.5f);
@@ -296,12 +328,14 @@ public class FossilInputHandler : MonoBehaviour
     void TriggerHapticFeedback()
     {
 #if UNITY_ANDROID || UNITY_IOS
+        Debug.Log("[FossilInputHandler] >>> VIBRATING NOW <<<");
         Handheld.Vibrate();
 #endif
     }
     
     void DisableInputTemporarily(float duration)
     {
+        Debug.Log($"[FossilInputHandler] DisableInputTemporarily({duration}s)");
         inputEnabled = false;
         SetButtonsInteractable(false);
         
@@ -310,6 +344,7 @@ public class FossilInputHandler : MonoBehaviour
     
     void EnableInput()
     {
+        Debug.Log("[FossilInputHandler] EnableInput() - Input re-enabled");
         inputEnabled = true;
         SetButtonsInteractable(true);
     }
@@ -324,6 +359,8 @@ public class FossilInputHandler : MonoBehaviour
     
     public void SetInputEnabled(bool enabled)
     {
+        Debug.Log($"[FossilInputHandler] SetInputEnabled({enabled})");
+        
         inputEnabled = enabled;
         SetButtonsInteractable(enabled);
         
@@ -333,12 +370,20 @@ public class FossilInputHandler : MonoBehaviour
             lastInputTime = 0f; // Reset Cooldown
             CheckAccelerometerAvailability();
         }
+        else
+        {
+            // Bei Deaktivierung auch Initial Reading zurücksetzen
+            hasInitialReading = false;
+        }
     }
     
     public void CalibrateDevice()
     {
+        Debug.Log("[FossilInputHandler] CalibrateDevice()");
+        
         hasInitialReading = false;
-        lastInputTime = 0f; // Reset Cooldown
+        lastInputTime = 0f;
+        isInNeutralZone = true; // ? NEU: Reset neutral zone
         
         if (accelerometerAvailable)
         {
@@ -351,10 +396,7 @@ public class FossilInputHandler : MonoBehaviour
                 initialAcceleration = accelerometerAction.ReadValue<Vector3>();
             }
             
-            if (debugMode)
-            {
-                Debug.Log($"Device calibrated - Initial: {initialAcceleration}");
-            }
+            Debug.Log($"[FossilInputHandler] Device calibrated - Initial: {initialAcceleration}");
         }
     }
     
@@ -363,7 +405,6 @@ public class FossilInputHandler : MonoBehaviour
         return accelerometerAvailable && !forceTouchMode;
     }
     
-    // NEU: Erweiterte Info-Methode
     public string GetInputModeInfo()
     {
         if (IsUsingAccelerometer() && allowDualInput)
@@ -382,6 +423,8 @@ public class FossilInputHandler : MonoBehaviour
     
     void OnDestroy()
     {
+        Debug.Log("[FossilInputHandler] OnDestroy()");
+        
         if (inputActions != null)
         {
             inputActions.Disable();

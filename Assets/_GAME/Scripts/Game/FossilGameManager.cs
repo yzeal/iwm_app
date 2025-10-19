@@ -163,6 +163,9 @@ public class FossilGameManager : MonoBehaviour
 
         SetupInputHandlers();
         SetupTeamImages();
+        
+        // ? FIX 1: Input standardm‰ﬂig deaktivieren
+        fossilInputHandler.SetInputEnabled(false);
 
         explanationUI.SetActive(true);
         countdownUI.SetActive(false);
