@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3923dc4776ebe947b54a1444889b74d, type: 3}
+  m_Name: Quizroom_T1
+  m_EditorClassIdentifier: Assembly-CSharp::QuizRoomData
+  localizedRoomName: {fileID: 0}
+  roomName: T1
+  roomNumber: 0
+  kidsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: f57daec8b3f948f4d96d9cf077cab4ca, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e85c8efef41f4454bad7c30564fc1891, type: 2}
+    - {fileID: 11400000, guid: 6fb60ae2218ce0b49b1a93714baeaaff, type: 2}
+    - {fileID: 11400000, guid: 3acb91ccd404cc649b58af47e5a227c1, type: 2}
+    - {fileID: 11400000, guid: beadc8d98eb60ae408bddc2f17360f4c, type: 2}
+    answers: []
+  bigKidsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: f57daec8b3f948f4d96d9cf077cab4ca, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e85c8efef41f4454bad7c30564fc1891, type: 2}
+    - {fileID: 11400000, guid: 6fb60ae2218ce0b49b1a93714baeaaff, type: 2}
+    - {fileID: 11400000, guid: 3acb91ccd404cc649b58af47e5a227c1, type: 2}
+    - {fileID: 11400000, guid: beadc8d98eb60ae408bddc2f17360f4c, type: 2}
+    answers: []
+  adultsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: 6a6f6c58b1c268c418830e942c0ab88f, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 7dce49b6e4c8f114dacd00e48ce85571, type: 2}
+    - {fileID: 11400000, guid: 91a0c5e4beb43344681671f30181e944, type: 2}
+    - {fileID: 11400000, guid: c56cd81431cf9e449b3eac005a98bac6, type: 2}
+    - {fileID: 11400000, guid: c2f21b69aa0e76b47a7a136e408b9b72, type: 2}
+    answers: []
+  roomColor: {r: 0, g: 0, b: 1, a: 1}
+  roomIcon: {fileID: 0}
+  timeSettings:
+    kidsTimeMultiplier: 1.5
+    bigKidsTimeMultiplier: 1.2
+    adultsTimeMultiplier: 1
