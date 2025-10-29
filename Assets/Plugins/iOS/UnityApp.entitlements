@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.developer.nfc.readersession.formats</key>
+    <array>
+        <string>TAG</string>
+    </array>
+    <key>NFCReaderUsageDescription</key>
+    <string>Wir benötigen NFC, um Museumsräume zu identifizieren. We need NFC to identify rooms inside the museum.</string>
+</dict>
+</plist>
