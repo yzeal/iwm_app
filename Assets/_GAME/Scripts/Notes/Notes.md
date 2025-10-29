@@ -515,8 +515,19 @@ Assets/_GAME/
 ?   ?   ??? LocalizedText.cs
 ?   ?   ??? Notes/
 ?       ??? Notes.md
+?   ??? NFC/
+?   ?   ??? NFCManager.cs (NEU - 29.10.2025)
+?   ??? Game/
+?   ?   ??? NFCSceneLoader.cs (NEU - 29.10.2025)
+?   ??? Data/
+?   ?   ??? NFCRoomMapping.cs (NEU - 29.10.2025)
 ??? Plugins/
-    ??? FullscreenWebGL.jslib (DEPRECATED für Mobile)
+    ??? Android/
+    ?   ??? NFCHelper.java (NEU - 29.10.2025)
+    ?   ??? AndroidManifest.xml (AKTUALISIERT - NFC Support)
+    ??? iOS/
+        ??? NFCPlugin.mm (NEU - 29.10.2025)
+        ??? UnityApp.entitlements (NEU - NFC Entitlements)
 
 ### ?? DEVELOPMENT NOTES
 
@@ -616,199 +627,6 @@ Assets/_GAME/
 
 ### FOSSILIEN-STIRNRATEN DETAILS (VOLLSTÄNDIG LOKALISIERT)
 - **100% LocalizedText Assets**: ALLE UI-Texte über ScriptableObjects
-- **Neue LocalizedText-Variablen** (benötigt Assets-Erstellung):
-  - holdPhoneInstructionLocalizedText: "Halte das Handy an deine Stirn" etc.
-  - teamExplainsInstructionLocalizedText: "Dein Team erklärt dir das Fossil" etc.
-  - tiltModeLocalizedText: "Neige-Modus - Neige das Handy..." etc.
-  - touchModeLocalizedText: "Touch-Modus - Tippe links..." etc.
-- **Dynamische Input-Mode-Texte**: GetLocalizedInputModeInfo() prüft IsUsingAccelerometer()
-- **Entfernte Hardcoding**: GetLocalizedHoldPhoneText() und GetLocalizedTeamExplainsText() gelöscht
-- **Multi-Language Explanation**: Vollständig lokalisierter Explanation-Screen
-- **Lokalisierte Fossilien**: Fossil-Namen in gewählter Sprache
-- **Adaptive Difficulty-Display**: Schwierigkeitsgrade in passender Sprache angezeigt
-- **Live Updates**: UI aktualisiert sich automatisch bei Sprachwechsel
-- **Adaptive Zeiten**: GetAdjustedRoundDuration() basierend auf Team-Schwierigkeitsgrad
-- **Content-Sets**: Separate Fossil-Arrays pro Schwierigkeitsgrad
-- **Input-System**: Accelerometer mit Touch-Fallback
-- **Fossil-Management**: Correct = Remove, Skip = Move to End
-- **Timer-Audio**: Countdown-Sounds bei 3-2-1 Sekunden
-- **Team-System**: Image-basierte Darstellung mit ScriptableObject-Config
-
-### TABU-MINISPIEL DETAILS (VOLLSTÄNDIG FERTIGGESTELLT)
-
-#### Architektur
-- **Analog zu FossilGameManager**: Konsistente Struktur für einfache Wartung
-- **Vier Screens**: Explanation, Countdown, Gameplay, Results (wie Fossil-Stirnraten)
-- **Portrait-Vollbild**: Kein Split-Screen, Teams spielen nacheinander
-- **Button-basiert**: Keine Accelerometer-Steuerung, nur Touch-Buttons
-
-#### Lokalisierung
-- **12 LocalizedText Assets erstellt**: Alle UI-Texte vollständig lokalisiert
-- **Keine hardcodierten Strings**: Alle Texte über LocalizedText Assets
-- **Live Language-Updates**: OnLanguageChanged Event-Handler implementiert
-- **GetLocalizedText() Helper**: Zentrale Methode mit Fallback-System
-
-#### Gameplay-Features
-- **Begriff-Recycling**: Übersprungene Begriffe kommen ans Ende der Queue zurück
-- **Team-Exklusion**: GetRandomTermsExcluding() für unterschiedliche Begriffe pro Team
-- **Dynamische Tabu-Wörter**: UI-Pool-System für variable Anzahl Tabu-Wörter
-- **Timer-System**: Countdown mit Audio-Warnung bei letzten 3 Sekunden
-- **Adaptive Zeiten**: DifficultyTimeSettings für schwierigkeitsgrad-basierte Rundendauer
-- **Gewinner-Icon**: winnerTeamImage zeigt Gewinner-Team-Sprite auf Results Screen
-
-#### ScriptableObjects
-- **TabuTerm**: Einzelner Begriff mit lokalisierten Hauptbegriffen und Tabu-Wörtern
-- **TabuCollection**: Container mit Schwierigkeitsgrad-Sets und Spieleinstellungen
-- **Validation-Tools**: Context-Menu-Funktionen für Content-Prüfung
-- **Fallback-System**: Automatische Fallbacks bei fehlenden Lokalisierungen
-
-#### Mobile-Optimierung
-- **Haptic Feedback**: Bei allen Button-Klicks (Correct, Skip, Start, Back)
-- **Touch-Targets**: Mobile-optimierte Button-Größen
-- **Portrait-Layout**: Optimiert für mobile Geräte
-- **Safe Area Support**: Automatische Anpassung an Notch/Cutouts
-
-#### Content & UI
-- **TabuTerm Assets**: 10-15 Begriffe pro Schwierigkeitsgrad erstellt
-- **TabuCollection Asset**: Konfiguriert mit allen Settings
-- **TabuGame Scene**: Vollständig aufgebaut und funktionsfähig
-- **UI-Referenzen**: Alle Komponenten im TabuGameManager zugewiesen
-- **Audio**: Countdown und Timer-Warning Sounds zugewiesen
-
-### SHARED SYSTEM DETAILS (ERWEITERT + LOKALISIERT)
-- **Language-Persistence**: Gewählte Sprache wird dauerhaft gespeichert
-- **Cross-System-Sync**: GameDataManager synchronisiert automatisch mit LanguageSystem
-- **Save-System**: PlayerPrefs + JSON + Backup-Mechanismus + TeamSettings + Language
-- **Mobile-Support**: Platform-Detection und Mobile-spezifische Features
-- **Error-Handling**: Try-Catch mit Debug-Logging
-- **Platform-Support**: Mobile-First mit Cross-Platform-Kompatibilität
-
-### AUDIO-SYSTEM
-- **Split-Screen Quiz**: Continue-Sounds, Feedback-Audio
-- **Fossilien-Stirnraten**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback
-- **Tabu-Minispiel**: Countdown-Sounds, Timer-Warnings, Correct/Skip-Feedback (Audio-Clips zugewiesen)
-- **Settings-UI**: Button-Click-Sounds entfernt (Dopplung mit LanguageRadioGroup)
-- **Universal**: AudioSource-basiert mit optional AudioClip assignments
-
----
-
-## CHANGELOG - SESSION VOM 19. OKTOBER 2025
-
-### FOSSILINPUTHANDLER CRITICAL BUG FIX
-
-#### Problem: Ungewollte Vibrationen auf Explanation Screen
-- **Symptom**: Nach Team 1 Runde vibrierte Handy auf Explanation Screen bei Handy-Bewegungen
-- **Root Cause**: EnableInput() Invoke-Callback aus DisableInputTemporarily() wurde NACH SetInputEnabled(false) ausgeführt
-- **Timeline des Problems**:
-  1. Letzter TriggerCorrect()/TriggerSkip() Call registriert Invoke(EnableInput, 0.5s)
-  2. OnCorrectInput/OnSkipInput Event triggert EndRound() ? SetInputEnabled(false)
-  3. 0.5 Sekunden später: EnableInput() führt sich aus und re-aktiviert Input
-  4. User ist auf Explanation Screen, aber Input ist aktiv ? Vibrationen bei Handy-Bewegung
-
-#### Lösung 1: CancelInvoke() in SetInputEnabled() (NICHT AUSREICHEND)
-- CancelInvoke(nameof(EnableInput)) in SetInputEnabled(false) hinzugefügt
-- **Problem**: Invoke wurde bereits VOR SetInputEnabled() Call registriert
-- **Ergebnis**: Vibrationen blieben bestehen
-
-#### Lösung 2: Event-Reihenfolge ändern (ERFOLGREICH)
-- **Änderung in TriggerCorrect() und TriggerSkip()**:
-
-VORHER (FALSCH):
-1. OnCorrectInput?.Invoke()  ? Ruft SetInputEnabled(false)
-2. TriggerHapticFeedback()
-3. DisableInputTemporarily()  ? Invoke läuft NACH SetInputEnabled
-
-NACHHER (RICHTIG):
-1. TriggerHapticFeedback()
-2. DisableInputTemporarily()  ? Invoke wird registriert
-3. OnCorrectInput?.Invoke()   ? SetInputEnabled(false) + CancelInvoke() löscht Invoke
-
-- **Ergebnis**: CancelInvoke() in SetInputEnabled(false) kann jetzt den gerade registrierten Invoke erfolgreich löschen
-- **Bestätigung**: Log-Analyse vom 19.10.2025 16:25 Uhr zeigt KEINE ungewollten Vibrationen mehr
-
-#### Code-Änderungen in FossilInputHandler.cs
-
-**TriggerCorrect() - Neue Reihenfolge:**
-```csharp
-public void TriggerCorrect()
-{
-    if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN) 
-    {
-        return;
-    }
-    
-    lastInputTime = Time.time;
-    
-    // KRITISCHE REIHENFOLGE: Haptic ZUERST
-    TriggerHapticFeedback();
-    
-    // DisableInputTemporarily VOR Event-Invoke
-    DisableInputTemporarily(0.5f);
-    
-    // Event als LETZTES (triggert SetInputEnabled(false) ? CancelInvoke löscht Invoke)
-    OnCorrectInput?.Invoke();
-}
-```
-
-**TriggerSkip() - Neue Reihenfolge:**
-```csharp
-public void TriggerSkip()
-{
-    if (!inputEnabled || Time.time - lastInputTime < INPUT_COOLDOWN)
-    {
-        return;
-    }
-    
-    lastInputTime = Time.time;
-    
-    // KRITISCHE REIHENFOLGE: Haptic ZUERST
-    TriggerHapticFeedback();
-    
-    // DisableInputTemporarily VOR Event-Invoke
-    DisableInputTemporarily(0.5f);
-    
-    // Event als LETZTES (triggert SetInputEnabled(false) ? CancelInvoke löscht Invoke)
-    OnSkipInput?.Invoke();
-}
-```
-
-**SetInputEnabled() - Mit CancelInvoke (bereits am 16.10. implementiert):**
-```csharp
-public void SetInputEnabled(bool enabled)
-{
-    // Cancel alle geplanten EnableInput() Callbacks
-    CancelInvoke(nameof(EnableInput));
-    
-    inputEnabled = enabled;
-    SetButtonsInteractable(enabled);
-    
-    if (enabled)
-    {
-        hasInitialReading = false;
-        lastInputTime = 0f;
-        CheckAccelerometerAvailability();
-    }
-    else
-    {
-        hasInitialReading = false;
-    }
-}
-```
-
-#### Testing & Verification
-- **Log-Analyse**: Android-Logcat vom 19.10.2025 16:25 Uhr
-- **Bestätigung**: KEINE Vibrationen während Explanation Screen
-- **Gameplay**: Input funktioniert normal während aktiver Spielphase
-- **Team-Wechsel**: Saubere Deaktivierung zwischen Runden
-- **Mobile-Test**: iOS/Android Haptic Feedback funktioniert korrekt
-
-#### Lessons Learned
-- **Event-Reihenfolge ist kritisch**: Events sollten IMMER als letztes ausgeführt werden
-- **Invoke + SetEnabled kombinieren**: CancelInvoke() muss NACH Invoke() Call passieren
-- **Race-Conditions**: Asynchrone Callbacks (Invoke) können State-Management brechen
-- **Debugging-Strategie**: Timestamp-Logs helfen enorm bei Invoke-Timing-Problemen
-### FOSSILIEN-STIRNRATEN DETAILS (VOLLSTÄNDIG LOKALISIERT + POLISHED)
-- **100% LocalizedText Assets**: ALLE UI-Texte über ScriptableObjects
 - **Keine hardcodierten Strings mehr**: Explanation-Screen, Input-Modi, Anweisungen
 - **Lokalisierte Fossilien**: Fossil-Namen in gewählter Sprache
 - **Adaptive Schwierigkeitsgrad-Anzeige**: Angepasst an gewählte Sprache
@@ -853,3 +671,75 @@ public void TriggerAction()
 3. **Sofortige Aktionen zuerst**: Haptic Feedback, Audio, UI-Updates vor Callbacks
 4. **Events als Letztes**: Events können State ändern ? sollten letzte Aktion sein
 5. **Race-Conditions beachten**: Asynchrone Callbacks können State-Management brechen
+### NFC-SYSTEM (VOLLSTÄNDIG IMPLEMENTIERT - 29.10.2025)
+
+**NFCManager.cs**
+- Zentrale NFC-Verwaltung für iOS und Android
+- Platform-Detection mit Compile-Directives
+- Automatische NFC-Aktivierung bei App-Start
+- Polling-System für Android NFC-Intents (0.5s Intervall)
+- Integration mit NFCSceneLoader für automatisches Szenen-Laden
+- OnApplicationPause-Handling für NFC-Reaktivierung
+- UI-Feedback über TextMeshPro (DebugText, StatusText)
+- Editor-Test-Support mit Mock-Tags
+
+**NFCHelper.java (Android)**
+- Native Android NFC-Integration
+- Foreground Dispatch System für Tag-Erkennung
+- KRITISCH: Liest NDEF-Daten aus Intent (NICHT direkt vom Tag!)
+  - METHODE 1: intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES) - Bevorzugt!
+  - METHODE 2: Direktes Tag-Lesen als Fallback (kann "out of date" Fehler werfen)
+  - METHODE 3: Tag-ID als Hex-String (finaler Fallback)
+- Löst "Tag is out of date" Problem durch Intent-basiertes Lesen
+- Unterstützt NDEF Text Records mit Language-Code-Parsing
+- Automatisches Fallback zu Tag-ID wenn NDEF nicht verfügbar
+- Detailliertes Android-Logging für Debugging
+
+**NFCPlugin.mm (iOS)**
+- Core NFC Framework Integration für iOS 13+
+- NFCTagReaderSession mit TAG Entitlement (NICHT NDEF!)
+- WICHTIG: Nutzt com.apple.developer.nfc.readersession.formats mit "TAG"
+- NDEF Entitlement ist DEPRECATED seit iOS 13
+- Objective-C Bridge für Unity-Kommunikation
+- UnitySendMessage für Tag-Daten und Fehler
+
+**NFCRoomMapping.cs (ScriptableObject)**
+- Mapping zwischen NFC-Tag-IDs und Szenen-Namen
+- Unterstützt sowohl NDEF-Text ("ROOM_01") als auch Tag-IDs ("TAG_ID:04A3B2C1")
+- Exakte und Partial-Match-Unterstützung
+- GetSceneNameForTag() mit Fallback-Logik
+- GetDisplayNameForTag() für UI-Anzeige
+- Validation-Tools für Content-Prüfung
+- CreateAssetMenu Integration für einfache Erstellung
+
+**NFCSceneLoader.cs**
+- Scene-Loading-System basierend auf NFC-Tags
+- Async Scene Loading mit Progress-Tracking
+- Konfigurierbare Delay vor Szenen-Wechsel
+- Hub-Scene-Pattern für Rückkehr-Navigation
+- Integration mit GameDataManager für Room-Tracking
+- IsValidRoomTag() für Tag-Validierung
+- ReturnToHub() Methode für Navigation zurück
+
+**AndroidManifest.xml Konfiguration**
+- NFC Permission und Feature deklariert
+- Intent-Filter für TAG_DISCOVERED und NDEF_DISCOVERED
+- launchMode="singleTop" für korrekte Intent-Verarbeitung
+- Verhindert Activity-Duplikation bei Tag-Scans
+
+**iOS Entitlements & Info.plist**
+- com.apple.developer.nfc.readersession.formats mit "TAG" Array
+- NFCReaderUsageDescription für App Store Compliance
+- WICHTIG: Nicht "NDEF" verwenden - ist deprecated!
+
+**Testing & Validation**
+- Editor-Support mit Mock-Tags ("TEST_ROOM_01")
+- Android-Testing: Xiaomi Device mit NFC Tools beschriebenen Tags
+- Erfolgreiche Tag-Erkennung und Szenen-Wechsel
+- Hub-Pattern funktioniert wie designed
+
+**Nächste Schritte**
+- Raum-Szenen erstellen und mit Tags verknüpfen
+- Content für NFCRoomMapping ScriptableObject erstellen
+- ReturnToHub-Buttons in Raum-Szenen implementieren
+- iOS-Testing sobald Device verfügbar
