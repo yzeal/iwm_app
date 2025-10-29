@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 272860917}
   - component: {fileID: 272860916}
+  - component: {fileID: 272860918}
   m_Layer: 0
   m_Name: NFCManager
   m_TagString: Untagged
@@ -150,6 +151,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NFCManager
   debugText: {fileID: 579788970}
   statusText: {fileID: 313787828}
+  sceneLoader: {fileID: 272860918}
+  autoLoadSceneOnScan: 1
 --- !u!4 &272860917
 Transform:
   m_ObjectHideFlags: 0
@@ -165,6 +168,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &272860918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272860915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b473afeb0f3e545b66059a2acdebab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NFCSceneLoader
+  roomMapping: {fileID: 11400000, guid: 73a9078345acc114bb459f5b93b7db38, type: 2}
+  delayBeforeLoad: 1.5
+  showLoadingScreen: 0
+  hubSceneName: NFCTest
 --- !u!1 &313787826
 GameObject:
   m_ObjectHideFlags: 0

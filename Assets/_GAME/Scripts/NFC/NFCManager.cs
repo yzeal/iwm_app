@@ -10,6 +10,10 @@ public class NFCManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI statusText;
     
+    [Header("Scene Loading")]
+    [SerializeField] private NFCSceneLoader sceneLoader;
+    [SerializeField] private bool autoLoadSceneOnScan = true;
+    
     private string lastReadTag = "";
     
     #if UNITY_IOS && !UNITY_EDITOR
@@ -28,17 +32,34 @@ public class NFCManager : MonoBehaviour
     
     void Start()
     {
-        UpdateStatus("NFC Manager bereit. Tippe zum Scannen.");
+        UpdateStatus("Halte dein Geraet an den NFC-Tag");
+        
+        // Validiere Scene Loader
+        if (sceneLoader == null)
+        {
+            sceneLoader = GetComponent<NFCSceneLoader>();
+            if (sceneLoader == null)
+            {
+                Debug.LogError("[NFCManager] NFCSceneLoader fehlt!");
+            }
+        }
         
         #if UNITY_ANDROID && !UNITY_EDITOR
-        // NFC Helper initialisieren
+        InitializeAndroid();
+        #elif UNITY_IOS && !UNITY_EDITOR
+        InitializeIOS();
+        #endif
+    }
+    
+    #if UNITY_ANDROID && !UNITY_EDITOR
+    private void InitializeAndroid()
+    {
         try
         {
             AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             nfcHelper = new AndroidJavaObject("com.yourcompany.nfc.NFCHelper");
             
-            // Automatisch NFC aktivieren bei Start
             StartAndroidNFC();
         }
         catch (System.Exception e)
@@ -46,39 +67,8 @@ public class NFCManager : MonoBehaviour
             UpdateStatus($"Init Fehler: {e.Message}");
             Debug.LogError($"[NFCManager] Init Exception: {e}");
         }
-        #endif
     }
     
-    void Update()
-    {
-        // Touch zum manuellen Starten des Scans
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-            StartNFCReading();
-        }
-    }
-    
-    public void StartNFCReading()
-    {
-        #if UNITY_EDITOR
-        // Editor-Test
-        OnNFCTagRead("TEST_ROOM_01");
-        #elif UNITY_ANDROID
-        StartAndroidNFC();
-        #elif UNITY_IOS
-        if (_IsNFCAvailable())
-        {
-            _StartNFCReading();
-            UpdateStatus("iOS NFC Scan gestartet...");
-        }
-        else
-        {
-            UpdateStatus("NFC nicht verfuegbar auf diesem Geraet");
-        }
-        #endif
-    }
-    
-    #if UNITY_ANDROID && !UNITY_EDITOR
     private void StartAndroidNFC()
     {
         try
@@ -86,15 +76,14 @@ public class NFCManager : MonoBehaviour
             if (nfcHelper != null && currentActivity != null)
             {
                 nfcHelper.Call("startNFCReading", currentActivity);
-                UpdateStatus("Android NFC wird aktiviert...");
+                UpdateStatus("NFC bereit - Tag ans Geraet halten");
                 
-                // Starte Polling fuer NFC Intents
                 InvokeRepeating(nameof(CheckForNFCIntent), 0.5f, 0.5f);
             }
         }
         catch (System.Exception e)
         {
-            UpdateStatus($"Android NFC Fehler: {e.Message}");
+            UpdateStatus($"NFC Fehler: {e.Message}");
             Debug.LogError($"[NFCManager] Exception: {e}");
         }
     }
@@ -113,14 +102,9 @@ public class NFCManager : MonoBehaviour
             if (action != null && (action.Equals("android.nfc.action.TAG_DISCOVERED") || 
                                    action.Equals("android.nfc.action.NDEF_DISCOVERED")))
             {
-                // Verhindere doppelte Verarbeitung
-                if (action == lastProcessedAction)
-                {
-                    return;
-                }
+                if (action == lastProcessedAction) return;
                 
                 lastProcessedAction = action;
-                
                 Debug.Log("[NFCManager] NFC Intent erkannt: " + action);
                 
                 if (nfcHelper != null)
@@ -128,11 +112,9 @@ public class NFCManager : MonoBehaviour
                     nfcHelper.Call("handleIntent", intent);
                 }
                 
-                // Intent als verarbeitet markieren
                 AndroidJavaObject newIntent = new AndroidJavaObject("android.content.Intent");
                 currentActivity.Call("setIntent", newIntent);
                 
-                // Polling kurz pausieren und neu starten
                 CancelInvoke(nameof(CheckForNFCIntent));
                 Invoke(nameof(RestartPolling), 2.0f);
             }
@@ -151,46 +133,77 @@ public class NFCManager : MonoBehaviour
 
     void OnApplicationPause(bool pauseStatus)
     {
+        #if UNITY_ANDROID && !UNITY_EDITOR
         if (!pauseStatus && nfcHelper != null && currentActivity != null)
         {
-            // NFC reaktivieren wenn App zurueckkommt
             nfcHelper.Call("startNFCReading", currentActivity);
-            
-            // Polling neu starten
             CancelInvoke(nameof(CheckForNFCIntent));
             InvokeRepeating(nameof(CheckForNFCIntent), 0.5f, 0.5f);
         }
         else if (pauseStatus)
         {
-            // Polling stoppen wenn App pausiert
             CancelInvoke(nameof(CheckForNFCIntent));
         }
+        #endif
     }
     
     void OnDestroy()
     {
+        #if UNITY_ANDROID && !UNITY_EDITOR
         CancelInvoke(nameof(CheckForNFCIntent));
+        #endif
     }
     #endif
     
-    // Wird von nativem Code aufgerufen - fuer Tag-Daten
+    #if UNITY_IOS && !UNITY_EDITOR
+    private void InitializeIOS()
+    {
+        if (_IsNFCAvailable())
+        {
+            _StartNFCReading();
+            UpdateStatus("iOS NFC bereit");
+        }
+        else
+        {
+            UpdateStatus("NFC nicht verfuegbar");
+        }
+    }
+    #endif
+    
+    // Wird von nativem Code aufgerufen
     public void OnNFCTagRead(string tagData)
     {
         lastReadTag = tagData;
-        debugText.text = $"Gelesener Tag:\n{tagData}";
-        UpdateStatus("Tag erfolgreich gelesen!");
         
+        if (debugText != null)
+        {
+            debugText.text = $"Raum erkannt:\n{tagData}";
+        }
+        
+        UpdateStatus("Tag erfolgreich gelesen!");
         Debug.Log($"[NFCManager] Tag gelesen: {tagData}");
+        
+        // Automatisch Szene laden
+        if (autoLoadSceneOnScan && sceneLoader != null)
+        {
+            if (sceneLoader.IsValidRoomTag(tagData))
+            {
+                UpdateStatus("Lade Raum...");
+                sceneLoader.LoadSceneForTag(tagData);
+            }
+            else
+            {
+                UpdateStatus($"Unbekannter Raum: {tagData}");
+                Debug.LogWarning($"[NFCManager] Kein Mapping gefunden für: {tagData}");
+            }
+        }
     }
     
-    // Wird von nativem Code aufgerufen - fuer Status-Updates
     public void OnNFCStatus(string status)
     {
         UpdateStatus(status);
-        Debug.Log($"[NFCManager] NFC Status: {status}");
     }
     
-    // Wird bei Fehlern von nativem Code aufgerufen
     public void OnNFCError(string error)
     {
         UpdateStatus($"Fehler: {error}");
