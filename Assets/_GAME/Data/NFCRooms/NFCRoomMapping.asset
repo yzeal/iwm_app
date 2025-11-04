@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4516a425b8ed7ba43841ff1adb14d3f8, type: 3}
+  m_Name: NFCRoomMapping
+  m_EditorClassIdentifier: Assembly-CSharp::NFCRoomMapping
+  roomMappings:
+  - nfcTagId: ROOM_01
+    sceneName: A01_Terminal_2
+    displayName: '"Landschaft"'
+    roomIcon: {fileID: 0}
+  - nfcTagId: ROOM_02
+    sceneName: TeamSettings
+    displayName: '"Fossilienraum"'
+    roomIcon: {fileID: 0}

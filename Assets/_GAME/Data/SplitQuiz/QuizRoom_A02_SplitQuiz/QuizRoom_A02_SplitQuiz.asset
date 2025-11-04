@@ -1,0 +1,338 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3923dc4776ebe947b54a1444889b74d, type: 3}
+  m_Name: QuizRoom_A02_SplitQuiz
+  m_EditorClassIdentifier: Assembly-CSharp::QuizRoomData
+  localizedRoomName: {fileID: 0}
+  roomName: AllTerminals
+  roomNumber: 0
+  kidsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: f68aedf2f5ad26640a0566165d08763b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 1dde3752823784f4197a4647d4b7246c, type: 2}
+    - {fileID: 11400000, guid: c147024701391ef468a8a6f86b4ecca7, type: 2}
+    - {fileID: 11400000, guid: f9e1a233de0dc3f4ea6333ac669b6ce6, type: 2}
+    - {fileID: 11400000, guid: cab331d5ad5901f4ba92489916ec292f, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 3e558836df53ec94fac408b00d44a5cf, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e523504050b89534a8a23e813a6975b5, type: 2}
+    - {fileID: 11400000, guid: 759b964a93887bc4b8691ff5ee9762aa, type: 2}
+    - {fileID: 11400000, guid: 58a5a9b2435206940ae816e36f32ec00, type: 2}
+    - {fileID: 11400000, guid: 6c3d6836d824b1145827d14ce16ac56c, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 97b78e5fd39ab674a8e85413827b7a5b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ddae34c06c1e0ca43b8ef57e1860ff4c, type: 2}
+    - {fileID: 11400000, guid: ed679f2332d0bc043ae2993b853ef271, type: 2}
+    - {fileID: 11400000, guid: 852f037111bf7144993a9490ff033898, type: 2}
+    - {fileID: 11400000, guid: 1440ded581668034cb014d56225112de, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 34720ebedd107f64c96ed11b63461427, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 43ab34791700b194d8b079cb81acc64e, type: 2}
+    - {fileID: 11400000, guid: 5f29ee1a9819baf4182728c2c4841a50, type: 2}
+    - {fileID: 11400000, guid: cb027ce4c0a3a5645aa5acc3ef097ed6, type: 2}
+    - {fileID: 11400000, guid: e108f81a690702944b67ceb717cf0a19, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b2666c8f9b533fc4994515b04d70fd3c, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: b54e73886d1615044b76f5610a858e9c, type: 2}
+    - {fileID: 11400000, guid: 85f981e04f89cc249bc02d960915bfed, type: 2}
+    - {fileID: 11400000, guid: f0110dfcc14447746b41a170aba032c5, type: 2}
+    - {fileID: 11400000, guid: c3922975227d8f64fa4c8f9394d9fa83, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 60606082b4b04e24a9a427325071025e, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 38800c98676403c4eaec846b972682b1, type: 2}
+    - {fileID: 11400000, guid: 5d77758095527e24a9dda9f1a60e086f, type: 2}
+    - {fileID: 11400000, guid: 3789b1f36c8a6704a96576d412177b71, type: 2}
+    - {fileID: 11400000, guid: 4397a1e7cd3ef874eba12e976dda54be, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 6c9111a86bd650d4dbbe61b2b3bb0542, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 93bbefd64713f904888f317557869104, type: 2}
+    - {fileID: 11400000, guid: 430f5f504a3403b43990c84cc1f547df, type: 2}
+    - {fileID: 11400000, guid: 86823f0663f17f443b4b6c88cf295d88, type: 2}
+    - {fileID: 11400000, guid: f632c3bebc3fd62428352f9cdd2ef273, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b933bb5113b733b4dbbcdd92817bb9d2, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 3509769384cb00740a326dee6a2e1974, type: 2}
+    - {fileID: 11400000, guid: 001d2cf0821635149a944cea30147143, type: 2}
+    - {fileID: 11400000, guid: 1d9247a187d79c74483bd527439e1845, type: 2}
+    - {fileID: 11400000, guid: 459024098900a5f4586be8d31f7142ad, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 2eb37ffd47955d74ebe1d2bc500f5bcb, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ec0f5cfebb3675c43a1f295f42cef9f7, type: 2}
+    - {fileID: 11400000, guid: 1b53afcc73eefda4984a2562ed1a3fe6, type: 2}
+    - {fileID: 11400000, guid: ecd41203db0228546a1532c0c0fcd5c5, type: 2}
+    - {fileID: 11400000, guid: c8be1c4ef38ad194fb5dcb9b760b0d95, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: a41c6b050e1c8fc41b35c653e3940e35, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 7a703651116049349b8e73d0d3c2f3f7, type: 2}
+    - {fileID: 11400000, guid: b600e937a0523e54fa3199639c5fb702, type: 2}
+    - {fileID: 11400000, guid: 864ba89dded9d88499bb014ca820e4d8, type: 2}
+    - {fileID: 11400000, guid: 62b92465b51112a4dbe1abaaa893497b, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 583c659a4943d0c4b9bcdc1df4fd1737, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e0ded208257bc3b449c6cff5aef81077, type: 2}
+    - {fileID: 11400000, guid: bb8c60a89fd3d1b459b9c2ae3af4879f, type: 2}
+    - {fileID: 11400000, guid: 890c003180858c64494e31490c8979cf, type: 2}
+    - {fileID: 11400000, guid: 367fc306cd222454b8b3fca0c4c358d1, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: f2efb3754ae532b44878469e609344f8, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e521295cf0a666b4b9c76453e4d2eff6, type: 2}
+    - {fileID: 11400000, guid: 4263bbcf22772534ea0c5f7059c92652, type: 2}
+    - {fileID: 11400000, guid: 5bffd6cbd75699f49a43c98659fcbdbb, type: 2}
+    - {fileID: 11400000, guid: 2c32255abd2445f40982be535c418e88, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: ad9af1509aa1b0a4281c5aa30db54254, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: a37b54fbbcd451a42b555a748fd273b8, type: 2}
+    - {fileID: 11400000, guid: 88d54e5c45057ed4792b577938679000, type: 2}
+    - {fileID: 11400000, guid: 402e4c867dee66d48acf0942b61957b4, type: 2}
+    - {fileID: 11400000, guid: 21a44e9f58c004b46a2edfdee140918c, type: 2}
+    answers: []
+  bigKidsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: f68aedf2f5ad26640a0566165d08763b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 1dde3752823784f4197a4647d4b7246c, type: 2}
+    - {fileID: 11400000, guid: c147024701391ef468a8a6f86b4ecca7, type: 2}
+    - {fileID: 11400000, guid: f9e1a233de0dc3f4ea6333ac669b6ce6, type: 2}
+    - {fileID: 11400000, guid: cab331d5ad5901f4ba92489916ec292f, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 3e558836df53ec94fac408b00d44a5cf, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e523504050b89534a8a23e813a6975b5, type: 2}
+    - {fileID: 11400000, guid: 759b964a93887bc4b8691ff5ee9762aa, type: 2}
+    - {fileID: 11400000, guid: 58a5a9b2435206940ae816e36f32ec00, type: 2}
+    - {fileID: 11400000, guid: 6c3d6836d824b1145827d14ce16ac56c, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 97b78e5fd39ab674a8e85413827b7a5b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ddae34c06c1e0ca43b8ef57e1860ff4c, type: 2}
+    - {fileID: 11400000, guid: ed679f2332d0bc043ae2993b853ef271, type: 2}
+    - {fileID: 11400000, guid: 852f037111bf7144993a9490ff033898, type: 2}
+    - {fileID: 11400000, guid: 1440ded581668034cb014d56225112de, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 34720ebedd107f64c96ed11b63461427, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 43ab34791700b194d8b079cb81acc64e, type: 2}
+    - {fileID: 11400000, guid: 5f29ee1a9819baf4182728c2c4841a50, type: 2}
+    - {fileID: 11400000, guid: cb027ce4c0a3a5645aa5acc3ef097ed6, type: 2}
+    - {fileID: 11400000, guid: e108f81a690702944b67ceb717cf0a19, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b2666c8f9b533fc4994515b04d70fd3c, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: b54e73886d1615044b76f5610a858e9c, type: 2}
+    - {fileID: 11400000, guid: 85f981e04f89cc249bc02d960915bfed, type: 2}
+    - {fileID: 11400000, guid: f0110dfcc14447746b41a170aba032c5, type: 2}
+    - {fileID: 11400000, guid: c3922975227d8f64fa4c8f9394d9fa83, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 60606082b4b04e24a9a427325071025e, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 38800c98676403c4eaec846b972682b1, type: 2}
+    - {fileID: 11400000, guid: 5d77758095527e24a9dda9f1a60e086f, type: 2}
+    - {fileID: 11400000, guid: 3789b1f36c8a6704a96576d412177b71, type: 2}
+    - {fileID: 11400000, guid: 4397a1e7cd3ef874eba12e976dda54be, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 6c9111a86bd650d4dbbe61b2b3bb0542, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 93bbefd64713f904888f317557869104, type: 2}
+    - {fileID: 11400000, guid: 430f5f504a3403b43990c84cc1f547df, type: 2}
+    - {fileID: 11400000, guid: 86823f0663f17f443b4b6c88cf295d88, type: 2}
+    - {fileID: 11400000, guid: f632c3bebc3fd62428352f9cdd2ef273, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b933bb5113b733b4dbbcdd92817bb9d2, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 3509769384cb00740a326dee6a2e1974, type: 2}
+    - {fileID: 11400000, guid: 001d2cf0821635149a944cea30147143, type: 2}
+    - {fileID: 11400000, guid: 1d9247a187d79c74483bd527439e1845, type: 2}
+    - {fileID: 11400000, guid: 459024098900a5f4586be8d31f7142ad, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 2eb37ffd47955d74ebe1d2bc500f5bcb, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ec0f5cfebb3675c43a1f295f42cef9f7, type: 2}
+    - {fileID: 11400000, guid: 1b53afcc73eefda4984a2562ed1a3fe6, type: 2}
+    - {fileID: 11400000, guid: ecd41203db0228546a1532c0c0fcd5c5, type: 2}
+    - {fileID: 11400000, guid: c8be1c4ef38ad194fb5dcb9b760b0d95, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: a41c6b050e1c8fc41b35c653e3940e35, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 7a703651116049349b8e73d0d3c2f3f7, type: 2}
+    - {fileID: 11400000, guid: b600e937a0523e54fa3199639c5fb702, type: 2}
+    - {fileID: 11400000, guid: 864ba89dded9d88499bb014ca820e4d8, type: 2}
+    - {fileID: 11400000, guid: 62b92465b51112a4dbe1abaaa893497b, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 583c659a4943d0c4b9bcdc1df4fd1737, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e0ded208257bc3b449c6cff5aef81077, type: 2}
+    - {fileID: 11400000, guid: bb8c60a89fd3d1b459b9c2ae3af4879f, type: 2}
+    - {fileID: 11400000, guid: 890c003180858c64494e31490c8979cf, type: 2}
+    - {fileID: 11400000, guid: 367fc306cd222454b8b3fca0c4c358d1, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: f2efb3754ae532b44878469e609344f8, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e521295cf0a666b4b9c76453e4d2eff6, type: 2}
+    - {fileID: 11400000, guid: 4263bbcf22772534ea0c5f7059c92652, type: 2}
+    - {fileID: 11400000, guid: 5bffd6cbd75699f49a43c98659fcbdbb, type: 2}
+    - {fileID: 11400000, guid: 2c32255abd2445f40982be535c418e88, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: ad9af1509aa1b0a4281c5aa30db54254, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: a37b54fbbcd451a42b555a748fd273b8, type: 2}
+    - {fileID: 11400000, guid: 88d54e5c45057ed4792b577938679000, type: 2}
+    - {fileID: 11400000, guid: 402e4c867dee66d48acf0942b61957b4, type: 2}
+    - {fileID: 11400000, guid: 21a44e9f58c004b46a2edfdee140918c, type: 2}
+    answers: []
+  adultsQuestions:
+  - localizedQuestionText: {fileID: 11400000, guid: f68aedf2f5ad26640a0566165d08763b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 1dde3752823784f4197a4647d4b7246c, type: 2}
+    - {fileID: 11400000, guid: c147024701391ef468a8a6f86b4ecca7, type: 2}
+    - {fileID: 11400000, guid: f9e1a233de0dc3f4ea6333ac669b6ce6, type: 2}
+    - {fileID: 11400000, guid: cab331d5ad5901f4ba92489916ec292f, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 3e558836df53ec94fac408b00d44a5cf, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e523504050b89534a8a23e813a6975b5, type: 2}
+    - {fileID: 11400000, guid: 759b964a93887bc4b8691ff5ee9762aa, type: 2}
+    - {fileID: 11400000, guid: 58a5a9b2435206940ae816e36f32ec00, type: 2}
+    - {fileID: 11400000, guid: 6c3d6836d824b1145827d14ce16ac56c, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 97b78e5fd39ab674a8e85413827b7a5b, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ddae34c06c1e0ca43b8ef57e1860ff4c, type: 2}
+    - {fileID: 11400000, guid: ed679f2332d0bc043ae2993b853ef271, type: 2}
+    - {fileID: 11400000, guid: 852f037111bf7144993a9490ff033898, type: 2}
+    - {fileID: 11400000, guid: 1440ded581668034cb014d56225112de, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 34720ebedd107f64c96ed11b63461427, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 43ab34791700b194d8b079cb81acc64e, type: 2}
+    - {fileID: 11400000, guid: 5f29ee1a9819baf4182728c2c4841a50, type: 2}
+    - {fileID: 11400000, guid: cb027ce4c0a3a5645aa5acc3ef097ed6, type: 2}
+    - {fileID: 11400000, guid: e108f81a690702944b67ceb717cf0a19, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b2666c8f9b533fc4994515b04d70fd3c, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: b54e73886d1615044b76f5610a858e9c, type: 2}
+    - {fileID: 11400000, guid: 85f981e04f89cc249bc02d960915bfed, type: 2}
+    - {fileID: 11400000, guid: f0110dfcc14447746b41a170aba032c5, type: 2}
+    - {fileID: 11400000, guid: c3922975227d8f64fa4c8f9394d9fa83, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 60606082b4b04e24a9a427325071025e, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 38800c98676403c4eaec846b972682b1, type: 2}
+    - {fileID: 11400000, guid: 5d77758095527e24a9dda9f1a60e086f, type: 2}
+    - {fileID: 11400000, guid: 3789b1f36c8a6704a96576d412177b71, type: 2}
+    - {fileID: 11400000, guid: 4397a1e7cd3ef874eba12e976dda54be, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 6c9111a86bd650d4dbbe61b2b3bb0542, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 93bbefd64713f904888f317557869104, type: 2}
+    - {fileID: 11400000, guid: 430f5f504a3403b43990c84cc1f547df, type: 2}
+    - {fileID: 11400000, guid: 86823f0663f17f443b4b6c88cf295d88, type: 2}
+    - {fileID: 11400000, guid: f632c3bebc3fd62428352f9cdd2ef273, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: b933bb5113b733b4dbbcdd92817bb9d2, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 3509769384cb00740a326dee6a2e1974, type: 2}
+    - {fileID: 11400000, guid: 001d2cf0821635149a944cea30147143, type: 2}
+    - {fileID: 11400000, guid: 1d9247a187d79c74483bd527439e1845, type: 2}
+    - {fileID: 11400000, guid: 459024098900a5f4586be8d31f7142ad, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 2eb37ffd47955d74ebe1d2bc500f5bcb, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: ec0f5cfebb3675c43a1f295f42cef9f7, type: 2}
+    - {fileID: 11400000, guid: 1b53afcc73eefda4984a2562ed1a3fe6, type: 2}
+    - {fileID: 11400000, guid: ecd41203db0228546a1532c0c0fcd5c5, type: 2}
+    - {fileID: 11400000, guid: c8be1c4ef38ad194fb5dcb9b760b0d95, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: a41c6b050e1c8fc41b35c653e3940e35, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: 7a703651116049349b8e73d0d3c2f3f7, type: 2}
+    - {fileID: 11400000, guid: b600e937a0523e54fa3199639c5fb702, type: 2}
+    - {fileID: 11400000, guid: 864ba89dded9d88499bb014ca820e4d8, type: 2}
+    - {fileID: 11400000, guid: 62b92465b51112a4dbe1abaaa893497b, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: 583c659a4943d0c4b9bcdc1df4fd1737, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e0ded208257bc3b449c6cff5aef81077, type: 2}
+    - {fileID: 11400000, guid: bb8c60a89fd3d1b459b9c2ae3af4879f, type: 2}
+    - {fileID: 11400000, guid: 890c003180858c64494e31490c8979cf, type: 2}
+    - {fileID: 11400000, guid: 367fc306cd222454b8b3fca0c4c358d1, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: f2efb3754ae532b44878469e609344f8, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: e521295cf0a666b4b9c76453e4d2eff6, type: 2}
+    - {fileID: 11400000, guid: 4263bbcf22772534ea0c5f7059c92652, type: 2}
+    - {fileID: 11400000, guid: 5bffd6cbd75699f49a43c98659fcbdbb, type: 2}
+    - {fileID: 11400000, guid: 2c32255abd2445f40982be535c418e88, type: 2}
+    answers: []
+  - localizedQuestionText: {fileID: 11400000, guid: ad9af1509aa1b0a4281c5aa30db54254, type: 2}
+    questionText: 
+    localizedAnswers:
+    - {fileID: 11400000, guid: a37b54fbbcd451a42b555a748fd273b8, type: 2}
+    - {fileID: 11400000, guid: 88d54e5c45057ed4792b577938679000, type: 2}
+    - {fileID: 11400000, guid: 402e4c867dee66d48acf0942b61957b4, type: 2}
+    - {fileID: 11400000, guid: 21a44e9f58c004b46a2edfdee140918c, type: 2}
+    answers: []
+  roomColor: {r: 0, g: 0, b: 1, a: 1}
+  roomIcon: {fileID: 0}
+  timeSettings:
+    kidsTimeMultiplier: 1.5
+    bigKidsTimeMultiplier: 1.2
+    adultsTimeMultiplier: 1

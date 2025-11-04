@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Wir begr\xFC\xDFen euch im Landschaftsraum. Hier gibt es verschiedenste
+    Faktoren, die im Laufe der Erdgeschichte zu Ver\xE4nderungen der Landschaft rund
+    um die Grube Messel gef\xFChrt haben, zu entdecken. An dieser Station erwarten
+    euch Quizfragen. Sie werden im Splitscreen angezeigt, also haltet das Handy bitte
+    so, dass jede Person sie sehen kann. Gespielt wird X Runden. Auf jede Frage gibt
+    es eine richtige Antwort und einige der L\xF6sungen sind sogar im Raum versteckt.
+    F\xFCr jede richtig beantwortete Frage gibt es einen Punkt. Das Team, das schneller
+    die richtige L\xF6sung einloggt, erh\xE4lt einen Extrapunkt. "
+  englishStandard: 
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 0
