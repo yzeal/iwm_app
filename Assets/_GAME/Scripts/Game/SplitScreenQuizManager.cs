@@ -364,8 +364,9 @@ public class SplitScreenQuizManager : MonoBehaviour
         player1.AddScore(player1Points);
         player2.AddScore(player2Points);
         
-        ShowFeedback(player1, player1Points, player1Correct, player1AnswerButtons);
-        ShowFeedback(player2, player2Points, player2Correct, player2AnswerButtons);
+        // GEÄNDERT: Übergebe Question für korrekte Antwort-Ermittlung
+        ShowFeedback(player1, player1Points, player1Correct, player1AnswerButtons, team1Question);
+        ShowFeedback(player2, player2Points, player2Correct, player2AnswerButtons, team2Question);
         
         UpdateScoreDisplay();
         
@@ -413,7 +414,8 @@ public class SplitScreenQuizManager : MonoBehaviour
         return selectedAnswer == question.GetCorrectAnswer(currentLanguage);
     }
     
-    void ShowFeedback(PlayerData player, int points, bool correct, Button[] buttons)
+    // GEÄNDERT: Neue Signatur mit QuizQuestion Parameter
+    void ShowFeedback(PlayerData player, int points, bool correct, Button[] buttons, QuizQuestion question)
     {
         GameObject feedbackPanel = (player == player1) ? player1FeedbackPanel : player2FeedbackPanel;
         TextMeshProUGUI feedbackText = (player == player1) ? player1FeedbackText : player2FeedbackText;
@@ -421,15 +423,39 @@ public class SplitScreenQuizManager : MonoBehaviour
         UpdateFeedbackText(feedbackText, points, correct);
         feedbackPanel.SetActive(true);
         
+        // Schritt 1: Alle Buttons zurücksetzen
         for (int i = 0; i < buttons.Length; i++)
         {
             HighlightSelectedButtonWithTextColor(buttons[i], Color.white, Color.black);
         }
         
+        // Schritt 2: Finde den Index der korrekten Antwort
+        string correctAnswer = question.GetCorrectAnswer(currentLanguage);
+        int correctAnswerIndex = -1;
+        
+        for (int i = 0; i < player.shuffledAnswers.Length; i++)
+        {
+            if (player.shuffledAnswers[i] == correctAnswer)
+            {
+                correctAnswerIndex = i;
+                break;
+            }
+        }
+        
+        // Schritt 3: Markiere die gewählte Antwort (falls falsch in Rot)
         if (player.selectedAnswerIndex >= 0 && player.selectedAnswerIndex < buttons.Length)
         {
-            Color finalColor = correct ? correctAnswerColor : wrongAnswerColor;
-            HighlightSelectedButtonWithTextColor(buttons[player.selectedAnswerIndex], finalColor, Color.white);
+            if (!correct)
+            {
+                // Falsche Antwort in Rot
+                HighlightSelectedButtonWithTextColor(buttons[player.selectedAnswerIndex], wrongAnswerColor, Color.white);
+            }
+        }
+        
+        // Schritt 4: Markiere IMMER die richtige Antwort in Grün
+        if (correctAnswerIndex >= 0 && correctAnswerIndex < buttons.Length)
+        {
+            HighlightSelectedButtonWithTextColor(buttons[correctAnswerIndex], correctAnswerColor, Color.white);
         }
     }
     
