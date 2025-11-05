@@ -10,15 +10,15 @@ public class GameProgressData
     public int currentRoomIndex = 0;
     public DateTime lastPlayedTime;
     public string sessionId;
-    public TeamSettings teamSettings = new TeamSettings(); // Team-Schwierigkeitsgrade
-    public LanguageSystem.Language selectedLanguage = LanguageSystem.Language.German_Standard; // NEU: Sprache speichern
+    public TeamSettings teamSettings = new TeamSettings(); // Team-Schwierigkeitsgrade + Icons
+    public LanguageSystem.Language selectedLanguage = LanguageSystem.Language.German_Standard;
     
     public GameProgressData()
     {
         sessionId = System.Guid.NewGuid().ToString();
         lastPlayedTime = DateTime.Now;
         teamSettings = new TeamSettings();
-        selectedLanguage = LanguageSystem.Language.German_Standard; // Standard-Sprache
+        selectedLanguage = LanguageSystem.Language.German_Standard;
     }
 }
 
@@ -37,7 +37,7 @@ public class RoomResult
 public class GameDataManager : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private bool enableCloudSave = false; // Für später
+    [SerializeField] private bool enableCloudSave = false;
     [SerializeField] private bool enableLocalBackup = true;
     
     private const string SAVE_KEY = "MuseumQuizProgress";
@@ -52,8 +52,12 @@ public class GameDataManager : MonoBehaviour
     public DifficultyLevel Team1Difficulty => CurrentProgress.teamSettings.team1Difficulty;
     public DifficultyLevel Team2Difficulty => CurrentProgress.teamSettings.team2Difficulty;
     
-    // NEU: Properties für Sprach-Zugriff
+    // Properties für Sprach-Zugriff
     public LanguageSystem.Language CurrentLanguage => CurrentProgress.selectedLanguage;
+    
+    // NEU: Properties für Icon-Zugriff
+    public int Team1IconIndex => CurrentProgress.teamSettings.team1IconIndex;
+    public int Team2IconIndex => CurrentProgress.teamSettings.team2IconIndex;
     
     void Awake()
     {
@@ -64,7 +68,7 @@ public class GameDataManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             LoadGameData();
             
-            // NEU: Sprache mit LanguageSystem synchronisieren
+            // Sprache mit LanguageSystem synchronisieren
             SyncLanguageWithSystem();
         }
         else
@@ -73,7 +77,7 @@ public class GameDataManager : MonoBehaviour
         }
     }
     
-    #region Language Management (NEU)
+    #region Language Management
     
     /// <summary>
     /// Sprache setzen und mit LanguageSystem synchronisieren
@@ -182,6 +186,38 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Team difficulties set: Team1={team1}, Team2={team2}");
     }
     
+    // NEU: Team-Icon-Management
+    /// <summary>
+    /// Setzt den Icon-Index für ein Team (0-2)
+    /// </summary>
+    public void SetTeamIconIndex(int teamIndex, int iconIndex)
+    {
+        CurrentProgress.teamSettings.SetTeamIconIndex(teamIndex, iconIndex);
+        CurrentProgress.lastPlayedTime = DateTime.Now;
+        SaveGameData();
+        Debug.Log($"Team {teamIndex + 1} icon set to index {iconIndex}");
+    }
+    
+    /// <summary>
+    /// Holt den Icon-Index für ein Team (0-2)
+    /// </summary>
+    public int GetTeamIconIndex(int teamIndex)
+    {
+        return CurrentProgress.teamSettings.GetTeamIconIndex(teamIndex);
+    }
+    
+    /// <summary>
+    /// Setzt Icon-Indizes für beide Teams gleichzeitig
+    /// </summary>
+    public void SetTeamIconIndices(int team1IconIndex, int team2IconIndex)
+    {
+        CurrentProgress.teamSettings.team1IconIndex = Mathf.Clamp(team1IconIndex, 0, 2);
+        CurrentProgress.teamSettings.team2IconIndex = Mathf.Clamp(team2IconIndex, 0, 2);
+        CurrentProgress.lastPlayedTime = DateTime.Now;
+        SaveGameData();
+        Debug.Log($"Team icons set: Team1={team1IconIndex}, Team2={team2IconIndex}");
+    }
+    
     public RoomResult GetRoomResult(int roomNumber)
     {
         return CurrentProgress.roomResults.Find(r => r.roomNumber == roomNumber);
@@ -259,10 +295,11 @@ public class GameDataManager : MonoBehaviour
                     CurrentProgress.teamSettings = new TeamSettings();
                 }
                 
-                // NEU: Sicherstellen, dass selectedLanguage gesetzt ist (für bestehende Saves)
-                // Bei alten Saves ist selectedLanguage = 0 (German_Standard), was perfekt ist
+                // NEU: Icon-Indizes validieren (für bestehende Saves)
+                CurrentProgress.teamSettings.team1IconIndex = Mathf.Clamp(CurrentProgress.teamSettings.team1IconIndex, 0, 2);
+                CurrentProgress.teamSettings.team2IconIndex = Mathf.Clamp(CurrentProgress.teamSettings.team2IconIndex, 0, 2);
                 
-                Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}, Language: {CurrentProgress.selectedLanguage}");
+                Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}, Language: {CurrentProgress.selectedLanguage}, Team1Icon: {Team1IconIndex}, Team2Icon: {Team2IconIndex}");
                 SaveGameData(); // Aktualisiere Save falls Migrationen stattgefunden haben
             }
             else
@@ -303,7 +340,7 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Progress: Room {CurrentProgress.currentRoomIndex}, " +
                  $"Completed Rooms: {CurrentProgress.roomResults.Count}, " +
                  $"Session: {CurrentProgress.sessionId}, " +
-                 $"Team1: {Team1Difficulty}, Team2: {Team2Difficulty}, " +
+                 $"Team1: {Team1Difficulty} (Icon {Team1IconIndex}), Team2: {Team2Difficulty} (Icon {Team2IconIndex}), " +
                  $"Language: {CurrentProgress.selectedLanguage}");
     }
     
@@ -326,7 +363,7 @@ public class GameDataManager : MonoBehaviour
         SetTeamDifficulties(DifficultyLevel.Kids, DifficultyLevel.Adults);
     }
     
-    // NEU: Debug-Methoden für Sprachen
+    // Debug-Methoden für Sprachen
     [ContextMenu("Set Language to English")]
     void DebugSetEnglish()
     {
@@ -337,6 +374,19 @@ public class GameDataManager : MonoBehaviour
     void DebugSetGermanSimple()
     {
         SetLanguage(LanguageSystem.Language.German_Simple);
+    }
+    
+    // NEU: Debug-Methoden für Icons
+    [ContextMenu("Set Team 1 Icon to 2")]
+    void DebugSetTeam1Icon2()
+    {
+        SetTeamIconIndex(0, 2);
+    }
+    
+    [ContextMenu("Set Team 2 Icon to 1")]
+    void DebugSetTeam2Icon1()
+    {
+        SetTeamIconIndex(1, 1);
     }
     
     #endregion
