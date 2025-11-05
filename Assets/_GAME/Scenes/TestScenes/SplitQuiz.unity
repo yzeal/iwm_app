@@ -3426,6 +3426,7 @@ MonoBehaviour:
   player1ScoreText: {fileID: 1701031328}
   player1FeedbackPanel: {fileID: 110474737}
   player1FeedbackText: {fileID: 727805085}
+  player1TeamIcon: {fileID: 0}
   player2QuestionText: {fileID: 1750239023}
   player2AnswerButtons:
   - {fileID: 1032674954}
@@ -3435,6 +3436,7 @@ MonoBehaviour:
   player2ScoreText: {fileID: 836418494}
   player2FeedbackPanel: {fileID: 1508140263}
   player2FeedbackText: {fileID: 14509754}
+  player2TeamIcon: {fileID: 0}
   questionProgressIcons: {fileID: 997243576}
   continueButton: {fileID: 2100877306}
   correctAnswerColor: {r: 0.09148792, g: 0.5902965, b: 0.3227052, a: 1}
@@ -3443,6 +3445,9 @@ MonoBehaviour:
   finalScoreText: {fileID: 689602444}
   playAgainButton: {fileID: 827611267}
   continueToNextRoomButton: {fileID: 830595836}
+  result1TeamIcon: {fileID: 0}
+  result2TeamIcon: {fileID: 0}
+  teamIconProvider: {fileID: 11400000, guid: f94b5d49efe57434295d597f52b96e8c, type: 2}
   correctAnswerLocalizedText: {fileID: 11400000, guid: f1285a7792db1f64c8da1d518f08a4eb, type: 2}
   wrongAnswerLocalizedText: {fileID: 11400000, guid: 0bc50b04448e61c4a903284b72bd4435, type: 2}
   pointsLabelLocalizedText: {fileID: 11400000, guid: bab46c5d997e55b42ac8ceb1aa7d753c, type: 2}

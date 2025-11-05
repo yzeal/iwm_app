@@ -8135,6 +8135,7 @@ MonoBehaviour:
   timeUpPopup: {fileID: 1634383255}
   timeUpPopupText: {fileID: 1502753316}
   timeUpContinueButton: {fileID: 2123759523}
+  teamIconProvider: {fileID: 11400000, guid: f94b5d49efe57434295d597f52b96e8c, type: 2}
   audioSource: {fileID: 442634830}
   countdownSound1: {fileID: 8300000, guid: 7160a56a88cab8845a98d3210bb3fc3c, type: 3}
   countdownSound2: {fileID: 8300000, guid: 7160a56a88cab8845a98d3210bb3fc3c, type: 3}

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a396a7dcc69a8498bdfe029c27538b, type: 3}
+  m_Name: TeamIconProvider
+  m_EditorClassIdentifier: Assembly-CSharp::TeamIconProvider
+  team1Icons:
+    icon0: {fileID: 7737758374531229269, guid: f082ef21c5aedd840a1d0dfd4bc226c9, type: 3}
+    icon1: {fileID: -5297267953587320536, guid: 4f6b3e6d83af0e04699d02e6417df77b, type: 3}
+    icon2: {fileID: 7413952595828912886, guid: 4733e6d54e2a8c342bacc94a28e116fd, type: 3}
+  team2Icons:
+    icon0: {fileID: 8548759473956336968, guid: fa188759a03612e49a37e14977f1ac1a, type: 3}
+    icon1: {fileID: 5472611288588223021, guid: c68d9e9e98a35504ab164dba33c0bf36, type: 3}
+    icon2: {fileID: -6008647230880515285, guid: e6c014e4810650d428d178771a9b0698, type: 3}

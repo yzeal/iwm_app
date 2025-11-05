@@ -1133,6 +1133,7 @@ MonoBehaviour:
   winnerText: {fileID: 1251377181}
   playAgainButton: {fileID: 126526503}
   backToMenuButton: {fileID: 781525065}
+  teamIconProvider: {fileID: 11400000, guid: f94b5d49efe57434295d597f52b96e8c, type: 2}
   audioSource: {fileID: 442634830}
   correctSound: {fileID: 8300000, guid: 02e6883f615d7844697821c9937c29ee, type: 3}
   skipSound: {fileID: 8300000, guid: 67ec1e4cee5584a42adbffdc6bdb9339, type: 3}

@@ -743,3 +743,567 @@ public void TriggerAction()
 - Content für NFCRoomMapping ScriptableObject erstellen
 - ReturnToHub-Buttons in Raum-Szenen implementieren
 - iOS-Testing sobald Device verfügbar
+
+# PROJEKT-UPDATE: TEAM-ICON-AUSWAHL-SYSTEM (05.11.2025)
+
+## NEUE FEATURES IMPLEMENTIERT
+
+### TEAM-ICON-AUSWAHL-SYSTEM (VOLLSTÄNDIG IMPLEMENTIERT)
+- **Zweck**: Jedes Team kann vor dem Spiel aus 3 verschiedenen Icons wählen
+- **Persistenz**: Auswahl wird über GameDataManager gespeichert
+- **UI-System**: Radio-Button-Pattern mit Sprite-Swapping für Selected/Unselected States
+- **Integration**: Alle 4 Minispiele verwenden dynamisch ausgewählte Icons
+
+#### Neue Dateien erstellt:
+1. **TeamIconProvider.cs (ScriptableObject)** - Zentrales Icon-Management
+   - TeamIconSet für je 3 Icons pro Team (icon0, icon1, icon2)
+   - GetTeam1Icon() / GetTeam2Icon() / GetTeamIcon(teamIndex)
+   - Liest Icon-Index aus GameDataManager
+   - Validation-Tools für Content-Prüfung
+   
+2. **TeamIconRadioGroup.cs (UI Component)** - Icon-Auswahl-UI
+   - Radio-Button-System analog zu DifficultyRadioGroup
+   - IconButton Struktur (Button, IconImage, normalSprite, selectedSprite)
+   - Sprite-Swapping für visuelle Hervorhebung der Auswahl
+   - Event-System: OnIconChanged(int iconIndex)
+   - Haptic Feedback Integration
+   - Mobile-optimierte Touch-Targets
+
+#### Erweiterte Dateien:
+
+**DifficultySystem.cs**
+- TeamSettings erweitert mit team1IconIndex und team2IconIndex (0-2)
+- GetTeamIconIndex(teamIndex) und SetTeamIconIndex(teamIndex, iconIndex)
+- Clamp-System für sichere Index-Verwaltung (0-2)
+
+**GameDataManager.cs**
+- Icon-Management-Methoden hinzugefügt:
+  - SetTeamIconIndex(teamIndex, iconIndex)
+  - GetTeamIconIndex(teamIndex)
+  - SetTeamIconIndices(team1IconIndex, team2IconIndex)
+- Properties: Team1IconIndex, Team2IconIndex
+- Icon-Indizes werden validiert und geclampt bei LoadGameData()
+- Debug-Methoden für Icon-Testing
+- Rückwärtskompatibilität: Alte Saves funktionieren weiterhin (Default: Icon 0)
+
+**TeamSettingsManager.cs**
+- UI erweitert mit team1IconGroup und team2IconGroup
+- Icon-Change-Handler: OnTeam1IconChanged(), OnTeam2IconChanged()
+- ApplySettings() speichert Icon-Indizes zusätzlich zu Difficulty
+- InitializeSettings() lädt gespeicherte Icon-Indizes
+- SetupUI() bindet Icon-Group-Events
+
+**SplitScreenQuizManager.cs** (TeamIconProvider Integration)
+- Header-Feld: [SerializeField] private TeamIconProvider teamIconProvider
+- Neue Methoden:
+  - UpdateTeamIcons() - Zentrale Icon-Update-Logik
+  - UpdateTeamIconForImage(Image, teamIndex) - Helper für einzelne Icons
+  - SetupTeamIconsLegacy() - Fallback auf QuizRoomData.team1/2Image
+- Icons werden aktualisiert:
+  - Bei Start() nach InitializeQuiz()
+  - Bei ShowResults() für Results Screen
+  - Bei RestartQuiz() für Icon-Refresh
+- player1TeamIcon und player2TeamIcon UI-Referenzen hinzugefügt
+- result1TeamIcon und result2TeamIcon für Results Screen
+- Legacy-Fallback: Funktioniert ohne TeamIconProvider (nutzt alte team1/2Image)
+- DEPRECATED-Warnung für alte QuizRoomData team images
+
+**FossilGameManager.cs** (TeamIconProvider Integration)
+- Header-Feld: [SerializeField] private TeamIconProvider teamIconProvider
+- Neue Methoden:
+  - UpdateTeamIcons() - Zentrale Icon-Update-Logik
+  - UpdateTeamIconForImage(Image, teamIndex) - Helper für einzelne Icons
+  - SetupTeamIconsLegacy() - Fallback auf FossilCollection.team1/2Image
+  - UpdateCurrentTeamImage(Image) - DEPRECATED Legacy-Methode
+- Icons werden aktualisiert:
+  - Bei InitializeGame() nach SetupUI()
+  - Bei ShowResults() für Results Screen
+  - Bei RestartGame() für Icon-Refresh
+- Explanation, Countdown, Gameplay, Results Screens verwenden dynamische Icons
+- Winner-Icon auf Results Screen nutzt TeamIconProvider
+- DEPRECATED-Warnung für alte FossilCollection team images
+
+**TabuGameManager.cs** (TeamIconProvider Integration)
+- Header-Feld: [SerializeField] private TeamIconProvider teamIconProvider
+- Neue Methoden:
+  - UpdateTeamIcons() - Zentrale Icon-Update-Logik
+  - UpdateTeamIconForImage(Image, teamIndex) - Helper für einzelne Icons
+  - SetupTeamIconsLegacy() - Fallback auf TabuCollection.Team1/2Image
+  - UpdateCurrentTeamImage(Image) - DEPRECATED Legacy-Methode
+- Icons werden aktualisiert:
+  - Bei InitializeGame() nach SetupUI()
+  - Bei ShowResults() für Results Screen
+  - Bei RestartGame() für Icon-Refresh
+- Explanation, Gameplay, Results Screens verwenden dynamische Icons
+- Winner-Icon auf Results Screen nutzt TeamIconProvider
+- DEPRECATED-Warnung für alte TabuCollection team images
+
+**PuzzleGameManager.cs** (TeamIconProvider Integration) - NEU ENTDECKT UND ANGEPASST
+- Header-Feld: [SerializeField] private TeamIconProvider teamIconProvider
+- Neue Methoden:
+  - UpdateTeamIcons() - Zentrale Icon-Update-Logik
+  - UpdateTeamIconForImage(Image, teamNumber) - Helper für einzelne Icons
+  - SetupTeamIconsLegacy() - Fallback auf PuzzleCollection.team1/2Image
+  - UpdateCurrentTeamImageLegacy(Image) - DEPRECATED Legacy-Methode
+- Icons werden aktualisiert:
+  - Bei Start() nach InitializeGame()
+  - Bei ShowExplanationScreen() für Explanation Icon
+  - Bei ShowCountdownScreen() für Countdown Icon
+  - Bei ShowGameplayScreen() für Gameplay Icon
+  - Bei ShowResultsScreen() für Results Screen Icons
+- Winner-Icon auf Results Screen nutzt TeamIconProvider
+- Team-Difficulty-Index-Fix: GetTeamDifficulty(0/1) statt (1/2) für Konsistenz
+- DEPRECATED-Warnung für alte PuzzleCollection team images
+
+### TECHNISCHE DETAILS - TEAM-ICON-SYSTEM
+
+#### Icon-Index-System
+- **3 Icons pro Team**: Index 0, 1, 2 (insgesamt 6 Icons)
+- **Default**: Icon 0 für beide Teams bei neuen Saves
+- **Persistenz**: Gespeichert in GameProgressData.teamSettings
+- **Zugriff**: GameDataManager.GetTeamIconIndex(0/1) - 0-basiert!
+
+#### TeamIconProvider-Architektur
+- **ScriptableObject-basiert**: Zentrale Asset-Verwaltung
+- **TeamIconSet-Klasse**: Kapselt 3 Icons + GetIcon(index) Methode
+- **GetTeamIcon(teamIndex)**: Kombiniert Team-Auswahl + Icon-Index aus GameDataManager
+- **Validation**: ValidateIcons() prüft Vollständigkeit, HasAllIcons() für einzelne Sets
+- **Fallback-System**: Legacy team1/2Image aus Collections als Backup
+
+#### UI-Pattern: TeamIconRadioGroup
+- **Analog zu DifficultyRadioGroup**: Konsistentes UI-System
+- **IconButton-Struktur**: 
+  - Button (Unity UI Button Component)
+  - IconImage (Image Component für Sprite-Anzeige)
+  - normalSprite (nicht ausgewählt - z.B. Graustufen-Icon)
+  - selectedSprite (ausgewählt - z.B. Farbiges Icon mit Rahmen)
+- **Sprite-Swapping statt Farbwechsel**: Bessere Kontrolle über visuelle Hervorhebung
+- **Mobile-optimiert**: Touch-Target-Größen, Haptic Feedback
+- **Event-System**: OnIconChanged(int iconIndex) für externe Handler
+
+#### Game-Manager-Integration-Pattern
+ALLE 4 Game-Manager verwenden identisches Pattern:
+
+1. **Header-Feld**: [SerializeField] private TeamIconProvider teamIconProvider;
+2. **UpdateTeamIcons()**: Zentrale Methode, aufgerufen bei:
+   - InitializeGame() / Start()
+   - ShowResults() (für Results Screen Refresh)
+   - RestartGame() (für Icon-Refresh nach Änderungen)
+3. **UpdateTeamIconForImage(Image, teamIndex)**: Helper für einzelne Icon-Updates
+4. **SetupTeamIconsLegacy()**: Fallback wenn teamIconProvider == null
+5. **Legacy-Warnung**: Debug.LogWarning bei Verwendung alter Collection-Images
+
+#### Konsistenz-Fixes
+- **Team-Difficulty-Index**: Jetzt einheitlich 0-basiert (0 = Team 1, 1 = Team 2)
+  - SplitScreenQuizManager: team1Difficulty = GetTeamDifficulty(0)
+  - FossilGameManager: team1Difficulty = GetTeamDifficulty(0)
+  - TabuGameManager: team1Difficulty = GetTeamDifficulty(0)
+  - PuzzleGameManager: team1Difficulty = GetTeamDifficulty(0) - FIXED!
+- **teamIndex vs teamNumber**: 
+  - teamIndex ist 0-basiert (für Arrays/Provider)
+  - teamNumber ist 1-basiert (für UI-Anzeige)
+  - Konvertierung: teamIconProvider.GetTeamIcon(teamNumber - 1)
+
+### RÜCKWÄRTSKOMPATIBILITÄT
+
+**Alte Saves funktionieren weiterhin:**
+- Fehlende icon-Indizes werden mit 0 initialisiert (Default-Icon)
+- GameDataManager migriert Saves automatisch
+- Legacy team1Image/team2Image in Collections werden als Fallback genutzt
+- Keine Breaking-Changes für bestehende Inhalte
+
+**Migration-Path:**
+1. Bestehende Saves laden automatisch mit Icon-Index 0 für beide Teams
+2. TeamIconProvider-Asset zuweisen (optional, Legacy-Fallback funktioniert)
+3. Icon-Sprites in TeamIconProvider zuweisen
+4. Teams können Icons in TeamSettings auswählen
+5. Alte Collection-Images können entfernt werden (aber nicht notwendig)
+
+### CONTENT-REQUIREMENTS
+
+**Für vollständige Nutzung benötigt:**
+1. **TeamIconProvider.asset** erstellen (Create ? Museum Quiz ? Team Icon Provider)
+2. **6 Icon-Sprites** zuweisen:
+   - Team 1: icon0, icon1, icon2
+   - Team 2: icon0, icon1, icon2
+3. **12 Selected-Sprites** erstellen (für Hervorhebung):
+   - Gleiche Icons mit visueller Hervorhebung (Rahmen, Farbe, Glow, etc.)
+4. **TeamIconRadioGroup UI-Setup** in TeamSettings-Scene:
+   - 2x TeamIconRadioGroup Components (Team 1 + Team 2)
+   - Je 3 IconButton-Strukturen konfigurieren
+5. **Game-Manager UI-Referenzen** in allen 4 Game-Szenen:
+   - TeamIconProvider Asset zuweisen
+   - Bestehende Team-Icon-Image-Referenzen bleiben (für Legacy-Fallback)
+
+## GAME DESIGN - BILDERRÄTSEL/PUZZLE-GAME (VOLLSTÄNDIG IMPLEMENTIERT)
+
+### KERNMECHANIK
+- **Gameplay**: Find-the-Exhibit Style - Spieler finden Exponate im Raum anhand von Bildausschnitten
+- **Teams**: 2 Teams spielen abwechselnd mit individuellen Schwierigkeitsgraden
+- **Rundensystem**: Konfigurierbare Anzahl Runden pro Team (roundsPerTeam)
+- **Hinweis-System**: 2 verfügbare Hinweise (größere Bildausschnitte) mit Punktabzug
+- **Punktesystem**: Startpunkte - (Hinweise × hintPenalty)
+- **Timer**: Optional, schwierigkeitsgrad-abhängig
+
+### SCHWIERIGKEITSGRADE (IMPLEMENTIERT)
+- **Kids**: Einfachere Puzzles, optionaler Timer (1.5x länger)
+- **BigKids**: Mittlere Komplexität, Timer möglich (1.2x länger)
+- **Adults**: Volle Komplexität, Timer standardmäßig aktiv (1.0x)
+- **Content-Sets**: Separate PuzzlePiece-Arrays pro Schwierigkeitsgrad
+
+### SPIELABLAUF
+1. **Explanation Screen**: Regeln, Team-Icon, Schwierigkeitsgrad-Info, Spieleinstellungen
+2. **Countdown**: 3-2-1 mit unterschiedlichen Sounds
+3. **Gameplay Phase**:
+   - Bildausschnitt (hint0) wird angezeigt
+   - Mögliche Punkte werden angezeigt
+   - Buttons: "Gefunden!", "Hinweis anzeigen", "Aufgeben"
+   - Hinweis-System: hint0 ? hint1 ? hint2 (3 Bilder total)
+   - Jeder Hinweis kostet Punkte (hintPenalty)
+   - Optional: Timer mit Audio-Warnung bei letzten 3 Sekunden
+4. **Solution Screen**: Vollständiges Bild, Exponat-Name, Beschreibung, verdiente Punkte
+5. **Team-Wechsel**: Nach Team 1 spielt Team 2
+6. **Results Screen**: Gewinner-Ermittlung, Scores, Team-Icons
+
+### FEATURES
+- **Hinweis-System**: 2 Hinweise verfügbar (größere Bildausschnitte)
+  - hint0: Kleinster Ausschnitt (Start)
+  - hint1: Mittlerer Ausschnitt (1. Hinweis)
+  - hint2: Großer Ausschnitt (2. Hinweis)
+  - Jeder Hinweis kostet konfigurierbare Punkte (hintPenalty)
+- **Punktesystem**: startingPoints - (hintsUsed × hintPenalty)
+- **Aufgeben-Option**: Popup mit Bestätigung, 0 Punkte für Runde
+- **Timer-System**: 
+  - Optional pro Schwierigkeitsgrad aktivierbar
+  - Time-Up Popup bei Ablauf
+  - Audio-Warnung bei letzten 3 Sekunden
+- **Team-Exklusion**: Team 2 bekommt (wenn möglich) andere Puzzles als Team 1
+- **Lokalisierung**: Vollständig lokalisiert (Exponat-Namen, Beschreibungen, UI)
+- **Mobile-optimiert**: Haptic Feedback, Portrait-Vollbild, Touch-optimiert
+- **Team-Icon-System**: Dynamische Icons wie bei anderen Minispielen
+
+### PUNKTESYSTEM
+- **Startpunkte**: Konfigurierbar in PuzzleCollection (Standard: 3)
+- **Hinweis-Kosten**: Konfigurierbar in PuzzleCollection (Standard: 1)
+- **Gefunden ohne Hinweis**: Volle Punktzahl (z.B. 3 Punkte)
+- **Gefunden mit 1 Hinweis**: Startpunkte - 1 (z.B. 2 Punkte)
+- **Gefunden mit 2 Hinweisen**: Startpunkte - 2 (z.B. 1 Punkt)
+- **Aufgegeben oder Zeit abgelaufen**: 0 Punkte
+
+### HAUPTKLASSEN - PUZZLE-GAME (VOLLSTÄNDIG IMPLEMENTIERT)
+
+**PuzzleGameManager.cs**
+- Vollständige Implementierung des Puzzle-Minispiels
+- Fünf Screens: Explanation, Countdown, Gameplay, Solution, Results
+- Vollständig lokalisiert (21 LocalizedText Assets)
+- Hinweis-System mit Punktabzug
+- Timer-System optional mit Audio-Warnung
+- Give-Up und Time-Up Popups mit Bestätigung
+- Team-Exklusions-System (Team 2 bekommt andere Puzzles)
+- Schwierigkeitsgrad-basierte Runden-Timer
+- OnLanguageChanged Event-Handler für Live-Updates
+- GetLocalizedText() Helper-Methode mit Fallback-System
+- Haptic Feedback bei Button-Klicks
+- Integration mit GameDataManager für Team-Schwierigkeitsgrade
+- **NEU**: TeamIconProvider Integration für dynamische Team-Icons
+- Team-Difficulty-Index-Fix: Jetzt 0-basiert (0 = Team 1, 1 = Team 2)
+
+**PuzzlePiece.cs (ScriptableObject)**
+- Datenstruktur für einzelne Puzzle-Exponate
+- Vollständig lokalisiert (4 Sprachen)
+- Drei Hint-Images (hint0, hint1, hint2) für progressives Enthüllen
+- Solution-Image (vollständiges Exponat-Foto)
+- Exponat-Name in allen 4 Sprachen
+- Optional: Exponat-Beschreibung in allen 4 Sprachen
+- GetExhibitName(Language) Methode mit Fallback-Hierarchie
+- GetExhibitDescription(Language) Methode mit Fallback-Hierarchie
+- GetHintImage(hintLevel) Methode (0-2)
+- HasAllLocalizations() für Content-Validation
+- ValidateLocalizations() Context-Menu für Editor
+- CreateAssetMenu Integration
+
+**PuzzleCollection.cs (ScriptableObject)**
+- Container für Puzzle-Stücke mit Schwierigkeitsgrad-Sets
+- Analog zu FossilCollection und TabuCollection strukturiert
+- Lokalisierter Collection-Name über LocalizedText
+- Separate PuzzlePiece-Arrays für Kids/BigKids/Adults
+- Team-Images für visuelle Darstellung (DEPRECATED - TeamIconProvider nutzen)
+- Konfigurierbare Spieleinstellungen:
+  - roundsPerTeam (Anzahl Runden pro Team)
+  - startingPoints (Punkte bei Start)
+  - hintPenalty (Punktabzug pro Hinweis)
+  - enableTimerKids, enableTimerBigKids, enableTimerAdults
+  - roundDuration (Basis-Rundendauer)
+- DifficultyTimeSettings Integration
+- GetPuzzlesForDifficulty(DifficultyLevel) Methode
+- GetRandomPuzzles(count, difficulty) Methode
+- GetRandomPuzzlesExcluding(count, difficulty, excludeList) für Team 2
+- GetAdjustedRoundDuration(difficulty) für angepasste Zeiten
+- UseTimerForDifficulty(difficulty) für Timer-Aktivierung
+- GetTeamImage(teamNumber) - DEPRECATED, nutzt Legacy team1/2Image
+- HasPuzzlesForAllDifficulties() Validation
+- HasAllLocalizations() für Content-Validation
+- Context-Menu Validierungs-Tools
+- CreateAssetMenu Integration
+
+## AKTUALISIERTE PROJEKTSTRUKTUR
+
+Assets/_GAME/
+??? Scripts/
+?   ??? UI/
+?   ?   ??? TeamIconRadioGroup.cs (NEU)
+?   ?   ??? TeamSettingsManager.cs (ERWEITERT)
+?   ?   ??? DifficultyRadioGroup.cs
+?   ?   ??? ...
+?   ??? Game/
+?   ?   ??? SplitScreenQuizManager.cs (ERWEITERT - Icon-System)
+?   ?   ??? FossilGameManager.cs (ERWEITERT - Icon-System)
+?   ?   ??? TabuGameManager.cs (ERWEITERT - Icon-System)
+?   ?   ??? PuzzleGameManager.cs (ERWEITERT - Icon-System + Dokumentiert)
+?   ?   ??? ...
+?   ??? Data/
+?   ?   ??? TeamIconProvider.cs (NEU)
+?   ?   ??? GameDataManager.cs (ERWEITERT - Icon-Management)
+?   ?   ??? DifficultySystem.cs (ERWEITERT - Icon-Indizes)
+?   ?   ??? PuzzlePiece.cs (DOKUMENTIERT)
+?   ?   ??? PuzzleCollection.cs (DOKUMENTIERT)
+?   ?   ??? ...
+?   ??? Notes/
+?       ??? Notes.md (AKTUALISIERT)
+
+## AKTUELLER PROJEKTSTATUS (UPDATE 05.11.2025)
+
+### ? VOLLSTÄNDIG IMPLEMENTIERT UND FUNKTIONSFÄHIG
+
+#### Team-Icon-Auswahl-System (NEU - 05.11.2025)
+- **3 Icons pro Team**: Insgesamt 6 wählbare Team-Icons
+- **Persistent**: Auswahl bleibt über GameDataManager gespeichert
+- **UI-System**: Radio-Button-Pattern mit Sprite-Swapping
+- **All-Game Integration**: Alle 4 Minispiele verwenden dynamische Icons
+- **Legacy-Support**: Funktioniert auch ohne TeamIconProvider (Fallback)
+- **Mobile-optimiert**: Touch-Targets, Haptic Feedback
+- **Content-Ready**: ScriptableObject-System für einfache Icon-Verwaltung
+
+#### Puzzle-Game (VOLLSTÄNDIG DOKUMENTIERT - 05.11.2025)
+- **4. Minispiel**: Bilderrätsel - Find-the-Exhibit Gameplay
+- **Hinweis-System**: 2 Hinweise mit progressiven Bildausschnitten
+- **Timer-System**: Optional, schwierigkeitsgrad-abhängig
+- **Punktesystem**: Dynamisch basierend auf Hinweis-Verwendung
+- **Team-Exklusion**: Teams bekommen unterschiedliche Puzzles
+- **Vollständig lokalisiert**: Exponat-Namen, Beschreibungen, UI
+- **TeamIconProvider Integration**: Dynamische Team-Icons implementiert
+
+#### Alle 4 Minispiele mit Team-Icon-System (05.11.2025)
+1. ? **Split-Screen Quiz** - TeamIconProvider integriert
+2. ? **Fossilien-Stirnraten** - TeamIconProvider integriert
+3. ? **Tabu** - TeamIconProvider integriert
+4. ? **Bilderrätsel/Puzzle** - TeamIconProvider integriert + vollständig dokumentiert
+
+### ?? NÄCHSTE SCHRITTE
+
+#### Team-Icon-System Setup
+1. **TeamIconProvider.asset erstellen**
+   - Unity Editor: Create ? Museum Quiz ? Team Icon Provider
+   - 6 Icon-Sprites zuweisen (3 pro Team)
+   
+2. **Icon-Sprites erstellen**
+   - 6 Normal-State Sprites (z.B. Graustufen)
+   - 6 Selected-State Sprites (z.B. Farbe + Rahmen)
+   
+3. **TeamSettings UI-Setup**
+   - 2x TeamIconRadioGroup Components hinzufügen
+   - Je 3 IconButton-Strukturen konfigurieren (Button, Image, normalSprite, selectedSprite)
+   
+4. **Game-Szenen aktualisieren**
+   - TeamIconProvider Asset in allen 4 Game-Managern zuweisen
+   - UI-Image-Referenzen prüfen (für Legacy-Fallback)
+   
+5. **Testing durchführen**
+   - Icon-Auswahl in TeamSettings testen
+   - Persistenz validieren (Icon bleibt nach App-Neustart)
+   - Alle 4 Minispiele mit verschiedenen Icons testen
+   - Team-Wechsel und Results-Screens validieren
+
+#### Content-Erstellung für Puzzle-Game
+- PuzzlePiece ScriptableObjects erstellen
+- Für jedes Puzzle: 3 Hint-Images + 1 Solution-Image
+- Exponat-Namen und Beschreibungen lokalisieren
+- PuzzleCollection erstellen und konfigurieren
+- Puzzles für alle 3 Schwierigkeitsgrade zuweisen
+
+## WICHTIGE IMPLEMENTIERUNGSDETAILS (UPDATE 05.11.2025)
+
+### TEAM-ICON-SYSTEM DETAILS
+
+#### Icon-Index-Verwaltung
+- **Speicherort**: GameProgressData.teamSettings.team1IconIndex / team2IconIndex
+- **Gültiger Bereich**: 0-2 (3 Icons pro Team)
+- **Clamping**: Automatisch bei Load und Set (Mathf.Clamp(iconIndex, 0, 2))
+- **Default**: 0 (erstes Icon) für neue Saves und Migration
+
+#### TeamIconProvider-Integration-Pattern
+ALLE Game-Manager verwenden identisches Pattern:
+
+
+// 1. Header-Feld
+[SerializeField] private TeamIconProvider teamIconProvider;
+
+// 2. Zentrale Update-Methode
+void UpdateTeamIcons()
+{
+    if (teamIconProvider == null)
+    {
+        SetupTeamIconsLegacy(); // Fallback
+        return;
+    }
+    
+    UpdateTeamIconForImage(explanationIcon, currentTeam);
+    UpdateTeamIconForImage(gameplayIcon, currentTeam);
+    // ... weitere Icons ...
+    
+    team1ResultImage.sprite = teamIconProvider.GetTeam1Icon();
+    team2ResultImage.sprite = teamIconProvider.GetTeam2Icon();
+}
+
+// 3. Helper für einzelne Icons
+void UpdateTeamIconForImage(Image targetImage, int teamNumber)
+{
+    if (targetImage == null || teamIconProvider == null) return;
+    
+    Sprite icon = teamIconProvider.GetTeamIcon(teamNumber - 1); // 1-based ? 0-based
+    if (icon != null)
+    {
+        targetImage.sprite = icon;
+        targetImage.gameObject.SetActive(true);
+    }
+}
+
+// 4. Legacy-Fallback
+void SetupTeamIconsLegacy()
+{
+    team1ResultImage.sprite = collection.team1Image;
+    team2ResultImage.sprite = collection.team2Image;
+    // ... alte Logik ...
+}
+
+
+#### Aufruf-Zeitpunkte
+- **Start() / InitializeGame()**: Initiales Icon-Setup
+- **ShowResults()**: Results-Screen Icon-Refresh
+- **RestartGame()**: Icon-Refresh nach möglichen Änderungen
+- **ShowExplanation() / ShowCountdown() / ShowGameplay()**: Team-spezifische Icons (Puzzle)
+
+#### Team-Index-Konsistenz (WICHTIG!)
+- **GameDataManager**: 0-basiert (0 = Team 1, 1 = Team 2)
+- **TeamIconProvider**: 0-basiert (0 = Team 1, 1 = Team 2)
+- **UI-Anzeige**: 1-basiert (currentTeam = 1 oder 2)
+- **Konvertierung**: teamIconProvider.GetTeamIcon(currentTeam - 1)
+
+### PUZZLE-GAME DETAILS
+
+#### Hinweis-System-Mechanik
+- **3 Bilder pro Puzzle**: hint0 (klein) ? hint1 (mittel) ? hint2 (groß)
+- **Start-State**: hint0 wird angezeigt, hintsUsed = 0
+- **Hinweis-Click**: currentHintLevel++, hintsUsed++, points -= hintPenalty
+- **Max Hinweise**: 2 (hardcoded, immer 2 Hinweise verfügbar)
+- **UI-Update**: Button wird deaktiviert nach 2 Hinweisen
+- **Punkteberechnung**: currentPossiblePoints = startingPoints - (hintsUsed × hintPenalty)
+
+#### Timer-System-Logik
+- **Aktivierung**: UseTimerForDifficulty(difficulty) aus PuzzleCollection
+- **Dauer**: GetAdjustedRoundDuration(difficulty) mit DifficultyTimeSettings
+- **Audio-Warnung**: Bei 3 Sekunden verbleibend (timerWarningSound)
+- **Time-Up**: Popup mit "Weiter"-Button, 0 Punkte für Runde
+- **UI-Ausblendung**: timerContainer kann komplett ausgeblendet werden
+
+#### Runden-System
+- **currentRound**: Globaler Round-Counter (0-basiert)
+- **GetCurrentTeamRound()**: Mapped globalen Counter auf team-spezifische Runde
+  - Team 1 spielt bei currentRound 0, 2, 4, ... ? teamRound = currentRound / 2
+  - Team 2 spielt bei currentRound 1, 3, 5, ... ? teamRound = (currentRound - 1) / 2
+- **totalRounds**: roundsPerTeam × 2 (beide Teams)
+- **Team-Wechsel**: currentTeam = currentTeam == 1 ? 2 : 1
+
+#### Screen-Flow mit Coroutines
+ALLE UI-Updates verwenden WaitForEndOfFrame-Pattern:
+
+
+private void ShowExplanationScreen()
+{
+    explanationScreen.SetActive(true);
+    StartCoroutine(UpdateExplanationUIDelayed());
+}
+
+private IEnumerator UpdateExplanationUIDelayed()
+{
+    yield return new WaitForEndOfFrame();
+    UpdateExplanationUI(); // Text-Updates nach OnEnable
+}
+
+
+**Grund**: Sicherstellen dass OnEnable() aller UI-Components fertig ist bevor Texte aktualisiert werden
+
+#### Popup-System
+- **Give-Up Popup**: Bestätigung erforderlich, 2 Buttons (Ja/Abbrechen)
+- **Time-Up Popup**: Info-Popup, 1 Button (Weiter)
+- **Popup-Text-Updates**: Auch mit WaitForEndOfFrame-Coroutines
+- **Button-Texte**: Lokalisiert über separate LocalizedText Assets (NEU: 3 zusätzliche)
+
+## CONTENT-ANFORDERUNGEN (UPDATE 05.11.2025)
+
+### Team-Icon-System
+- **1x TeamIconProvider.asset**: Zentrale Icon-Verwaltung
+- **12 Sprites total**:
+  - 6 Normal-State Sprites (3 pro Team, nicht ausgewählt)
+  - 6 Selected-State Sprites (3 pro Team, ausgewählt/hervorgehoben)
+- **Design-Empfehlungen**:
+  - Normal: Graustufen oder gedämpfte Farben
+  - Selected: Volle Farben + visueller Indikator (Rahmen, Glow, Checkmark)
+  - Konsistente Größe (empfohlen: 512×512px)
+  - Transparenter Hintergrund (PNG)
+
+### Puzzle-Game Content
+- **PuzzlePiece ScriptableObjects**: Pro Exponat 1 Asset
+- **4 Images pro Puzzle**:
+  - hint0: Kleinster Ausschnitt (z.B. 10% des Bildes)
+  - hint1: Mittlerer Ausschnitt (z.B. 25% des Bildes)
+  - hint2: Großer Ausschnitt (z.B. 50% des Bildes)
+  - solutionImage: Vollständiges Foto des Exponats
+- **Texte pro Puzzle** (4 Sprachen):
+  - exhibitName: Kurzer Name (z.B. "Ammonit")
+  - exhibitDescription: Optional, kurze Info (1-3 Sätze)
+- **PuzzleCollection ScriptableObjects**: Pro Raum 1 Asset
+- **Mindest-Anzahl Puzzles**: roundsPerTeam × 2 pro Schwierigkeitsgrad
+
+### LocalizedText Assets (Puzzle-Game)
+**21 Assets benötigt** (alle bereits im Code referenziert):
+1. explanationTitleLocalizedText
+2. explanationRulesLocalizedText (mit {0}, {1}, {2} Platzhaltern)
+3. startButtonLocalizedText
+4. roundCounterLocalizedText (mit {0}/{1} Format)
+5. timerLabelLocalizedText
+6. possiblePointsLocalizedText (mit {0} Platzhalter)
+7. foundButtonLocalizedText
+8. hintButtonLocalizedText
+9. hintButtonLabelLocalizedText (mit {0}, {1} Platzhaltern)
+10. allHintsUsedLocalizedText
+11. giveUpButtonLocalizedText
+12. giveUpPopupLocalizedText
+13. timeUpPopupLocalizedText
+14. earnedPointsLocalizedText (mit {0} Platzhalter)
+15. nextTeamButtonLocalizedText
+16. resultsWinnerLocalizedText (mit {0} Platzhalter)
+17. resultsTieLocalizedText
+18. backButtonLocalizedText
+19. giveUpConfirmButtonLocalizedText (NEU)
+20. giveUpCancelButtonLocalizedText (NEU)
+21. timeUpContinueButtonLocalizedText (NEU)
+
+---
+
+**LETZTE AKTUALISIERUNG**: 05. November 2025
+**HAUPT-FEATURES DIESES UPDATES**:
+- Team-Icon-Auswahl-System vollständig implementiert (alle 4 Minispiele)
+- Puzzle-Game vollständig dokumentiert
+- Team-Difficulty-Index-Konsistenz hergestellt (0-basiert)
+- Legacy-Fallback-System für nahtlose Migration
