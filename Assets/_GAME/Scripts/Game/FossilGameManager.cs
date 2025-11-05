@@ -44,6 +44,9 @@ public class FossilGameManager : MonoBehaviour
     public TextMeshProUGUI winnerText;
     public Button playAgainButton;
     public Button backToMenuButton;
+    
+    [Header("Team Icon Provider (NEU)")]
+    [SerializeField] private TeamIconProvider teamIconProvider;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -66,11 +69,11 @@ public class FossilGameManager : MonoBehaviour
     [SerializeField] private LocalizedText winnerLocalizedText;
     [SerializeField] private LocalizedText tieLocalizedText;
 
-    [Header("Localized Instructions (NEU)")]
+    [Header("Localized Instructions")]
     [SerializeField] private LocalizedText holdPhoneInstructionLocalizedText;
     [SerializeField] private LocalizedText teamExplainsInstructionLocalizedText;
 
-    [Header("Localized Input Mode Texts (NEU)")]
+    [Header("Localized Input Mode Texts")]
     [SerializeField] private LocalizedText tiltModeLocalizedText;
     [SerializeField] private LocalizedText touchModeLocalizedText;
 
@@ -145,13 +148,18 @@ public class FossilGameManager : MonoBehaviour
         {
             Debug.LogWarning("Not all difficulty levels have fossils assigned!");
         }
-
-        if (fossilCollection.team1Image == null || fossilCollection.team2Image == null)
+        
+        // DEPRECATED: Legacy team images - jetzt über TeamIconProvider
+        if (fossilCollection.team1Image != null || fossilCollection.team2Image != null)
         {
-            Debug.LogWarning("Team images not assigned in FossilCollection!");
+            Debug.LogWarning("FossilCollection team images sind DEPRECATED. Verwende TeamIconProvider stattdessen!");
         }
 
         SetupUI();
+        
+        // NEU: Team-Icons laden
+        UpdateTeamIcons();
+        
         ShowExplanation();
     }
 
@@ -162,7 +170,6 @@ public class FossilGameManager : MonoBehaviour
         backToMenuButton.onClick.AddListener(BackToMenu);
 
         SetupInputHandlers();
-        SetupTeamImages();
 
         // ? KRITISCH: Input standardmäßig deaktivieren!
         fossilInputHandler.SetInputEnabled(false);
@@ -173,13 +180,68 @@ public class FossilGameManager : MonoBehaviour
         resultUI.SetActive(false);
     }
 
-    void SetupTeamImages()
+    // NEU: Team-Icons aktualisieren
+    void UpdateTeamIcons()
+    {
+        if (teamIconProvider == null)
+        {
+            Debug.LogWarning("TeamIconProvider nicht zugewiesen! Verwende Fallback von FossilCollection.");
+            SetupTeamIconsLegacy();
+            return;
+        }
+        
+        // Explanation Screen Icon
+        UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
+        
+        // Gameplay Icon
+        UpdateTeamIconForImage(currentTeamImage, currentTeam);
+        
+        // Results Screen Icons
+        if (team1ImageResult != null)
+        {
+            Sprite team1Icon = teamIconProvider.GetTeam1Icon();
+            if (team1Icon != null)
+                team1ImageResult.sprite = team1Icon;
+        }
+        
+        if (team2ImageResult != null)
+        {
+            Sprite team2Icon = teamIconProvider.GetTeam2Icon();
+            if (team2Icon != null)
+                team2ImageResult.sprite = team2Icon;
+        }
+        
+        Debug.Log($"Fossil Game Team Icons updated: Team1={teamIconProvider.GetTeam1Icon()?.name}, Team2={teamIconProvider.GetTeam2Icon()?.name}");
+    }
+    
+    /// <summary>
+    /// Aktualisiert ein einzelnes Team-Icon basierend auf aktuellem Team
+    /// </summary>
+    void UpdateTeamIconForImage(Image targetImage, int teamIndex)
+    {
+        if (targetImage == null || teamIconProvider == null) return;
+        
+        Sprite icon = teamIconProvider.GetTeamIcon(teamIndex - 1); // teamIndex ist 1-basiert, Provider ist 0-basiert
+        if (icon != null)
+        {
+            targetImage.sprite = icon;
+            targetImage.gameObject.SetActive(true);
+        }
+    }
+    
+    /// <summary>
+    /// LEGACY: Fallback auf alte FossilCollection team images
+    /// </summary>
+    void SetupTeamIconsLegacy()
     {
         if (team1ImageResult && fossilCollection.team1Image)
             team1ImageResult.sprite = fossilCollection.team1Image;
 
         if (team2ImageResult && fossilCollection.team2Image)
             team2ImageResult.sprite = fossilCollection.team2Image;
+            
+        UpdateCurrentTeamImage(currentTeamImageExplanation);
+        UpdateCurrentTeamImage(currentTeamImage);
     }
 
     void SetupInputHandlers()
@@ -190,7 +252,7 @@ public class FossilGameManager : MonoBehaviour
 
     void ShowExplanation()
     {
-        // NEU: Lokalisierte Input-Mode Info
+        // Lokalisierte Input-Mode Info
         string inputInfo = GetLocalizedInputModeInfo();
 
         DifficultyLevel currentTeamDifficulty = DifficultyLevel.Adults;
@@ -210,8 +272,6 @@ public class FossilGameManager : MonoBehaviour
         string difficulty = GetLocalizedText(difficultyLocalizedText, GetDefaultDifficulty);
         string thisTeamPlaying = GetLocalizedText(thisTeamPlayingLocalizedText, GetDefaultThisTeamPlaying);
         string seconds = GetLocalizedText(secondsLocalizedText, GetDefaultSeconds);
-
-        // NEU: Lokalisierte Anweisungen
         string holdPhoneInstruction = GetLocalizedText(holdPhoneInstructionLocalizedText, GetDefaultHoldPhoneInstruction);
         string teamExplainsInstruction = GetLocalizedText(teamExplainsInstructionLocalizedText, GetDefaultTeamExplainsInstruction);
 
@@ -226,12 +286,10 @@ public class FossilGameManager : MonoBehaviour
                               $"<b>{difficulty}:</b> {GetDifficultyDisplayName(currentTeamDifficulty)}\n\n" +
                               $"{thisTeamPlaying}:";
     
-        UpdateCurrentTeamImage(currentTeamImageExplanation);
+        // NEU: Verwende TeamIconProvider
+        UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
     }
 
-    /// <summary>
-    /// NEU: Lokalisierte Input-Mode Information
-    /// </summary>
     string GetLocalizedInputModeInfo()
     {
         bool usingAccelerometer = fossilInputHandler.IsUsingAccelerometer();
@@ -403,7 +461,6 @@ public class FossilGameManager : MonoBehaviour
         };
     }
 
-    // NEU: Fallback-Funktionen für Anweisungen
     string GetDefaultHoldPhoneInstruction(LanguageSystem.Language language)
     {
         return language switch
@@ -426,7 +483,6 @@ public class FossilGameManager : MonoBehaviour
         };
     }
 
-    // NEU: Fallback-Funktionen für Input-Modi
     string GetDefaultTiltMode(LanguageSystem.Language language)
     {
         return language switch
@@ -451,10 +507,19 @@ public class FossilGameManager : MonoBehaviour
 
     #endregion
 
+    // DEPRECATED: Legacy-Methode - wird durch UpdateTeamIconForImage ersetzt
     void UpdateCurrentTeamImage(Image targetImage)
     {
         if (targetImage == null) return;
 
+        // Versuche zuerst TeamIconProvider
+        if (teamIconProvider != null)
+        {
+            UpdateTeamIconForImage(targetImage, currentTeam);
+            return;
+        }
+
+        // Legacy-Fallback
         if (currentTeam == 1 && fossilCollection.team1Image)
         {
             targetImage.sprite = fossilCollection.team1Image;
@@ -674,6 +739,10 @@ public class FossilGameManager : MonoBehaviour
     {
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
+        
+        // NEU: Icons auf Results Screen aktualisieren
+        UpdateTeamIcons();
+        
         UpdateResultsUI();
         SaveResults();
     }
@@ -689,7 +758,18 @@ public class FossilGameManager : MonoBehaviour
         {
             string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
             winnerText.text = winnerFormat;
-            if (winnerTeamImage && fossilCollection.team1Image)
+            
+            // NEU: Verwende TeamIconProvider
+            if (winnerTeamImage && teamIconProvider != null)
+            {
+                Sprite team1Icon = teamIconProvider.GetTeam1Icon();
+                if (team1Icon != null)
+                {
+                    winnerTeamImage.sprite = team1Icon;
+                    winnerTeamImage.gameObject.SetActive(true);
+                }
+            }
+            else if (winnerTeamImage && fossilCollection.team1Image) // Legacy-Fallback
             {
                 winnerTeamImage.sprite = fossilCollection.team1Image;
                 winnerTeamImage.gameObject.SetActive(true);
@@ -699,7 +779,18 @@ public class FossilGameManager : MonoBehaviour
         {
             string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
             winnerText.text = winnerFormat;
-            if (winnerTeamImage && fossilCollection.team2Image)
+            
+            // NEU: Verwende TeamIconProvider
+            if (winnerTeamImage && teamIconProvider != null)
+            {
+                Sprite team2Icon = teamIconProvider.GetTeam2Icon();
+                if (team2Icon != null)
+                {
+                    winnerTeamImage.sprite = team2Icon;
+                    winnerTeamImage.gameObject.SetActive(true);
+                }
+            }
+            else if (winnerTeamImage && fossilCollection.team2Image) // Legacy-Fallback
             {
                 winnerTeamImage.sprite = fossilCollection.team2Image;
                 winnerTeamImage.gameObject.SetActive(true);
@@ -732,7 +823,8 @@ public class FossilGameManager : MonoBehaviour
 
     void UpdateGameplayUI()
     {
-        UpdateCurrentTeamImage(currentTeamImage);
+        // NEU: Verwende TeamIconProvider
+        UpdateTeamIconForImage(currentTeamImage, currentTeam);
         scoreText.text = $"{correctFossilsThisRound}/{fossilCollection.fossilsPerRound}";
     }
 
@@ -754,6 +846,10 @@ public class FossilGameManager : MonoBehaviour
         hasPlayedOneSecondWarning = false;
 
         resultUI.SetActive(false);
+        
+        // NEU: Icons neu laden (falls geändert)
+        UpdateTeamIcons();
+        
         ShowExplanation();
     }
 

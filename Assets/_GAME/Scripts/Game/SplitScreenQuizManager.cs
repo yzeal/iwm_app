@@ -19,6 +19,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI player1ScoreText;
     public GameObject player1FeedbackPanel;
     public TextMeshProUGUI player1FeedbackText;
+    public Image player1TeamIcon; // NEU: Dynamisches Team-Icon
     
     [Header("Player 2 UI (Top - Rotated)")]
     public TextMeshProUGUI player2QuestionText;
@@ -26,6 +27,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI player2ScoreText;
     public GameObject player2FeedbackPanel;
     public TextMeshProUGUI player2FeedbackText;
+    public Image player2TeamIcon; // NEU: Dynamisches Team-Icon
     
     [Header("Shared UI")]
     public QuestionProgressIcons questionProgressIcons;
@@ -40,8 +42,13 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI finalScoreText;
     public Button playAgainButton;
     public Button continueToNextRoomButton;
+    public Image result1TeamIcon; // NEU: Team-Icon auf Results Screen
+    public Image result2TeamIcon; // NEU: Team-Icon auf Results Screen
     
-    [Header("Localized Texts (NEU)")]
+    [Header("Team Icon Provider (NEU)")]
+    [SerializeField] private TeamIconProvider teamIconProvider;
+    
+    [Header("Localized Texts")]
     [SerializeField] private LocalizedText correctAnswerLocalizedText;
     [SerializeField] private LocalizedText wrongAnswerLocalizedText;
     [SerializeField] private LocalizedText pointsLabelLocalizedText;
@@ -68,13 +75,16 @@ public class SplitScreenQuizManager : MonoBehaviour
     private float player2AnswerTime = float.MaxValue;
     private float questionStartTime;
     
-    // NEU: Aktuelle Sprache für Performance
+    // Aktuelle Sprache für Performance
     private LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
     
     void Start()
     {
         InitializeLocalization();
         InitializeQuiz();
+        
+        // NEU: Team-Icons setzen
+        UpdateTeamIcons();
         
         // Event-Listener für Sprachwechsel
         LanguageSystem.OnLanguageChanged += OnLanguageChanged;
@@ -117,16 +127,56 @@ public class SplitScreenQuizManager : MonoBehaviour
         };
     }
     
+    // NEU: Team-Icons aktualisieren
+    void UpdateTeamIcons()
+    {
+        if (teamIconProvider == null)
+        {
+            Debug.LogWarning("TeamIconProvider nicht zugewiesen! Verwende Fallback.");
+            return;
+        }
+        
+        // Gameplay Icons
+        if (player1TeamIcon != null)
+        {
+            Sprite team1Icon = teamIconProvider.GetTeam1Icon();
+            if (team1Icon != null)
+                player1TeamIcon.sprite = team1Icon;
+        }
+        
+        if (player2TeamIcon != null)
+        {
+            Sprite team2Icon = teamIconProvider.GetTeam2Icon();
+            if (team2Icon != null)
+                player2TeamIcon.sprite = team2Icon;
+        }
+        
+        // Results Screen Icons
+        if (result1TeamIcon != null)
+        {
+            Sprite team1Icon = teamIconProvider.GetTeam1Icon();
+            if (team1Icon != null)
+                result1TeamIcon.sprite = team1Icon;
+        }
+        
+        if (result2TeamIcon != null)
+        {
+            Sprite team2Icon = teamIconProvider.GetTeam2Icon();
+            if (team2Icon != null)
+                result2TeamIcon.sprite = team2Icon;
+        }
+        
+        Debug.Log($"Team Icons updated: Team1={teamIconProvider.GetTeam1Icon()?.name}, Team2={teamIconProvider.GetTeam2Icon()?.name}");
+    }
+    
     void OnLanguageChanged(LanguageSystem.Language newLanguage)
     {
         currentLanguage = newLanguage;
         UpdateLocalizedPlayerNames();
-        UpdateScoreDisplay(); // Score-Labels aktualisieren
+        UpdateScoreDisplay();
         
-        // Wenn Feedback gerade angezeigt wird, aktualisiere es
         if (showingFeedback)
         {
-            // Aktualisiere Feedback-Texte ohne Neuberechnung der Punkte
             RefreshFeedbackTexts();
         }
     }
@@ -239,7 +289,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         player2AnswerTime = float.MaxValue;
         questionStartTime = Time.time;
         
-        // NEU: Verwende lokalisierte Fragen
         player1.shuffledAnswers = team1Question.GetShuffledAnswers(currentLanguage);
         player2.shuffledAnswers = team2Question.GetShuffledAnswers(currentLanguage);
         
@@ -364,7 +413,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         player1.AddScore(player1Points);
         player2.AddScore(player2Points);
         
-        // GEÄNDERT: Übergebe Question für korrekte Antwort-Ermittlung
         ShowFeedback(player1, player1Points, player1Correct, player1AnswerButtons, team1Question);
         ShowFeedback(player2, player2Points, player2Correct, player2AnswerButtons, team2Question);
         
@@ -414,7 +462,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         return selectedAnswer == question.GetCorrectAnswer(currentLanguage);
     }
     
-    // GEÄNDERT: Neue Signatur mit QuizQuestion Parameter
     void ShowFeedback(PlayerData player, int points, bool correct, Button[] buttons, QuizQuestion question)
     {
         GameObject feedbackPanel = (player == player1) ? player1FeedbackPanel : player2FeedbackPanel;
@@ -497,7 +544,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
     }
     
-    // Default-Texte als Fallback
     string GetDefaultCorrectText(LanguageSystem.Language language)
     {
         return language switch
@@ -573,6 +619,9 @@ public class SplitScreenQuizManager : MonoBehaviour
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
         
+        // NEU: Icons auf Results Screen aktualisieren
+        UpdateTeamIcons();
+        
         string winnerText;
         if (player1.score > player2.score)
         {
@@ -646,6 +695,9 @@ public class SplitScreenQuizManager : MonoBehaviour
         
         gameplayUI.SetActive(true);
         resultUI.SetActive(false);
+        
+        // NEU: Icons neu laden (falls geändert)
+        UpdateTeamIcons();
         
         ShowCurrentQuestion();
     }
