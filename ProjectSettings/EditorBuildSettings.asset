@@ -47,6 +47,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_GAME/Scenes/A03_Terminal_2_Bye.unity
     guid: 8c18bacb0bfdf86448493053e9f7c0aa
+  - enabled: 1
+    path: Assets/_GAME/Scenes/C02_Terminal_4_Tabu.unity
+    guid: 5473dbc494a8d1b4eac36777ce44b9ba
+  - enabled: 1
+    path: Assets/_GAME/Scenes/C01_Terminal_4.unity
+    guid: 03d64d75ad493da4eb562ef22cb3ede4
+  - enabled: 1
+    path: Assets/_GAME/Scenes/D01_Terminal_5.unity
+    guid: 7e88899cf165c7f44869bc8ff15f81b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
