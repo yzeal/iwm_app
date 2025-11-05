@@ -57,18 +57,18 @@ public class TabuGameManager : MonoBehaviour
     public AudioClip countdownStartSound;
 
     [Header("Localized Texts")]
-    [SerializeField] private LocalizedText gameTitleLocalizedText;
-    [SerializeField] private LocalizedText howToPlayLocalizedText;
-    [SerializeField] private LocalizedText rulesLocalizedText;
-    [SerializeField] private LocalizedText explainWithoutTabuWordsLocalizedText;
-    [SerializeField] private LocalizedText timePerRoundLocalizedText;
-    [SerializeField] private LocalizedText termsPerRoundLocalizedText;
-    [SerializeField] private LocalizedText difficultyLocalizedText;
-    [SerializeField] private LocalizedText thisTeamPlayingLocalizedText;
-    [SerializeField] private LocalizedText secondsLocalizedText;
-    [SerializeField] private LocalizedText pointsLocalizedText;
-    [SerializeField] private LocalizedText winnerLocalizedText;
-    [SerializeField] private LocalizedText tieLocalizedText;
+    [SerializeField] private LocalizedText explanationTitleLocalizedText;
+    [SerializeField] private LocalizedText explanationRulesLocalizedText;
+    [SerializeField] private LocalizedText startButtonLocalizedText;
+    [SerializeField] private LocalizedText timerLabelLocalizedText;
+    [SerializeField] private LocalizedText tabuWordsHeaderLocalizedText;
+    [SerializeField] private LocalizedText correctButtonLocalizedText;
+    [SerializeField] private LocalizedText skipButtonLocalizedText;
+    [SerializeField] private LocalizedText resultsTeam1LabelLocalizedText;
+    [SerializeField] private LocalizedText resultsTeam2LabelLocalizedText;
+    [SerializeField] private LocalizedText resultsWinnerLocalizedText;
+    [SerializeField] private LocalizedText resultsTieLocalizedText;
+    [SerializeField] private LocalizedText backButtonLocalizedText;
 
     // Game State
     private List<TabuTerm> currentRoundTerms;
@@ -248,198 +248,29 @@ public class TabuGameManager : MonoBehaviour
         float adjustedDuration = tabuCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
 
         // Lokalisierte Texte verwenden
-        string gameTitle = GetLocalizedText(gameTitleLocalizedText, GetDefaultGameTitle);
-        string howToPlay = GetLocalizedText(howToPlayLocalizedText, GetDefaultHowToPlay);
-        string rules = GetLocalizedText(rulesLocalizedText, GetDefaultRules);
-        string explainWithoutTabu = GetLocalizedText(explainWithoutTabuWordsLocalizedText, GetDefaultExplainWithoutTabu);
-        string timePerRound = GetLocalizedText(timePerRoundLocalizedText, GetDefaultTimePerRound);
-        string termsPerRound = GetLocalizedText(termsPerRoundLocalizedText, GetDefaultTermsPerRound);
-        string difficulty = GetLocalizedText(difficultyLocalizedText, GetDefaultDifficulty);
-        string thisTeamPlaying = GetLocalizedText(thisTeamPlayingLocalizedText, GetDefaultThisTeamPlaying);
-        string seconds = GetLocalizedText(secondsLocalizedText, GetDefaultSeconds);
+        string explanationTitle = GetLocalizedText(explanationTitleLocalizedText, "Tabu - Erkläre den Begriff!");
+        string explanationRules = GetLocalizedText(explanationRulesLocalizedText, 
+            "Ein Spieler erklärt Begriffe, ohne die Tabu-Wörter zu verwenden. Das Team rät!");
 
-        explanationText.text = $"<b>{gameTitle}</b>\n\n" +
-                              $"<b>{howToPlay}:</b>\n" +
-                              $"<b>{rules}:</b>\n" +
-                              $"• {explainWithoutTabu}\n\n" +
-                              $"<b>{timePerRound}:</b> {adjustedDuration:F0} {seconds}\n" +
-                              $"<b>{termsPerRound}:</b> {tabuCollection.TermsPerRound}\n" +
-                              $"<b>{difficulty}:</b> {GetDifficultyDisplayName(currentTeamDifficulty)}\n\n" +
-                              $"{thisTeamPlaying}:";
+        explanationText.text = $"<b>{explanationTitle}</b>\n\n{explanationRules}";
     
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
-    }
-
-    string GetLocalizedText(LocalizedText localizedText, System.Func<LanguageSystem.Language, string> fallbackFunction)
-    {
-        return localizedText != null ? localizedText.GetText(currentLanguage) : fallbackFunction(currentLanguage);
-    }
-
-    string GetDifficultyDisplayName(DifficultyLevel difficulty)
-    {
-        return difficulty switch
+        
+        // Start Button
+        if (startButton != null && startButton.GetComponentInChildren<TextMeshProUGUI>() != null)
         {
-            DifficultyLevel.Kids => currentLanguage switch
-            {
-                LanguageSystem.Language.English_Standard => "Kids",
-                LanguageSystem.Language.English_Simple => "Easy",
-                LanguageSystem.Language.German_Simple => "Einfach",
-                _ => "Kids"
-            },
-            DifficultyLevel.BigKids => currentLanguage switch
-            {
-                LanguageSystem.Language.English_Standard => "Big Kids",
-                LanguageSystem.Language.English_Simple => "Medium",
-                LanguageSystem.Language.German_Simple => "Mittel",
-                _ => "BigKids"
-            },
-            DifficultyLevel.Adults => currentLanguage switch
-            {
-                LanguageSystem.Language.English_Standard => "Adults",
-                LanguageSystem.Language.English_Simple => "Hard",
-                LanguageSystem.Language.German_Simple => "Schwer",
-                _ => "Adults"
-            },
-            _ => "Adults"
-        };
+            startButton.GetComponentInChildren<TextMeshProUGUI>().text = 
+                GetLocalizedText(startButtonLocalizedText, "Start");
+        }
     }
 
-    #region Default Fallback Functions
-
-    string GetDefaultGameTitle(LanguageSystem.Language language)
+    string GetLocalizedText(LocalizedText localizedText, string fallback)
     {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Tabu",
-            LanguageSystem.Language.English_Simple => "Word Game",
-            LanguageSystem.Language.German_Simple => "Wörter-Spiel",
-            _ => "Tabu"
-        };
+        if (localizedText != null)
+            return localizedText.GetText(currentLanguage);
+        return fallback;
     }
-
-    string GetDefaultHowToPlay(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "How to play",
-            LanguageSystem.Language.English_Simple => "How to play",
-            LanguageSystem.Language.German_Simple => "So wird gespielt",
-            _ => "Wie gespielt wird"
-        };
-    }
-
-    string GetDefaultRules(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Rules",
-            LanguageSystem.Language.English_Simple => "Rules",
-            LanguageSystem.Language.German_Simple => "Regeln",
-            _ => "Regeln"
-        };
-    }
-
-    string GetDefaultExplainWithoutTabu(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Explain the main term without using the tabu words",
-            LanguageSystem.Language.English_Simple => "Explain without using the forbidden words",
-            LanguageSystem.Language.German_Simple => "Erkläre ohne die verbotenen Wörter",
-            _ => "Erkläre den Hauptbegriff ohne die Tabu-Wörter zu verwenden"
-        };
-    }
-
-    string GetDefaultTimePerRound(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Time per round",
-            LanguageSystem.Language.English_Simple => "Time",
-            LanguageSystem.Language.German_Simple => "Zeit pro Runde",
-            _ => "Zeit pro Runde"
-        };
-    }
-
-    string GetDefaultTermsPerRound(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Terms per round",
-            LanguageSystem.Language.English_Simple => "Words",
-            LanguageSystem.Language.German_Simple => "Wörter pro Runde",
-            _ => "Begriffe pro Runde"
-        };
-    }
-
-    string GetDefaultDifficulty(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Difficulty",
-            LanguageSystem.Language.English_Simple => "Level",
-            LanguageSystem.Language.German_Simple => "Schwierigkeit",
-            _ => "Schwierigkeitsgrad"
-        };
-    }
-
-    string GetDefaultThisTeamPlaying(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "This team is playing now",
-            LanguageSystem.Language.English_Simple => "This team plays now",
-            LanguageSystem.Language.German_Simple => "Dieses Team ist dran",
-            _ => "Dieses Team ist jetzt dran"
-        };
-    }
-
-    string GetDefaultSeconds(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "seconds",
-            LanguageSystem.Language.English_Simple => "seconds",
-            LanguageSystem.Language.German_Simple => "Sekunden",
-            _ => "Sekunden"
-        };
-    }
-
-    string GetDefaultPoints(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Points",
-            LanguageSystem.Language.English_Simple => "Points",
-            LanguageSystem.Language.German_Simple => "Punkte",
-            _ => "Punkte"
-        };
-    }
-
-    string GetDefaultWinner(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "Winner!",
-            LanguageSystem.Language.English_Simple => "Winner!",
-            LanguageSystem.Language.German_Simple => "Gewinner!",
-            _ => "Gewinner!"
-        };
-    }
-
-    string GetDefaultTie(LanguageSystem.Language language)
-    {
-        return language switch
-        {
-            LanguageSystem.Language.English_Standard => "It's a tie!",
-            LanguageSystem.Language.English_Simple => "Tie!",
-            LanguageSystem.Language.German_Simple => "Unentschieden!",
-            _ => "Unentschieden!"
-        };
-    }
-
-    #endregion
 
     // DEPRECATED: Legacy-Methode - wird durch UpdateTeamIconForImage ersetzt
     void UpdateCurrentTeamImage(Image targetImage)
@@ -734,14 +565,16 @@ public class TabuGameManager : MonoBehaviour
 
     void UpdateResultsUI()
     {
-        string pointsLabel = GetLocalizedText(pointsLocalizedText, GetDefaultPoints);
+        // Scores mit lokalisierten Team-Labels
+        string team1Label = GetLocalizedText(resultsTeam1LabelLocalizedText, "Team 1");
+        string team2Label = GetLocalizedText(resultsTeam2LabelLocalizedText, "Team 2");
 
-        team1ScoreText.text = $"{team1Score} {pointsLabel}";
-        team2ScoreText.text = $"{team2Score} {pointsLabel}";
+        team1ScoreText.text = $"{team1Label}: {team1Score}";
+        team2ScoreText.text = $"{team2Label}: {team2Score}";
 
         if (team1Score > team2Score)
         {
-            string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
+            string winnerFormat = GetLocalizedText(resultsWinnerLocalizedText, "gewinnt! ??");
             winnerText.text = winnerFormat;
             
             // NEU: Verwende TeamIconProvider
@@ -762,7 +595,7 @@ public class TabuGameManager : MonoBehaviour
         }
         else if (team2Score > team1Score)
         {
-            string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
+            string winnerFormat = GetLocalizedText(resultsWinnerLocalizedText, "gewinnt! ??");
             winnerText.text = winnerFormat;
             
             // NEU: Verwende TeamIconProvider
@@ -783,12 +616,19 @@ public class TabuGameManager : MonoBehaviour
         }
         else
         {
-            string tieText = GetLocalizedText(tieLocalizedText, GetDefaultTie);
+            string tieText = GetLocalizedText(resultsTieLocalizedText, "Unentschieden! ??");
             winnerText.text = tieText;
             if (winnerTeamImage)
             {
                 winnerTeamImage.gameObject.SetActive(false);
             }
+        }
+        
+        // Back Button
+        if (backToMenuButton != null && backToMenuButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+        {
+            backToMenuButton.GetComponentInChildren<TextMeshProUGUI>().text = 
+                GetLocalizedText(backButtonLocalizedText, "Zurück");
         }
     }
 
@@ -810,7 +650,24 @@ public class TabuGameManager : MonoBehaviour
     {
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImage, currentTeam);
+        
         scoreText.text = $"{correctTermsThisRound}/{tabuCollection.TermsPerRound}";
+        
+        // Tabu Words Header (falls vorhanden)
+        // Header wird im Backup-Code nicht aktualisiert, daher optional
+        
+        // Buttons
+        if (correctButton != null && correctButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+        {
+            correctButton.GetComponentInChildren<TextMeshProUGUI>().text = 
+                GetLocalizedText(correctButtonLocalizedText, "Richtig ?");
+        }
+        
+        if (skipButton != null && skipButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+        {
+            skipButton.GetComponentInChildren<TextMeshProUGUI>().text = 
+                GetLocalizedText(skipButtonLocalizedText, "Überspringen ?");
+        }
     }
 
     void UpdateTimerDisplay()

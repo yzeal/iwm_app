@@ -5039,7 +5039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 074a60fdfea9efe4b9adbd36c0a2c0dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TabuGameManager
-  tabuCollection: {fileID: 11400000, guid: 11a8db3c2dad9b94b84a07400199bec3, type: 2}
+  tabuCollection: {fileID: 11400000, guid: ebea439b57c48e4478d45ec9c605239b, type: 2}
   nextScene: Auswahl
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
@@ -5072,18 +5072,18 @@ MonoBehaviour:
   timeUpSound: {fileID: 8300000, guid: 6143a29cd93c5964d9dfe456291dc5ec, type: 3}
   countdownSound: {fileID: 8300000, guid: 991c9a30ddf8ad44989b3d691ea6f548, type: 3}
   countdownStartSound: {fileID: 8300000, guid: 7160a56a88cab8845a98d3210bb3fc3c, type: 3}
-  gameTitleLocalizedText: {fileID: 11400000, guid: 5e0e85ec11b5f2f4c9996c01181fd210, type: 2}
-  howToPlayLocalizedText: {fileID: 11400000, guid: eb7275ba61be51d4c9c7e0e7c3dfa25f, type: 2}
-  rulesLocalizedText: {fileID: 0}
-  explainWithoutTabuWordsLocalizedText: {fileID: 0}
-  timePerRoundLocalizedText: {fileID: 11400000, guid: b504598e963b5d547b350091d45f265b, type: 2}
-  termsPerRoundLocalizedText: {fileID: 0}
-  difficultyLocalizedText: {fileID: 0}
-  thisTeamPlayingLocalizedText: {fileID: 0}
-  secondsLocalizedText: {fileID: 0}
-  pointsLocalizedText: {fileID: 0}
-  winnerLocalizedText: {fileID: 0}
-  tieLocalizedText: {fileID: 11400000, guid: d32590617aaa27045b7960f551c2e90d, type: 2}
+  explanationTitleLocalizedText: {fileID: 11400000, guid: 5e0e85ec11b5f2f4c9996c01181fd210, type: 2}
+  explanationRulesLocalizedText: {fileID: 11400000, guid: eb7275ba61be51d4c9c7e0e7c3dfa25f, type: 2}
+  startButtonLocalizedText: {fileID: 11400000, guid: 03cd605ba9bc5f84c98163a52cb1fe24, type: 2}
+  timerLabelLocalizedText: {fileID: 11400000, guid: b504598e963b5d547b350091d45f265b, type: 2}
+  tabuWordsHeaderLocalizedText: {fileID: 11400000, guid: ff7b6e72b54a0854ab70500389d0760d, type: 2}
+  correctButtonLocalizedText: {fileID: 11400000, guid: 90539575b506b9944b614e791974d786, type: 2}
+  skipButtonLocalizedText: {fileID: 11400000, guid: 456d1c064e1355a429359cc09b6786e1, type: 2}
+  resultsTeam1LabelLocalizedText: {fileID: 11400000, guid: c038f154ab62b2547af4194f2741abb4, type: 2}
+  resultsTeam2LabelLocalizedText: {fileID: 11400000, guid: 472641331740ab0418162e014bb31934, type: 2}
+  resultsWinnerLocalizedText: {fileID: 11400000, guid: 6cd3a3eab6bb9cb4fbc22a3cb5148dec, type: 2}
+  resultsTieLocalizedText: {fileID: 11400000, guid: d32590617aaa27045b7960f551c2e90d, type: 2}
+  backButtonLocalizedText: {fileID: 11400000, guid: e2bc371ca15382e46b7c2c83dd23506f, type: 2}
 --- !u!4 &2124361923
 Transform:
   m_ObjectHideFlags: 0
