@@ -218,6 +218,57 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Team icons set: Team1={team1IconIndex}, Team2={team2IconIndex}");
     }
     
+    // NEU: Score-Abfrage-Methoden
+    /// <summary>
+    /// Berechnet den Gesamtscore für ein Team über alle abgeschlossenen Räume
+    /// </summary>
+    /// <param name="teamIndex">0 für Team 1, 1 für Team 2</param>
+    /// <returns>Gesamtscore des Teams</returns>
+    public int GetTotalScoreForTeam(int teamIndex)
+    {
+        if (teamIndex < 0 || teamIndex > 1)
+        {
+            Debug.LogWarning($"GetTotalScoreForTeam: Ungültiger teamIndex {teamIndex}. Verwende 0 oder 1.");
+            return 0;
+        }
+
+        int totalScore = 0;
+
+        foreach (var result in CurrentProgress.roomResults)
+        {
+            if (result.isCompleted)
+            {
+                // Team 1 (index 0) = player1Score, Team 2 (index 1) = player2Score
+                totalScore += teamIndex == 0 ? result.player1Score : result.player2Score;
+            }
+        }
+
+        Debug.Log($"GetTotalScoreForTeam({teamIndex}): {totalScore} Punkte über {CurrentProgress.roomResults.Count} Räume");
+        return totalScore;
+    }
+
+    /// <summary>
+    /// Gibt den Score beider Teams als Tuple zurück
+    /// </summary>
+    /// <returns>(Team1Score, Team2Score)</returns>
+    public (int team1Score, int team2Score) GetTotalScores()
+    {
+        int team1Total = 0;
+        int team2Total = 0;
+
+        foreach (var result in CurrentProgress.roomResults)
+        {
+            if (result.isCompleted)
+            {
+                team1Total += result.player1Score;
+                team2Total += result.player2Score;
+            }
+        }
+
+        Debug.Log($"GetTotalScores: Team 1={team1Total}, Team 2={team2Total}");
+        return (team1Total, team2Total);
+    }
+    
     public RoomResult GetRoomResult(int roomNumber)
     {
         return CurrentProgress.roomResults.Find(r => r.roomNumber == roomNumber);
@@ -387,6 +438,24 @@ public class GameDataManager : MonoBehaviour
     void DebugSetTeam2Icon1()
     {
         SetTeamIconIndex(1, 1);
+    }
+
+    // NEU: Debug-Methoden für Score-Testing
+    [ContextMenu("Print Total Scores")]
+    void DebugPrintTotalScores()
+    {
+        var (team1, team2) = GetTotalScores();
+        Debug.Log($"=== TOTAL SCORES ===\nTeam 1: {team1}\nTeam 2: {team2}");
+    }
+
+    [ContextMenu("Add Test Room Result")]
+    void DebugAddTestRoomResult()
+    {
+        int randomRoom = UnityEngine.Random.Range(1, 7);
+        int team1Score = UnityEngine.Random.Range(5, 20);
+        int team2Score = UnityEngine.Random.Range(5, 20);
+        SaveRoomResult($"Test Room {randomRoom}", randomRoom, team1Score, team2Score, 10);
+        Debug.Log($"Added test result: Room {randomRoom}, Team1={team1Score}, Team2={team2Score}");
     }
     
     #endregion

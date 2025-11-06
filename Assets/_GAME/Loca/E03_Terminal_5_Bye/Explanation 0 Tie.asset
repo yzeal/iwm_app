@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
-  m_Name: Explanation 0
+  m_Name: Explanation 0 Tie
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
   germanStandard: "Sch\xF6n, dass ihr bei dem spielerischen Rundgang dabei wart!\n\nWir
     hoffen, es hat euch gefallen und begl\xFCckw\xFCnschen alle Mitspielenden f\xFCr
     den an den Tag gelegten Eifer. \n\nKommen wir nun zur Auswertung:\n\n\r\nDas
-    <b>Siegerteam</b> ist"
+    <b>Siegerteam</b> ... sind beide Teams!"
   englishStandard: "We\u2019re so glad you joined us for this playful tour!\n\nWe
     hope you enjoyed it \u2014 and we\u2019d like to congratulate all participants
     for their enthusiasm and team spirit.\n\nAnd now, it\u2019s time for the results:\n\n\nThe
-    <b>winning team</b> is"
+    <b>winning team</b> is ... both teams!"
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 1
