@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Die Grube Messel ist durch den Ausbruch eines <b>Maarvulkans</b>
+    entstanden. \nDeswegen behandelt dieser Raum das Thema Vulkanismus. \n\r\nF\xFCr
+    unser <b>Bilderr\xE4tsel</b> m\xFCsst ihr schnell sein und gute Augen haben!
+    \n\nAbwechselnd bekommen eure Teams einen <b>Bildausschnitt</b> von einem Objekt
+    gezeigt, das sich hier in diesem Raum befindet. \n\nIst der Ausschnitt zu schwierig,
+    kann das Bild bis zu zweimal erweitern werden, <b>doch jede Hilfestellung gibt
+    Punkteabzug</b>! \n\nGlaubt ihr, das richtige Objekt innerhalb der vorgegebenen
+    Zeit gefunden zu haben, k\xF6nnt ihr aufl\xF6sen. \n\nLiegt ihr richtig, erhaltet
+    ihr eure Punkte! \n\nGespielt wird <b>eine Runde</b>.\n\r\nAuf geht\u2019s!\r\n"
+  englishStandard: "The Messel Pit was formed by the eruption of a <b>maar volcano</b>.\nThat\u2019s
+    why this room focuses on the theme of volcanism.\n\nFor this <b>picture puzzle</b>,
+    you\u2019ll need to be quick and have a sharp eye!\n\nYour teams will take turns
+    being shown a <b>close-up image</b> of an object located somewhere in this room.\n\nIf
+    the image is too hard to guess, it can be expanded up to two times \u2014 <b>but
+    each hint will cost you points</b>!\n\nIf you think you\u2019ve found the right
+    object within the given time, you can submit your answer.\n\nIf you\u2019re correct,
+    you\u2019ll earn your points!\n\nYou\u2019ll play <b>one round</b>.\n\nLet\u2019s
+    get started!"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 0

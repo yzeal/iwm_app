@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Ihr habt nun die Schatzkammer betreten, in der ihr <b>echte Fossilien</b>
+    aus der Grube Messel bestaunen k\xF6nnt!\n\nZum Abschluss schicken wir euch daf\xFCr
+    nochmal auf <b>Bildersuche</b>. \n\nGespielt wird wieder <b>nacheinander</b>.
+    \n\nJedes Team erh\xE4lt abwechselnd einen <b>Bildausschnitt</b> von einem Fossil,
+    das sich hier in diesem Raum befindet. \n\nDiesmal spielt ihr <b>3 Runden</b>!\n\nInnerhalb
+    des <b>Zeitlimits</b> muss das entsprechende Fossil gefunden werden. \n\nWie
+    im Vulkanraum <b>kostet jeder Hinweis einen Punkt</b>! "
+  englishStandard: "You\u2019ve now entered the Treasure Chamber, where you can admire
+    <b>real fossils</b> from the Messel Pit!\n\nTo finish things off, we\u2019re
+    sending you on one more <b>picture hunt</b>.\n\nYou\u2019ll play <b>in turns</b>
+    again.\n\nEach team will take turns being shown a <b>close-up image</b> of a
+    fossil located somewhere in this room.\n\nThis time, you\u2019ll play <b>3 rounds</b>!\n\nYou\u2019ll
+    need to find the matching fossil within the <b>time limit</b>.\n\nJust like in
+    the Volcano Room, <b>every hint will cost you one point</b>!"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 1

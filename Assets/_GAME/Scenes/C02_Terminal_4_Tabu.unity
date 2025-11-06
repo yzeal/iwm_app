@@ -972,8 +972,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 4, y: -526}
-  m_SizeDelta: {x: 922.403, y: 169.76404}
+  m_AnchoredPosition: {x: 0, y: -526}
+  m_SizeDelta: {x: 900, y: 169.764}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &433882177
 MonoBehaviour:
@@ -3941,6 +3941,7 @@ GameObject:
   - component: {fileID: 1650354152}
   - component: {fileID: 1650354151}
   - component: {fileID: 1650354150}
+  - component: {fileID: 1650354153}
   m_Layer: 5
   m_Name: SkipButton
   m_TagString: Untagged
@@ -3965,8 +3966,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -280, y: 179.77197}
-  m_SizeDelta: {x: 415.556, y: 116.772}
+  m_AnchoredPosition: {x: -240, y: 179.77197}
+  m_SizeDelta: {x: 382.135, y: 116.772}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1650354150
 MonoBehaviour:
@@ -4050,6 +4051,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650354148}
   m_CullTransparentMesh: 1
+--- !u!114 &1650354153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650354148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85bfd63e8e9eb964597f0f60102d9f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadScene
 --- !u!1 &1680651708
 GameObject:
   m_ObjectHideFlags: 0
@@ -4606,8 +4619,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4694,8 +4707,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 224.15314, y: 179.772}
-  m_SizeDelta: {x: 482.091, y: 211.03}
+  m_AnchoredPosition: {x: 213, y: 179.77197}
+  m_SizeDelta: {x: 443.319, y: 211.03}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1876955031
 MonoBehaviour:
@@ -5040,7 +5053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TabuGameManager
   tabuCollection: {fileID: 11400000, guid: ebea439b57c48e4478d45ec9c605239b, type: 2}
-  nextScene: D01_Terminal_5
+  nextScene: C03_Terminal_4_Bye
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
   gameplayUI: {fileID: 1725218809}
@@ -5064,14 +5077,14 @@ MonoBehaviour:
   winnerTeamImage: {fileID: 2007081079}
   winnerText: {fileID: 1251377181}
   playAgainButton: {fileID: 126526503}
-  backToMenuButton: {fileID: 126526503}
+  backToMenuButton: {fileID: 781525065}
   teamIconProvider: {fileID: 11400000, guid: f94b5d49efe57434295d597f52b96e8c, type: 2}
   audioSource: {fileID: 442634830}
   correctSound: {fileID: 8300000, guid: 02e6883f615d7844697821c9937c29ee, type: 3}
   skipSound: {fileID: 8300000, guid: 67ec1e4cee5584a42adbffdc6bdb9339, type: 3}
   timeUpSound: {fileID: 8300000, guid: 6143a29cd93c5964d9dfe456291dc5ec, type: 3}
-  countdownSound: {fileID: 8300000, guid: 991c9a30ddf8ad44989b3d691ea6f548, type: 3}
-  countdownStartSound: {fileID: 8300000, guid: 7160a56a88cab8845a98d3210bb3fc3c, type: 3}
+  countdownSound: {fileID: 8300000, guid: 7160a56a88cab8845a98d3210bb3fc3c, type: 3}
+  countdownStartSound: {fileID: 8300000, guid: 991c9a30ddf8ad44989b3d691ea6f548, type: 3}
   explanationTitleLocalizedText: {fileID: 11400000, guid: 5e0e85ec11b5f2f4c9996c01181fd210, type: 2}
   explanationRulesLocalizedText: {fileID: 11400000, guid: eb7275ba61be51d4c9c7e0e7c3dfa25f, type: 2}
   startButtonLocalizedText: {fileID: 11400000, guid: 03cd605ba9bc5f84c98163a52cb1fe24, type: 2}

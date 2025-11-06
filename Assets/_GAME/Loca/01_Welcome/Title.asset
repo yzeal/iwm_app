@@ -16,6 +16,6 @@ MonoBehaviour:
   description: "Beschreibung des Texts f\xFCr Editor"
   germanStandard: Willkommen!
   englishStandard: Welcome!
-  germanSimple: Willkommen!
-  englishSimple: Welcome!
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0

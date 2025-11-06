@@ -48,11 +48,23 @@ EditorBuildSettings:
     path: Assets/_GAME/Scenes/A03_Terminal_2_Bye.unity
     guid: 8c18bacb0bfdf86448493053e9f7c0aa
   - enabled: 1
-    path: Assets/_GAME/Scenes/C02_Terminal_4_Tabu.unity
-    guid: 5473dbc494a8d1b4eac36777ce44b9ba
+    path: Assets/_GAME/Scenes/B01_Terminal_3.unity
+    guid: 4f9445f0c75f4d04b8094713cb994c6f
+  - enabled: 1
+    path: Assets/_GAME/Scenes/B02_Terminal_3_Bildersuche.unity
+    guid: 59bcf20323d275e4e9a56ecffe211bbd
+  - enabled: 1
+    path: Assets/_GAME/Scenes/B03_Terminal_3_Bye.unity
+    guid: 4ad918b29ae95dc48a96db07eb69c59b
   - enabled: 1
     path: Assets/_GAME/Scenes/C01_Terminal_4.unity
     guid: 03d64d75ad493da4eb562ef22cb3ede4
+  - enabled: 1
+    path: Assets/_GAME/Scenes/C02_Terminal_4_Tabu.unity
+    guid: 5473dbc494a8d1b4eac36777ce44b9ba
+  - enabled: 1
+    path: Assets/_GAME/Scenes/C03_Terminal_4_Bye.unity
+    guid: f2ac22552ca114b4fb09737d8f4c34f1
   - enabled: 1
     path: Assets/_GAME/Scenes/D01_Terminal_5.unity
     guid: 7e88899cf165c7f44869bc8ff15f81b6
@@ -60,14 +72,14 @@ EditorBuildSettings:
     path: Assets/_GAME/Scenes/D02_Terminal_5_Stirnraten.unity
     guid: fc7bd8d1fc495af4599a3ee07580dbab
   - enabled: 1
-    path: Assets/_GAME/Scenes/E01_Terminal_6.unity
+    path: Assets/_GAME/Scenes/E01_Terminal_5.unity
     guid: 8085947ef5dae8447819141d8893f4d3
   - enabled: 1
-    path: Assets/_GAME/Scenes/B01_Terminal_3.unity
-    guid: 4f9445f0c75f4d04b8094713cb994c6f
+    path: Assets/_GAME/Scenes/E02_Terminal_5_Bildersuche.unity
+    guid: 2b2de4deb3cd76a458e9aa22728cb759
   - enabled: 1
-    path: Assets/_GAME/Scenes/B02_Terminal_3_Bildersuche.unity
-    guid: 59bcf20323d275e4e9a56ecffe211bbd
+    path: Assets/_GAME/Scenes/E03_Terminal_5_Bye.unity
+    guid: 5a282014f21dab2448c7796802afd790
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "In diesem Raum dreht sich alles rund um die <b>Forschung</b> in
+    der Grube Messel. \n\nHier wurden n\xE4mlich schon \xFCber <b>1400 Arten</b>
+    entdeckt! \n\nIn dem Spiel <b>\u201EBegriffe raten\u201C</b> k\xF6nnt ihr einige
+    dieser Arten kennenlernen \xAC\u2013 dazu m\xFCsst ihr sie nur erraten. \n\nGespielt
+    wird im <b>Wechsel</b>. \n\nPro Team h\xE4lt sich eine Person das Handy <b>an
+    die Stirn</b>. \n\nDarauf erscheint der Begriff, den sie erraten muss \u2013
+    selbstverst\xE4ndlich <b>ohne ihn zu lesen</b>!\n\nUm herauszufinden, worum es
+    sich handelt, darf die Person Fragen stellen, die von ihrem Team mit <b>Ja</b>
+    oder <b>Nein</b> beantwortet werden. \n\nWurde der richtige Begriff gefunden,
+    muss das Handy <b>nach vorne gekippt</b> werden und der n\xE4chste erscheint.
+    \n\nJe mehr Begriffe innerhalb des Zeitlimits erraten werden, desto mehr Punkte
+    gibt es!\n\nIst ein Begriff zu schwer, kann er mit dem <b>Kippen des Handys nach
+    hinten</b> \xFCbersprungen werden. "
+  englishStandard: "This room is all about the <b>scientific research</b> conducted
+    at the Messel Pit.\n\nOver <b>1,400 species</b> have already been discovered
+    here!\n\nIn the game <b>\u201CGuess the Term\u201D</b>, you\u2019ll get to know
+    some of these species \u2014 but first, you\u2019ll have to guess them!\n\nTeams
+    <b>take turns</b> playing.\n\nIn each team, one person holds the phone <b>to
+    their forehead</b>.\n\nA term will appear on the screen \u2014 the player <b>must
+    not read it</b>, of course!\n\nTo figure out what it is, they may ask questions,
+    which their teammates answer with <b>\u201Cyes\u201D</b> or <b>\u201Cno.\u201D</b>\n\nOnce
+    the correct term is guessed, the player <b>tilts the phone forward</b> and the
+    next term appears.\n\nThe more terms you guess within the time limit, the more
+    points you earn!\n\nIf a term is too difficult, it can be skipped by <b>tilting
+    the phone backward</b>."
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 0

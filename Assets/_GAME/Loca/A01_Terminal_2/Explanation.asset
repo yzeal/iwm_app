@@ -14,15 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Wir begr\xFC\xDFen euch im Landschaftsraum. Hier gibt es verschiedenste
-    Faktoren, die im Laufe der Erdgeschichte zu Ver\xE4nderungen der Landschaft rund
-    um die Grube Messel gef\xFChrt haben, zu entdecken. An dieser Station erwarten
-    euch Quizfragen. Sie werden im Splitscreen angezeigt, also haltet das Handy bitte
-    so, dass jede Person sie sehen kann. Gespielt wird X Runden. Auf jede Frage gibt
-    es eine richtige Antwort und einige der L\xF6sungen sind sogar im Raum versteckt.
-    F\xFCr jede richtig beantwortete Frage gibt es einen Punkt. Das Team, das schneller
-    die richtige L\xF6sung einloggt, erh\xE4lt einen Extrapunkt. "
-  englishStandard: 
+  germanStandard: "Wir begr\xFC\xDFen euch im <b>Landschaftsraum</b>!\n\nHier gibt
+    es verschiedenste Faktoren, die im Laufe der Erdgeschichte zu Ver\xE4nderungen
+    der Landschaft rund um die Grube Messel gef\xFChrt haben, zu entdecken. \n\nAn
+    dieser Station erwarten euch <b>Quizfragen</b>. \n\nSie werden im Splitscreen
+    angezeigt, also haltet das Handy bitte so, dass jede Person sie sehen kann. Gespielt
+    wird X Runden. \n\nAuf jede Frage gibt es eine richtige Antwort und einige der
+    L\xF6sungen sind sogar im Raum versteckt. F\xFCr jede richtig beantwortete Frage
+    gibt es einen Punkt. \n\nDas Team, das schneller die richtige L\xF6sung einloggt,
+    erh\xE4lt einen Extrapunkt!"
+  englishStandard: "Welcome to the <b>Landscape Room</b>!\n\nHere, you can explore
+    the many factors that have shaped and changed the landscape around the Messel
+    Pit over the course of Earth\u2019s history.\n\nAt this station, you\u2019ll
+    be playing a <b>quiz game</b>.\n\nThe questions will appear in split-screen mode,
+    so make sure to hold the phone so that everyone on your team can see. The game
+    consists of X rounds.\n\nEach question has one correct answer \u2014 and some
+    of the clues are even hidden in the room! You\u2019ll earn one point for every
+    correct answer.\n\nThe team that locks in the correct answer faster gets an extra
+    point!"
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0

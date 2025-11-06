@@ -15,8 +15,15 @@ MonoBehaviour:
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
   germanStandard: "Auf zur n\xE4chsten Station!\n\nHalte dein Handy im n\xE4chsten
-    Raum an den mesmobil-Chip.\n\n[Hier eine kleine Animation dazu.]"
-  englishStandard: 
+    Raum an den <b>mesmobil-Chip</b>.\n\n<i>[Hier eine kleine Animation dazu.]</i>"
+  englishStandard: 'On to the next station!
+
+
+    Hold your phone up to the <b>mesmobil
+    chip</b> in the next room.
+
+
+    <i>[A short animation plays here.]</i>'
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0

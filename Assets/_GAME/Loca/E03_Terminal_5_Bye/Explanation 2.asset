@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation 2
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "haltet die Ohren steif. \nDer n\xE4chste Sieg kann euch geh\xF6ren.\r\n\r\n<b>Bis
+    dahin macht es gut und noch viel Spa\xDF!</b>\r\n\r\nEuer mesmobil-Team"
+  englishStandard: "keep your spirits high! \nThe next victory might be yours.\n\n</b>Until
+    then, take care and have lots of fun!</b>\n\nYour mesmobil team"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 1

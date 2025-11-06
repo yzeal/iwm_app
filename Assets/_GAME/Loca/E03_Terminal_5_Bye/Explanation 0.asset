@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation 0
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Sch\xF6n, dass ihr bei dem spielerischen Rundgang dabei wart!\n\nWir
+    hoffen, es hat euch gefallen und begl\xFCckw\xFCnschen alle Mitspielenden f\xFCr
+    den an den Tag gelegten Eifer. \n\nKommen wir nun zur Auswertung:\n\r\nDas <b>Siegerteam</b>
+    ist"
+  englishStandard: "We\u2019re so glad you joined us for this playful tour!\n\nWe
+    hope you enjoyed it \u2014 and we\u2019d like to congratulate all participants
+    for their enthusiasm and team spirit.\n\nAnd now, it\u2019s time for the results:\n\nThe
+    <b>winning team</b> is"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 1

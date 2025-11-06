@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Hier geht\u2019s in die Tiefe! \nSchicht f\xFCr Schicht enth\xFCllt
+    der <b>Bohrkern</b> Messels Vergangenheit! \n\nEr stammt von einer Forschungsbohrung
+    im Jahr 2001 und kann hier bestaunt werden. \n\nBeim Spiel in diesem Raum, geht
+    es darum, <b>W\xF6rter zu erkl\xE4ren</b>, die alle etwas mit der Grube Messel
+    zu tun haben. \n\nPro Team erkl\xE4rt immer eine Person das vorgegebene Wort,
+    wobei jemand aus dem gegnerischen Team aufpasst, dass keines der <b>verbotenen
+    W\xF6rter</b> darunter benutzt wird.\n\nSchafft das Team es innerhalb der <b>vorgegebenen
+    Zeit</b>, das gesuchte Wort zu erraten, gibt es einen Punkt. \n\nSeid ihr nur
+    zwei Personen, versucht gemeinsam so viele Punkte wie m\xF6glich zu machen!\n\nDie
+    Teams spielen <b>abwechselnd</b>. \n\nNa, dann los!"
+  englishStandard: "Here we go underground!\nLayer by layer, the <b>drill core</b>
+    reveals Messel\u2019s past.\n\nIt comes from a research drilling carried out
+    in 2001 and can be admired here.\n\nIn the game for this room, your task is to
+    <b>explain words</b> \u2014 all of them related to the Messel Pit.\n\nIn each
+    team, one person explains the given word, while someone from the opposing team
+    makes sure none of the <b>forbidden words</b> are used.\n\nIf there are only
+    two of you, work together to score as many points as possible!\n\nIf the team
+    manages to guess the correct word within the <b>given time</b>, they earn one
+    point.\n\nTeams <b>take turns</b>.\n\nAlright then \u2014 let\u2019s go!"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 0

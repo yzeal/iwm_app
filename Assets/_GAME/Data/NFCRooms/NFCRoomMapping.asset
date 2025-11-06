@@ -18,6 +18,14 @@ MonoBehaviour:
     displayName: '"Landschaft"'
     roomIcon: {fileID: 0}
   - nfcTagId: ROOM_02
-    sceneName: TeamSettings
+    sceneName: B01_Terminal_3
+    displayName: '"Fossilienraum"'
+    roomIcon: {fileID: 0}
+  - nfcTagId: ROOM_03
+    sceneName: C01_Terminal_4
+    displayName: '"Fossilienraum"'
+    roomIcon: {fileID: 0}
+  - nfcTagId: ROOM_04
+    sceneName: D01_Terminal_5
     displayName: '"Fossilienraum"'
     roomIcon: {fileID: 0}

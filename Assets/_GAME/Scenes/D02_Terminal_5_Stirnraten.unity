@@ -1110,7 +1110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FossilGameManager
   fossilCollection: {fileID: 11400000, guid: 2d50caa1a54df664fa9eb7c4424a429e, type: 2}
-  nextScene: Auswahl
+  nextScene: E01_Terminal_5
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
   gameplayUI: {fileID: 1725218809}

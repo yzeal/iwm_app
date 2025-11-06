@@ -230,6 +230,41 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &303993848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 303993849}
+  m_Layer: 5
+  m_Name: Spacer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &303993849
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303993848}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 793756071}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &339841690
 GameObject:
   m_ObjectHideFlags: 0
@@ -1237,6 +1272,7 @@ GameObject:
   - component: {fileID: 789011202}
   - component: {fileID: 789011204}
   - component: {fileID: 789011203}
+  - component: {fileID: 789011205}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1362,6 +1398,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 789011201}
   m_CullTransparentMesh: 1
+--- !u!114 &789011205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 789011201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5171c58126fdb5d499d505097c56783f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedTextComponent
+  localizedText: {fileID: 11400000, guid: 6764abcfdcce6fd479158cd845dd9726, type: 2}
+  updateOnLanguageChange: 1
+  targetText: {fileID: 0}
+  targetTextMeshPro: {fileID: 0}
+  enableDebugLogs: 0
 --- !u!1 &793756070
 GameObject:
   m_ObjectHideFlags: 0
@@ -1392,6 +1445,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 303993849}
   - {fileID: 681720081}
   - {fileID: 1234438246}
   - {fileID: 343356512}
@@ -1736,7 +1790,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 541.5599, y: -539.161}
+  m_AnchoredPosition: {x: 541.5599, y: -589.161}
   m_SizeDelta: {x: 713.646, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1234438247
