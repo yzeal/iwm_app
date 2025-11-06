@@ -14,19 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Herzlich willkommen bei mesmobil! \n\nHier erwartet euch ein interaktiver
-    Spielspa\xDF, der euch durch die Ausstellung der Grube Messel f\xFChrt. \n\nZu
-    Beginn teilt euch bitte in zwei Teams auf. \nIhr werdet gegeneinander antreten.
-    \n\nIn jedem Ausstellungsraum erwarten euch verschiedene Spielformate. \nAm Ende
-    gewinnt das Team mit den meisten Punkten! \n\r\nLos geht\u2019s gleich nebenan,
-    im Landschaftsraum. \r\n\r\nW\xE4hlt euren Avatar und dann k\xF6nnt ihr loslegen!
-    \r\n\r\nViel Spa\xDF!"
-  englishStandard: "Welcome to mesmobil!\nGet ready for an interactive adventure
+  germanStandard: "Herzlich willkommen bei <b>mesmobil</b>! \n\nHier erwartet euch
+    ein interaktiver Spielspa\xDF, der euch durch die Ausstellung der Grube Messel
+    f\xFChrt. \n\nZu Beginn teilt euch bitte in <b>zwei Teams</b> auf. \nIhr werdet
+    gegeneinander antreten. \n\nIn jedem Ausstellungsraum erwarten euch verschiedene
+    Spielformate. \nAm Ende gewinnt das Team mit den meisten Punkten! \n\r\nLos geht\u2019s
+    gleich nebenan, im Landschaftsraum. \r\n\r\nW\xE4hlt euren Avatar und dann k\xF6nnt
+    ihr loslegen! \r\n\r\n<b>Viel Spa\xDF!</b>"
+  englishStandard: "Welcome to <b>mesmobil</b>!\nGet ready for an interactive adventure
     that will guide you through the Grube Messel exhibition.\n\nTo start, please
-    split into two teams \u2014 you\u2019ll be competing against each other. In each
-    exhibition room, different types of mini-games await you.\nAt the end, the team
-    with the most points wins!\n\nYour journey begins right next door, in the Landscape
-    Room.\n\nChoose your avatar, and you\u2019re ready to go!\n\nHave fun!"
+    split into <b>two teams</b> \u2014 you\u2019ll be competing against each other.
+    In each exhibition room, different types of mini-games await you.\nAt the end,
+    the team with the most points wins!\n\nYour journey begins right next door, in
+    the Landscape Room.\n\nChoose your avatar, and you\u2019re ready to go!\n\n</b>Have
+    fun!</b>"
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0
