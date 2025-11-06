@@ -937,9 +937,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 2936386131413245119, guid: 5c4f1f7ec3cb2584e82c7e0a7aa85ca9, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -8092,7 +8092,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9c8201e9147c4145a9d0507d23cdecd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleGameManager
-  puzzleCollection: {fileID: 11400000, guid: 4bf914f9f68671b47ad68bfefa2adb2b, type: 2}
+  puzzleCollection: {fileID: 11400000, guid: 10f758d3e2d25c246b0f29ae27c2b758, type: 2}
   nextScene: E03_Terminal_5_Bye
   explanationScreen: {fileID: 2107524641}
   countdownScreen: {fileID: 333924895}

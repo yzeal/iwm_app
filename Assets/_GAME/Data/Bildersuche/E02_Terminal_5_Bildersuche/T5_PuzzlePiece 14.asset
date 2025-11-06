@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8094aabba4ec4bd4495113a93763ea2b, type: 3}
   m_Name: T5_PuzzlePiece 14
   m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
-  hintImage0: {fileID: 0}
-  hintImage1: {fileID: 0}
-  hintImage2: {fileID: 0}
-  solutionImage: {fileID: 0}
+  hintImage0: {fileID: 21300000, guid: ca23a9431adc5b4469cc4dcd01943b66, type: 3}
+  hintImage1: {fileID: 21300000, guid: ffa6a5a8d01061b46bafff4e015a5bc5, type: 3}
+  hintImage2: {fileID: 21300000, guid: da6394d5a066ce4488edf6cbea71111c, type: 3}
+  solutionImage: {fileID: 21300000, guid: da6394d5a066ce4488edf6cbea71111c, type: 3}
   exhibitName: {fileID: 11400000, guid: fc66de4391f62be49a843f11bf32682d, type: 2}
   exhibitDescription: {fileID: 0}

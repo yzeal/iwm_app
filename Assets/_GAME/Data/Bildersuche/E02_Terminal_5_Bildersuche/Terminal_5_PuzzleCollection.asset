@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Terminal_5_PuzzleCollection
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleCollection
   collectionName: {fileID: 0}
-  roundsPerTeam: 1
+  roundsPerTeam: 3
   startingPoints: 3
   hintPenalty: 1
   roundDuration: 120
@@ -24,8 +24,53 @@ MonoBehaviour:
   useTimerForKids: 1
   useTimerForBigKids: 1
   useTimerForAdults: 1
-  kidsPuzzles: []
-  bigKidsPuzzles: []
-  adultsPuzzles: []
+  kidsPuzzles:
+  - {fileID: 11400000, guid: c692be239578eaa408bd7de9688d24e1, type: 2}
+  - {fileID: 11400000, guid: 17c2315748802e84b9f071dd30eddfad, type: 2}
+  - {fileID: 11400000, guid: 533893e74749e2d4da10fb3ccb97cc3b, type: 2}
+  - {fileID: 11400000, guid: f6c52426c44ceec42bfd196b77cbdf04, type: 2}
+  - {fileID: 11400000, guid: 2de2b72dc47d13a4da97634e3f60827a, type: 2}
+  - {fileID: 11400000, guid: e340614a08ce7054bb5939096b9cf1b9, type: 2}
+  - {fileID: 11400000, guid: 54c1544d8cf7c8e48b419ae86da6a08f, type: 2}
+  - {fileID: 11400000, guid: 896b8d9bfbe2c354f84770d64204d862, type: 2}
+  - {fileID: 11400000, guid: 2639d967539b91f4aa3086448aa25d85, type: 2}
+  - {fileID: 11400000, guid: f13ad1237b75cf64798cf028f9d55fe3, type: 2}
+  - {fileID: 11400000, guid: c2c8b9c96a9b0dd4d8f4410f0b6518b6, type: 2}
+  - {fileID: 11400000, guid: 9fbfcbcddbf79214bab5a9b6c07cc395, type: 2}
+  - {fileID: 11400000, guid: cadb93a8a96803c49b6410ad71629ffb, type: 2}
+  - {fileID: 11400000, guid: 4f952fef54833c849a0b54ce8357e25c, type: 2}
+  - {fileID: 11400000, guid: f3f529dc4b2a28d43beb6ac1b5d86bb5, type: 2}
+  bigKidsPuzzles:
+  - {fileID: 11400000, guid: c692be239578eaa408bd7de9688d24e1, type: 2}
+  - {fileID: 11400000, guid: 17c2315748802e84b9f071dd30eddfad, type: 2}
+  - {fileID: 11400000, guid: 533893e74749e2d4da10fb3ccb97cc3b, type: 2}
+  - {fileID: 11400000, guid: f6c52426c44ceec42bfd196b77cbdf04, type: 2}
+  - {fileID: 11400000, guid: 2de2b72dc47d13a4da97634e3f60827a, type: 2}
+  - {fileID: 11400000, guid: e340614a08ce7054bb5939096b9cf1b9, type: 2}
+  - {fileID: 11400000, guid: 54c1544d8cf7c8e48b419ae86da6a08f, type: 2}
+  - {fileID: 11400000, guid: 896b8d9bfbe2c354f84770d64204d862, type: 2}
+  - {fileID: 11400000, guid: 2639d967539b91f4aa3086448aa25d85, type: 2}
+  - {fileID: 11400000, guid: f13ad1237b75cf64798cf028f9d55fe3, type: 2}
+  - {fileID: 11400000, guid: c2c8b9c96a9b0dd4d8f4410f0b6518b6, type: 2}
+  - {fileID: 11400000, guid: 9fbfcbcddbf79214bab5a9b6c07cc395, type: 2}
+  - {fileID: 11400000, guid: cadb93a8a96803c49b6410ad71629ffb, type: 2}
+  - {fileID: 11400000, guid: 4f952fef54833c849a0b54ce8357e25c, type: 2}
+  - {fileID: 11400000, guid: f3f529dc4b2a28d43beb6ac1b5d86bb5, type: 2}
+  adultsPuzzles:
+  - {fileID: 11400000, guid: c692be239578eaa408bd7de9688d24e1, type: 2}
+  - {fileID: 11400000, guid: 17c2315748802e84b9f071dd30eddfad, type: 2}
+  - {fileID: 11400000, guid: 533893e74749e2d4da10fb3ccb97cc3b, type: 2}
+  - {fileID: 11400000, guid: f6c52426c44ceec42bfd196b77cbdf04, type: 2}
+  - {fileID: 11400000, guid: 2de2b72dc47d13a4da97634e3f60827a, type: 2}
+  - {fileID: 11400000, guid: e340614a08ce7054bb5939096b9cf1b9, type: 2}
+  - {fileID: 11400000, guid: 54c1544d8cf7c8e48b419ae86da6a08f, type: 2}
+  - {fileID: 11400000, guid: 896b8d9bfbe2c354f84770d64204d862, type: 2}
+  - {fileID: 11400000, guid: 2639d967539b91f4aa3086448aa25d85, type: 2}
+  - {fileID: 11400000, guid: f13ad1237b75cf64798cf028f9d55fe3, type: 2}
+  - {fileID: 11400000, guid: c2c8b9c96a9b0dd4d8f4410f0b6518b6, type: 2}
+  - {fileID: 11400000, guid: 9fbfcbcddbf79214bab5a9b6c07cc395, type: 2}
+  - {fileID: 11400000, guid: cadb93a8a96803c49b6410ad71629ffb, type: 2}
+  - {fileID: 11400000, guid: 4f952fef54833c849a0b54ce8357e25c, type: 2}
+  - {fileID: 11400000, guid: f3f529dc4b2a28d43beb6ac1b5d86bb5, type: 2}
   team1Image: {fileID: 0}
   team2Image: {fileID: 0}
