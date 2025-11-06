@@ -38,6 +38,14 @@ public class TourResultsManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI tieTeam2ScoreText;
     [SerializeField] private LocalizedText tieTeam2ScorePrefixLocalizedText;
 
+    [Header("Debug Settings")]
+    [Tooltip("Wenn aktiviert, werden simulierte Scores statt GameDataManager-Scores verwendet")]
+    [SerializeField] private bool simulateResult = false;
+    [Tooltip("Simulierter Score für Team 1 (nur wenn 'Simulate Result' aktiv)")]
+    [SerializeField] private int simulatedScoreTeam1 = 100;
+    [Tooltip("Simulierter Score für Team 2 (nur wenn 'Simulate Result' aktiv)")]
+    [SerializeField] private int simulatedScoreTeam2 = 80;
+
     // Cached Language
     private LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
 
@@ -77,20 +85,32 @@ public class TourResultsManager : MonoBehaviour
 
     /// <summary>
     /// Lädt finale Gesamtscores aus GameDataManager und ermittelt Gewinner/Verlierer
+    /// Falls simulateResult aktiv ist, werden simulierte Scores verwendet
     /// </summary>
     void LoadFinalScores()
     {
-        if (GameDataManager.Instance == null)
+        if (simulateResult)
         {
-            Debug.LogWarning("TourResultsManager: GameDataManager nicht gefunden! Verwende Test-Scores.");
-            team1TotalScore = 0;
-            team2TotalScore = 0;
-            return;
+            // Verwende simulierte Scores
+            team1TotalScore = simulatedScoreTeam1;
+            team2TotalScore = simulatedScoreTeam2;
+            Debug.Log($"TourResultsManager: SIMULIERTE SCORES verwendet - Team 1: {team1TotalScore}, Team 2: {team2TotalScore}");
         }
+        else
+        {
+            // Verwende echte Scores aus GameDataManager
+            if (GameDataManager.Instance == null)
+            {
+                Debug.LogWarning("TourResultsManager: GameDataManager nicht gefunden! Verwende 0-Scores.");
+                team1TotalScore = 0;
+                team2TotalScore = 0;
+                return;
+            }
 
-        // Hole Gesamtscores beider Teams über alle Räume
-        team1TotalScore = GameDataManager.Instance.GetTotalScoreForTeam(0); // Team 1 (0-basiert)
-        team2TotalScore = GameDataManager.Instance.GetTotalScoreForTeam(1); // Team 2 (0-basiert)
+            team1TotalScore = GameDataManager.Instance.GetTotalScoreForTeam(0); // Team 1 (0-basiert)
+            team2TotalScore = GameDataManager.Instance.GetTotalScoreForTeam(1); // Team 2 (0-basiert)
+            Debug.Log($"TourResultsManager: ECHTE SCORES aus GameDataManager - Team 1: {team1TotalScore}, Team 2: {team2TotalScore}");
+        }
 
         // Ermittle Gewinner, Verlierer oder Unentschieden
         if (team1TotalScore > team2TotalScore)
@@ -113,8 +133,7 @@ public class TourResultsManager : MonoBehaviour
             loserTeamIndex = 1;
         }
 
-        Debug.Log($"TourResultsManager: Team 1 Score: {team1TotalScore}, Team 2 Score: {team2TotalScore}, " +
-                  $"{(isTie ? "Unentschieden!" : $"Gewinner: Team {winnerTeamIndex + 1}")}");
+        Debug.Log($"TourResultsManager: Ergebnis - {(isTie ? "Unentschieden!" : $"Gewinner: Team {winnerTeamIndex + 1}")}");
     }
 
     /// <summary>
@@ -305,6 +324,19 @@ public class TourResultsManager : MonoBehaviour
         return fallback;
     }
 
+    #region Debug Methods
+
+    /// <summary>
+    /// Lädt Scores neu und aktualisiert UI (nützlich für Live-Testing im Editor)
+    /// </summary>
+    [ContextMenu("Refresh Scores")]
+    void RefreshScores()
+    {
+        LoadFinalScores();
+        UpdateUI();
+        Debug.Log($"TourResultsManager: Scores aktualisiert - Team 1: {team1TotalScore}, Team 2: {team2TotalScore}, Tie: {isTie}");
+    }
+
     /// <summary>
     /// Debug-Methode zum Testen mit simulierten Scores
     /// </summary>
@@ -365,4 +397,35 @@ public class TourResultsManager : MonoBehaviour
         Debug.Log($"TourResultsManager TEST WINNER: Team 1: {team1TotalScore}, Team 2: {team2TotalScore}");
         UpdateUI();
     }
+
+    /// <summary>
+    /// Debug-Methode: Aktiviert Simulation mit aktuellen Inspector-Werten
+    /// </summary>
+    [ContextMenu("Apply Simulated Scores")]
+    void ApplySimulatedScores()
+    {
+        if (!simulateResult)
+        {
+            Debug.LogWarning("TourResultsManager: 'Simulate Result' ist nicht aktiviert! Aktiviere es im Inspector.");
+            return;
+        }
+
+        LoadFinalScores();
+        UpdateUI();
+        Debug.Log($"TourResultsManager: Simulierte Scores angewendet - Team 1: {simulatedScoreTeam1}, Team 2: {simulatedScoreTeam2}");
+    }
+
+    /// <summary>
+    /// Debug-Methode: Setzt Simulation zurück und lädt echte Scores
+    /// </summary>
+    [ContextMenu("Reset to Real Scores")]
+    void ResetToRealScores()
+    {
+        simulateResult = false;
+        LoadFinalScores();
+        UpdateUI();
+        Debug.Log("TourResultsManager: Simulation deaktiviert, echte Scores geladen");
+    }
+
+    #endregion
 }
