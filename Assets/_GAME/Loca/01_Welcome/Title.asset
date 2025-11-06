@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: Herzlich willkommen!
+  germanStandard: Willkommen!
   englishStandard: Welcome!
   germanSimple: Willkommen!
   englishSimple: Welcome!

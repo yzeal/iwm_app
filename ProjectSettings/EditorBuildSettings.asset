@@ -56,6 +56,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_GAME/Scenes/D01_Terminal_5.unity
     guid: 7e88899cf165c7f44869bc8ff15f81b6
+  - enabled: 1
+    path: Assets/_GAME/Scenes/D02_Terminal_5_Stirnraten.unity
+    guid: fc7bd8d1fc495af4599a3ee07580dbab
+  - enabled: 1
+    path: Assets/_GAME/Scenes/E01_Terminal_6.unity
+    guid: 8085947ef5dae8447819141d8893f4d3
+  - enabled: 1
+    path: Assets/_GAME/Scenes/B01_Terminal_3.unity
+    guid: 4f9445f0c75f4d04b8094713cb994c6f
+  - enabled: 1
+    path: Assets/_GAME/Scenes/B02_Terminal_3_Bildersuche.unity
+    guid: 59bcf20323d275e4e9a56ecffe211bbd
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

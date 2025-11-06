@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Herzlich willkommen bei mesmobil! \nHier erwartet euch ein interaktiver
+  germanStandard: "Herzlich willkommen bei mesmobil! \n\nHier erwartet euch ein interaktiver
     Spielspa\xDF, der euch durch die Ausstellung der Grube Messel f\xFChrt. \n\nZu
-    Beginn teilt euch bitte in zwei Teams auf. Ihr werdet gegeneinander antreten.
-    In jedem Ausstellungsraum erwarten euch verschiedene Spielformate. \nAm Ende
+    Beginn teilt euch bitte in zwei Teams auf. \nIhr werdet gegeneinander antreten.
+    \n\nIn jedem Ausstellungsraum erwarten euch verschiedene Spielformate. \nAm Ende
     gewinnt das Team mit den meisten Punkten! \n\r\nLos geht\u2019s gleich nebenan,
     im Landschaftsraum. \r\n\r\nW\xE4hlt euren Avatar und dann k\xF6nnt ihr loslegen!
     \r\n\r\nViel Spa\xDF!"

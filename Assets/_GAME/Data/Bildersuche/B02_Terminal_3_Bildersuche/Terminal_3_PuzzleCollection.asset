@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af40366185bc634894ba02806dd990b, type: 3}
+  m_Name: Terminal_3_PuzzleCollection
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleCollection
+  collectionName: {fileID: 0}
+  roundsPerTeam: 1
+  startingPoints: 3
+  hintPenalty: 1
+  roundDuration: 120
+  timeSettings:
+    kidsTimeMultiplier: 1.5
+    bigKidsTimeMultiplier: 1
+    adultsTimeMultiplier: 1
+  useTimerForKids: 1
+  useTimerForBigKids: 1
+  useTimerForAdults: 1
+  kidsPuzzles:
+  - {fileID: 11400000, guid: fc0467c5992fd1d43861dabcacd04378, type: 2}
+  - {fileID: 11400000, guid: c6ad2e0e8d1eb15409ce060f90ed9464, type: 2}
+  bigKidsPuzzles:
+  - {fileID: 11400000, guid: fc0467c5992fd1d43861dabcacd04378, type: 2}
+  - {fileID: 11400000, guid: c6ad2e0e8d1eb15409ce060f90ed9464, type: 2}
+  adultsPuzzles:
+  - {fileID: 11400000, guid: fc0467c5992fd1d43861dabcacd04378, type: 2}
+  - {fileID: 11400000, guid: c6ad2e0e8d1eb15409ce060f90ed9464, type: 2}
+  team1Image: {fileID: 0}
+  team2Image: {fileID: 0}
