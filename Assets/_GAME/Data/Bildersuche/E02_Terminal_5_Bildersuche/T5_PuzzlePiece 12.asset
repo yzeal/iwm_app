@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8094aabba4ec4bd4495113a93763ea2b, type: 3}
+  m_Name: T5_PuzzlePiece 12
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzlePiece
+  hintImage0: {fileID: 0}
+  hintImage1: {fileID: 0}
+  hintImage2: {fileID: 0}
+  solutionImage: {fileID: 0}
+  exhibitName: {fileID: 11400000, guid: f06cd204b53ba984a8094fdf96ad36a0, type: 2}
+  exhibitDescription: {fileID: 0}
