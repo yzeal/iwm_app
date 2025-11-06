@@ -14,14 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: puzzle_explanationrules
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Finde das Exponat im Raum anhand des Bildausschnitts!\\n\\n\u2022
-    Du kannst 2x einen Hinweis anfordern (gr\xF6\xDFerer Bildausschnitt)\\n\u2022
-    Jeder Hinweis kostet 1 Punkt\\n\u2022 Maximal 3 Punkte pro R\xE4tsel"
-  englishStandard: "Find the exhibit in the room based on the image excerpt!\\n\\n\u2022
-    You can request 2 hints (larger image excerpt)\\n\u2022 Each hint costs 1 point\\n\u2022
-    Maximum 3 points per puzzle"
-  germanSimple: "Finde das Ding im Raum!\\n\\n\u2022 Du kannst 2 mal um Hilfe bitten\\n\u2022
-    Jede Hilfe kostet 1 Punkt\\n\u2022 H\xF6chstens 3 Punkte"
-  englishSimple: "Find the thing in the room!\\n\\n\u2022 You can ask for help 2
-    times\\n\u2022 Each help costs 1 point\\n\u2022 Maximum 3 points"
+  germanStandard: "Finde das Exponat im Raum anhand des Bildausschnitts!\n\nDu kannst
+    2x einen Hinweis anfordern (gr\xF6\xDFerer Bildausschnitt).\n\nJeder Hinweis
+    kostet 1 Punkt!\n\nMaximal 3 Punkte pro R\xE4tsel."
+  englishStandard: 'Find the exhibit in the room based on the image snippet!
+
+
+    You
+    can request 2 hints (each reveals a larger section of the image).
+
+
+    Each
+    hint costs 1 point!
+
+
+    You can earn a maximum of 3 points per puzzle.'
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0

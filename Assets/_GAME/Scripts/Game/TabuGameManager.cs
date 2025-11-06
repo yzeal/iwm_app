@@ -252,7 +252,7 @@ public class TabuGameManager : MonoBehaviour
         string explanationRules = GetLocalizedText(explanationRulesLocalizedText, 
             "Ein Spieler erklärt Begriffe, ohne die Tabu-Wörter zu verwenden. Das Team rät!");
 
-        explanationText.text = $"<b>{explanationTitle}</b>\n\n{explanationRules}";
+        explanationText.text = $"<b>{explanationRules}";
     
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);

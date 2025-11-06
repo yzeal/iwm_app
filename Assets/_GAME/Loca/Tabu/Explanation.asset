@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: tabu_explanation
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Ein Spieler erkl\xE4rt Begriffe,\\nohne die verbotenen W\xF6rter
-    zu verwenden.\\n\\nDer Rest  r\xE4t!"
-  englishStandard: One player explains terms\nwithout using the forbidden words.\n\nThe
-    others guess!
-  germanSimple: "Ein Spieler erkl\xE4rt W\xF6rter.\\n\\nDie verbotenen W\xF6rter
-    darf er nicht sagen.\\n\\nDer Rest  r\xE4t!"
-  englishSimple: One player explains words.\n\nThey cannot say the forbidden words.\n\nThe
-    others guess!
+  germanStandard: "Ein Spieler erkl\xE4rt Begriffe, ohne die verbotenen W\xF6rter
+    zu verwenden.\n\nDer Rest  r\xE4t!"
+  englishStandard: 'One player explains terms without using the forbidden words.
+
+
+    The
+    others guess!'
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0

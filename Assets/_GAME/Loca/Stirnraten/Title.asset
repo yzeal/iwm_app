@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: stirnraten_title
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: Stirnraten
-  englishStandard: Heads Up
-  germanSimple: Stirnraten
-  englishSimple: Heads Up
+  germanStandard: Begriffe raten
+  englishStandard: Guess the Term
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0
