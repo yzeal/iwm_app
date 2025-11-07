@@ -9,6 +9,9 @@ public class PuzzleCollection : ScriptableObject
     [Tooltip("Localized name of this puzzle collection")]
     public LocalizedText collectionName;
     
+    [Tooltip("Unique room number for saving progress (must be unique across all collections!)")]
+    public int roomNumber = 0; // NEU: Für GameDataManager
+    
     [Header("Game Settings")]
     [Tooltip("Number of rounds per team (both teams get equal rounds)")]
     [Range(1, 10)]
@@ -219,6 +222,7 @@ public class PuzzleCollection : ScriptableObject
     {
         int requiredPuzzles = roundsPerTeam * 2;
         
+        Debug.Log($"[{name}] Room Number: {roomNumber}"); // NEU
         Debug.Log($"[{name}] Required puzzles per difficulty: {requiredPuzzles}");
         
         if (kidsPuzzles == null || kidsPuzzles.Length < requiredPuzzles)

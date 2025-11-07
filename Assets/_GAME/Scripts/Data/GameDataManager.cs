@@ -10,7 +10,7 @@ public class GameProgressData
     public int currentRoomIndex = 0;
     public DateTime lastPlayedTime;
     public string sessionId;
-    public TeamSettings teamSettings = new TeamSettings(); // Team-Schwierigkeitsgrade + Icons
+    public TeamSettings teamSettings = new TeamSettings();
     public LanguageSystem.Language selectedLanguage = LanguageSystem.Language.German_Standard;
     
     public GameProgressData()
@@ -40,6 +40,9 @@ public class GameDataManager : MonoBehaviour
     [SerializeField] private bool enableCloudSave = false;
     [SerializeField] private bool enableLocalBackup = true;
     
+    [Header("Debug Settings")]
+    [SerializeField] private bool enableVerboseLogging = true; // NEU: Detaillierte Logs
+    
     private const string SAVE_KEY = "MuseumQuizProgress";
     private const string BACKUP_KEY = "MuseumQuizBackup";
     
@@ -47,28 +50,20 @@ public class GameDataManager : MonoBehaviour
     
     public GameProgressData CurrentProgress { get; private set; }
     
-    // Properties für einfachen Zugriff auf Team-Einstellungen
     public TeamSettings TeamSettings => CurrentProgress.teamSettings;
     public DifficultyLevel Team1Difficulty => CurrentProgress.teamSettings.team1Difficulty;
     public DifficultyLevel Team2Difficulty => CurrentProgress.teamSettings.team2Difficulty;
-    
-    // Properties für Sprach-Zugriff
     public LanguageSystem.Language CurrentLanguage => CurrentProgress.selectedLanguage;
-    
-    // NEU: Properties für Icon-Zugriff
     public int Team1IconIndex => CurrentProgress.teamSettings.team1IconIndex;
     public int Team2IconIndex => CurrentProgress.teamSettings.team2IconIndex;
     
     void Awake()
     {
-        // Singleton Pattern
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadGameData();
-            
-            // Sprache mit LanguageSystem synchronisieren
             SyncLanguageWithSystem();
         }
         else
@@ -79,9 +74,6 @@ public class GameDataManager : MonoBehaviour
     
     #region Language Management
     
-    /// <summary>
-    /// Sprache setzen und mit LanguageSystem synchronisieren
-    /// </summary>
     public void SetLanguage(LanguageSystem.Language language)
     {
         if (CurrentProgress.selectedLanguage != language)
@@ -90,7 +82,6 @@ public class GameDataManager : MonoBehaviour
             CurrentProgress.lastPlayedTime = DateTime.Now;
             SaveGameData();
             
-            // Mit LanguageSystem synchronisieren
             if (LanguageSystem.Instance != null)
             {
                 LanguageSystem.Instance.SetLanguage(language);
@@ -100,14 +91,10 @@ public class GameDataManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Sprache mit LanguageSystem synchronisieren beim Start
-    /// </summary>
     private void SyncLanguageWithSystem()
     {
         if (LanguageSystem.Instance != null)
         {
-            // Wenn LanguageSystem eine andere Sprache hat, diese übernehmen
             LanguageSystem.Language systemLanguage = LanguageSystem.Instance.GetCurrentLanguage();
             if (systemLanguage != CurrentProgress.selectedLanguage)
             {
@@ -116,7 +103,6 @@ public class GameDataManager : MonoBehaviour
             }
             else
             {
-                // GameDataManager-Sprache an LanguageSystem weitergeben
                 LanguageSystem.Instance.SetLanguage(CurrentProgress.selectedLanguage);
             }
         }
@@ -140,14 +126,31 @@ public class GameDataManager : MonoBehaviour
         };
         
         // Entferne vorhandenes Ergebnis für diesen Raum
-        CurrentProgress.roomResults.RemoveAll(r => r.roomNumber == roomNumber);
+        int removedCount = CurrentProgress.roomResults.RemoveAll(r => r.roomNumber == roomNumber);
+        
+        // DEBUG: Log wenn altes Ergebnis überschrieben wird
+        if (removedCount > 0 && enableVerboseLogging)
+        {
+            Debug.Log($"[SAVE] Überschreibe altes Ergebnis für Raum {roomNumber}");
+        }
+        
         CurrentProgress.roomResults.Add(result);
-        
         CurrentProgress.lastPlayedTime = DateTime.Now;
-        
         SaveGameData();
         
-        Debug.Log($"Saved result for {roomName}: Team1={player1Score}, Team2={player2Score}");
+        // DEBUG: Detailliertes Logging
+        if (enableVerboseLogging)
+        {
+            Debug.Log($"[SAVE] ? Raum '{roomName}' (#{roomNumber}) gespeichert: Team1={player1Score}, Team2={player2Score}, Fragen={totalQuestions}");
+            Debug.Log($"[SAVE] Gesamt gespeicherte Räume: {CurrentProgress.roomResults.Count}");
+            
+            // Zeige alle gespeicherten Ergebnisse
+            for (int i = 0; i < CurrentProgress.roomResults.Count; i++)
+            {
+                var r = CurrentProgress.roomResults[i];
+                Debug.Log($"[SAVE]   Raum {i + 1}: '{r.roomName}' (#{r.roomNumber}) - Team1={r.player1Score}, Team2={r.player2Score}, Completed={r.isCompleted}");
+            }
+        }
     }
     
     public void SetCurrentRoom(int roomIndex)
@@ -163,7 +166,6 @@ public class GameDataManager : MonoBehaviour
         SaveGameData();
     }
     
-    // Team-Schwierigkeitsgrad-Management
     public void SetTeamDifficulty(int teamIndex, DifficultyLevel difficulty)
     {
         CurrentProgress.teamSettings.SetTeamDifficulty(teamIndex, difficulty);
@@ -186,10 +188,6 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Team difficulties set: Team1={team1}, Team2={team2}");
     }
     
-    // NEU: Team-Icon-Management
-    /// <summary>
-    /// Setzt den Icon-Index für ein Team (0-2)
-    /// </summary>
     public void SetTeamIconIndex(int teamIndex, int iconIndex)
     {
         CurrentProgress.teamSettings.SetTeamIconIndex(teamIndex, iconIndex);
@@ -198,17 +196,11 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Team {teamIndex + 1} icon set to index {iconIndex}");
     }
     
-    /// <summary>
-    /// Holt den Icon-Index für ein Team (0-2)
-    /// </summary>
     public int GetTeamIconIndex(int teamIndex)
     {
         return CurrentProgress.teamSettings.GetTeamIconIndex(teamIndex);
     }
     
-    /// <summary>
-    /// Setzt Icon-Indizes für beide Teams gleichzeitig
-    /// </summary>
     public void SetTeamIconIndices(int team1IconIndex, int team2IconIndex)
     {
         CurrentProgress.teamSettings.team1IconIndex = Mathf.Clamp(team1IconIndex, 0, 2);
@@ -218,54 +210,100 @@ public class GameDataManager : MonoBehaviour
         Debug.Log($"Team icons set: Team1={team1IconIndex}, Team2={team2IconIndex}");
     }
     
-    // NEU: Score-Abfrage-Methoden
     /// <summary>
     /// Berechnet den Gesamtscore für ein Team über alle abgeschlossenen Räume
     /// </summary>
-    /// <param name="teamIndex">0 für Team 1, 1 für Team 2</param>
-    /// <returns>Gesamtscore des Teams</returns>
     public int GetTotalScoreForTeam(int teamIndex)
     {
         if (teamIndex < 0 || teamIndex > 1)
         {
-            Debug.LogWarning($"GetTotalScoreForTeam: Ungültiger teamIndex {teamIndex}. Verwende 0 oder 1.");
+            Debug.LogWarning($"[SCORE] GetTotalScoreForTeam: Ungültiger teamIndex {teamIndex}. Verwende 0 oder 1.");
             return 0;
         }
 
         int totalScore = 0;
+        int roomsProcessed = 0;
+
+        // DEBUG: Header
+        if (enableVerboseLogging)
+        {
+            Debug.Log($"[SCORE] ========== GetTotalScoreForTeam({teamIndex}) START ==========");
+            Debug.Log($"[SCORE] Gespeicherte RoomResults: {CurrentProgress.roomResults.Count}");
+        }
 
         foreach (var result in CurrentProgress.roomResults)
         {
+            int scoreToAdd = teamIndex == 0 ? result.player1Score : result.player2Score;
+            
+            // DEBUG: Jedes Raum-Ergebnis loggen
+            if (enableVerboseLogging)
+            {
+                Debug.Log($"[SCORE]   Raum '{result.roomName}' (#{result.roomNumber}): " +
+                         $"Team1={result.player1Score}, Team2={result.player2Score}, " +
+                         $"Completed={result.isCompleted}, " +
+                         $"Adding {scoreToAdd} to Team{teamIndex + 1}");
+            }
+            
             if (result.isCompleted)
             {
-                // Team 1 (index 0) = player1Score, Team 2 (index 1) = player2Score
-                totalScore += teamIndex == 0 ? result.player1Score : result.player2Score;
+                totalScore += scoreToAdd;
+                roomsProcessed++;
+            }
+            else if (enableVerboseLogging)
+            {
+                Debug.LogWarning($"[SCORE]   ? Raum {result.roomNumber} ist NICHT completed! Score wird NICHT addiert.");
             }
         }
 
-        Debug.Log($"GetTotalScoreForTeam({teamIndex}): {totalScore} Punkte über {CurrentProgress.roomResults.Count} Räume");
+        // DEBUG: Finale Zusammenfassung
+        if (enableVerboseLogging)
+        {
+            Debug.Log($"[SCORE] ========== GetTotalScoreForTeam({teamIndex}) ENDE ==========");
+            Debug.Log($"[SCORE] Team {teamIndex + 1} Gesamtscore: {totalScore} Punkte über {roomsProcessed}/{CurrentProgress.roomResults.Count} Räume");
+        }
+        else
+        {
+            Debug.Log($"[SCORE] Team {teamIndex + 1}: {totalScore} Punkte über {roomsProcessed} Räume");
+        }
+
         return totalScore;
     }
 
     /// <summary>
     /// Gibt den Score beider Teams als Tuple zurück
     /// </summary>
-    /// <returns>(Team1Score, Team2Score)</returns>
     public (int team1Score, int team2Score) GetTotalScores()
     {
         int team1Total = 0;
         int team2Total = 0;
+        int roomsProcessed = 0;
+
+        if (enableVerboseLogging)
+        {
+            Debug.Log($"[SCORE] ========== GetTotalScores() START ==========");
+        }
 
         foreach (var result in CurrentProgress.roomResults)
         {
+            if (enableVerboseLogging)
+            {
+                Debug.Log($"[SCORE]   Raum '{result.roomName}': Team1={result.player1Score}, Team2={result.player2Score}, Completed={result.isCompleted}");
+            }
+            
             if (result.isCompleted)
             {
                 team1Total += result.player1Score;
                 team2Total += result.player2Score;
+                roomsProcessed++;
             }
         }
 
-        Debug.Log($"GetTotalScores: Team 1={team1Total}, Team 2={team2Total}");
+        if (enableVerboseLogging)
+        {
+            Debug.Log($"[SCORE] ========== GetTotalScores() ENDE ==========");
+            Debug.Log($"[SCORE] Team 1: {team1Total} | Team 2: {team2Total} | Räume: {roomsProcessed}");
+        }
+
         return (team1Total, team2Total);
     }
     
@@ -282,11 +320,11 @@ public class GameDataManager : MonoBehaviour
     
     public void ResetProgress()
     {
-        LanguageSystem.Language currentLang = CurrentProgress.selectedLanguage; // Sprache beibehalten
+        LanguageSystem.Language currentLang = CurrentProgress.selectedLanguage;
         CurrentProgress = new GameProgressData();
-        CurrentProgress.selectedLanguage = currentLang; // Sprache wiederherstellen
+        CurrentProgress.selectedLanguage = currentLang;
         SaveGameData();
-        Debug.Log("Game progress reset (language preserved)");
+        Debug.Log("[RESET] Game progress reset (language preserved)");
     }
     
     #endregion
@@ -299,10 +337,8 @@ public class GameDataManager : MonoBehaviour
         {
             string jsonData = JsonUtility.ToJson(CurrentProgress, true);
             
-            // Primäre Speicherung
             PlayerPrefs.SetString(SAVE_KEY, jsonData);
             
-            // Backup-Speicherung
             if (enableLocalBackup)
             {
                 PlayerPrefs.SetString(BACKUP_KEY, jsonData);
@@ -310,11 +346,14 @@ public class GameDataManager : MonoBehaviour
             
             PlayerPrefs.Save();
             
-            Debug.Log("Game data saved successfully");
+            if (enableVerboseLogging)
+            {
+                Debug.Log($"[SAVE] ? Game data saved successfully ({CurrentProgress.roomResults.Count} rooms)");
+            }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to save game data: {e.Message}");
+            Debug.LogError($"[SAVE] ? Failed to save game data: {e.Message}");
         }
     }
     
@@ -324,44 +363,44 @@ public class GameDataManager : MonoBehaviour
         {
             string jsonData = "";
             
-            // Versuche primäre Daten zu laden
             if (PlayerPrefs.HasKey(SAVE_KEY))
             {
                 jsonData = PlayerPrefs.GetString(SAVE_KEY);
             }
-            // Fallback auf Backup
             else if (enableLocalBackup && PlayerPrefs.HasKey(BACKUP_KEY))
             {
                 jsonData = PlayerPrefs.GetString(BACKUP_KEY);
-                Debug.Log("Loaded from backup data");
+                Debug.Log("[LOAD] Loaded from backup data");
             }
             
             if (!string.IsNullOrEmpty(jsonData))
             {
                 CurrentProgress = JsonUtility.FromJson<GameProgressData>(jsonData);
                 
-                // Sicherstellen, dass TeamSettings existieren (für bestehende Saves)
                 if (CurrentProgress.teamSettings == null)
                 {
                     CurrentProgress.teamSettings = new TeamSettings();
                 }
                 
-                // NEU: Icon-Indizes validieren (für bestehende Saves)
                 CurrentProgress.teamSettings.team1IconIndex = Mathf.Clamp(CurrentProgress.teamSettings.team1IconIndex, 0, 2);
                 CurrentProgress.teamSettings.team2IconIndex = Mathf.Clamp(CurrentProgress.teamSettings.team2IconIndex, 0, 2);
                 
-                Debug.Log($"Game data loaded. Session: {CurrentProgress.sessionId}, Language: {CurrentProgress.selectedLanguage}, Team1Icon: {Team1IconIndex}, Team2Icon: {Team2IconIndex}");
-                SaveGameData(); // Aktualisiere Save falls Migrationen stattgefunden haben
+                Debug.Log($"[LOAD] ? Game data loaded. Session: {CurrentProgress.sessionId}, " +
+                         $"Language: {CurrentProgress.selectedLanguage}, " +
+                         $"Rooms: {CurrentProgress.roomResults.Count}, " +
+                         $"Team1Icon: {Team1IconIndex}, Team2Icon: {Team2IconIndex}");
+                
+                SaveGameData();
             }
             else
             {
                 CurrentProgress = new GameProgressData();
-                Debug.Log("No save data found, created new progress");
+                Debug.Log("[LOAD] No save data found, created new progress");
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to load game data: {e.Message}");
+            Debug.LogError($"[LOAD] ? Failed to load game data: {e.Message}");
             CurrentProgress = new GameProgressData();
         }
     }
@@ -395,13 +434,27 @@ public class GameDataManager : MonoBehaviour
                  $"Language: {CurrentProgress.selectedLanguage}");
     }
     
+    [ContextMenu("Print ALL Room Results")]
+    void PrintAllRoomResults()
+    {
+        Debug.Log($"========== ALLE RAUM-ERGEBNISSE ({CurrentProgress.roomResults.Count}) ==========");
+        for (int i = 0; i < CurrentProgress.roomResults.Count; i++)
+        {
+            var r = CurrentProgress.roomResults[i];
+            Debug.Log($"Raum {i + 1}: '{r.roomName}' (#{r.roomNumber})\n" +
+                     $"  Team 1: {r.player1Score} | Team 2: {r.player2Score}\n" +
+                     $"  Fragen: {r.totalQuestions} | Completed: {r.isCompleted}\n" +
+                     $"  Zeit: {r.completedTime}");
+        }
+        Debug.Log("=".PadRight(50, '='));
+    }
+    
     [ContextMenu("Reset All Data")]
     void DebugResetData()
     {
         ResetProgress();
     }
     
-    // Debug-Methoden für Schwierigkeitsgrade
     [ContextMenu("Set Both Teams to Kids")]
     void DebugSetKids()
     {
@@ -414,7 +467,6 @@ public class GameDataManager : MonoBehaviour
         SetTeamDifficulties(DifficultyLevel.Kids, DifficultyLevel.Adults);
     }
     
-    // Debug-Methoden für Sprachen
     [ContextMenu("Set Language to English")]
     void DebugSetEnglish()
     {
@@ -427,7 +479,6 @@ public class GameDataManager : MonoBehaviour
         SetLanguage(LanguageSystem.Language.German_Simple);
     }
     
-    // NEU: Debug-Methoden für Icons
     [ContextMenu("Set Team 1 Icon to 2")]
     void DebugSetTeam1Icon2()
     {
@@ -440,7 +491,6 @@ public class GameDataManager : MonoBehaviour
         SetTeamIconIndex(1, 1);
     }
 
-    // NEU: Debug-Methoden für Score-Testing
     [ContextMenu("Print Total Scores")]
     void DebugPrintTotalScores()
     {
@@ -455,7 +505,7 @@ public class GameDataManager : MonoBehaviour
         int team1Score = UnityEngine.Random.Range(5, 20);
         int team2Score = UnityEngine.Random.Range(5, 20);
         SaveRoomResult($"Test Room {randomRoom}", randomRoom, team1Score, team2Score, 10);
-        Debug.Log($"Added test result: Room {randomRoom}, Team1={team1Score}, Team2={team2Score}");
+        Debug.Log($"[DEBUG] Added test result: Room {randomRoom}, Team1={team1Score}, Team2={team2Score}");
     }
     
     #endregion

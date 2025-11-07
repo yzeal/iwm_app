@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Terminal_5_PuzzleCollection
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleCollection
   collectionName: {fileID: 0}
+  roomNumber: 4
   roundsPerTeam: 3
   startingPoints: 3
   hintPenalty: 1

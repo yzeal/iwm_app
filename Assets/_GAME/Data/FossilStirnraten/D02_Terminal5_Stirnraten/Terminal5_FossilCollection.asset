@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FossilCollection
   localizedCollectionName: {fileID: 0}
   collectionName: 
-  roomNumber: 0
+  roomNumber: 3
   team1Image: {fileID: 0}
   team2Image: {fileID: 0}
   kidsFossils:
