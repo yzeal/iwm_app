@@ -2,12 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections.Generic;
+using System.Linq;
 
 public class SplitScreenQuizManager : MonoBehaviour
 {
     [Header("Quiz Data")]
     public QuizRoomData roomData;
     [SerializeField] private string nextScene = "Auswahl";
+    
+    [Header("Game Settings")]
+    [SerializeField] private int questionsPerGame = 5; // Wie viele Fragen gespielt werden sollen (konfigurierbar im Inspector)
 
     [Header("UI References")]
     public GameObject gameplayUI;
@@ -39,12 +44,12 @@ public class SplitScreenQuizManager : MonoBehaviour
     [SerializeField] private Color selectedAnswerColor = Color.gray;
     
     [Header("Result Screen - ANALOG ZU PUZZLE")]
-    public TextMeshProUGUI resultsMessageText; // Gewinner/Tie Nachricht
-    public Image winnerTeamIcon; // GROSSES Gewinner-Icon (NEU!)
-    public Image team1ResultIcon; // Team 1 Icon
-    public Image team2ResultIcon; // Team 2 Icon
-    public TextMeshProUGUI team1ScoreText; // Team 1 Score
-    public TextMeshProUGUI team2ScoreText; // Team 2 Score
+    public TextMeshProUGUI resultsMessageText;
+    public Image winnerTeamIcon;
+    public Image team1ResultIcon;
+    public Image team2ResultIcon;
+    public TextMeshProUGUI team1ScoreText;
+    public TextMeshProUGUI team2ScoreText;
     public Button playAgainButton;
     public Button continueToNextRoomButton;
     
@@ -70,8 +75,11 @@ public class SplitScreenQuizManager : MonoBehaviour
     private bool bothPlayersAnswered = false;
     private bool showingFeedback = false;
     
-    private QuizQuestion[] team1Questions;
-    private QuizQuestion[] team2Questions;
+    private QuizQuestion[] team1Questions; // VOLLSTÄNDIGE Fragen aus Schwierigkeitsgrad
+    private QuizQuestion[] team2Questions; // VOLLSTÄNDIGE Fragen aus Schwierigkeitsgrad
+    
+    private List<int> selectedQuestionIndices; // ZUFÄLLIGE Indizes für diese Session
+    private int actualQuestionsToPlay; // Tatsächliche Anzahl (Min von questionsPerGame und verfügbaren Fragen)
     
     private float player1AnswerTime = float.MaxValue;
     private float player2AnswerTime = float.MaxValue;
@@ -188,19 +196,23 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void RefreshFeedbackTexts()
     {
-        if (player1.hasAnswered)
+        if (player1.hasAnswered && currentQuestionIndex < selectedQuestionIndices.Count)
         {
-            QuizQuestion team1Question = team1Questions[currentQuestionIndex];
+            int questionIndex = selectedQuestionIndices[currentQuestionIndex];
+            QuizQuestion team1Question = team1Questions[questionIndex];
             bool player1Correct = IsAnswerCorrect(player1, team1Question);
-            int player1Points = CalculatePoints(player1Correct, player1AnswerTime, player2AnswerTime, player2.hasAnswered && IsAnswerCorrect(player2, team2Questions[currentQuestionIndex]));
+            int player1Points = CalculatePoints(player1Correct, player1AnswerTime, player2AnswerTime, 
+                player2.hasAnswered && IsAnswerCorrect(player2, team2Questions[questionIndex]));
             UpdateFeedbackText(player1FeedbackText, player1Points, player1Correct);
         }
         
-        if (player2.hasAnswered)
+        if (player2.hasAnswered && currentQuestionIndex < selectedQuestionIndices.Count)
         {
-            QuizQuestion team2Question = team2Questions[currentQuestionIndex];
+            int questionIndex = selectedQuestionIndices[currentQuestionIndex];
+            QuizQuestion team2Question = team2Questions[questionIndex];
             bool player2Correct = IsAnswerCorrect(player2, team2Question);
-            int player2Points = CalculatePoints(player2Correct, player2AnswerTime, player1AnswerTime, player1.hasAnswered && IsAnswerCorrect(player1, team1Questions[currentQuestionIndex]));
+            int player2Points = CalculatePoints(player2Correct, player2AnswerTime, player1AnswerTime, 
+                player1.hasAnswered && IsAnswerCorrect(player1, team1Questions[questionIndex]));
             UpdateFeedbackText(player2FeedbackText, player2Points, player2Correct);
         }
     }
@@ -214,9 +226,9 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
         
         LoadQuestionsForTeams();
+        SelectRandomQuestions();
         
-        int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
-        if (maxQuestions == 0)
+        if (actualQuestionsToPlay == 0)
         {
             Debug.LogError("Keine Fragen für die gewählten Schwierigkeitsgrade verfügbar!");
             return;
@@ -224,7 +236,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         
         if (questionProgressIcons != null)
         {
-            questionProgressIcons.Initialize(maxQuestions);
+            questionProgressIcons.Initialize(actualQuestionsToPlay);
         }
         
         SetupUI();
@@ -246,6 +258,35 @@ public class SplitScreenQuizManager : MonoBehaviour
         team2Questions = roomData.GetQuestionsForDifficulty(team2Difficulty);
         
         Debug.Log($"Team 1 ({team1Difficulty}): {team1Questions.Length} Fragen, Team 2 ({team2Difficulty}): {team2Questions.Length} Fragen");
+    }
+    
+    /// <summary>
+    /// Wählt zufällige Fragen-Indizes aus, die für BEIDE Teams verwendet werden
+    /// WICHTIG: Beide Teams bekommen die gleichen Indizes, aber aus ihren jeweiligen Schwierigkeitsgrad-Pools
+    /// </summary>
+    void SelectRandomQuestions()
+    {
+        // Minimum der verfügbaren Fragen beider Teams
+        int maxAvailableQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
+        
+        // Tatsächliche Anzahl = Minimum von gewünschter Anzahl und verfügbaren Fragen
+        actualQuestionsToPlay = Mathf.Min(questionsPerGame, maxAvailableQuestions);
+        
+        if (actualQuestionsToPlay <= 0)
+        {
+            Debug.LogError("Keine Fragen verfügbar!");
+            selectedQuestionIndices = new List<int>();
+            return;
+        }
+        
+        // Zufällige Indizes generieren (0 bis maxAvailableQuestions-1)
+        List<int> availableIndices = Enumerable.Range(0, maxAvailableQuestions).ToList();
+        
+        // Fisher-Yates Shuffle für zufällige Auswahl
+        System.Random rng = new System.Random();
+        selectedQuestionIndices = availableIndices.OrderBy(x => rng.Next()).Take(actualQuestionsToPlay).ToList();
+        
+        Debug.Log($"Spiele {actualQuestionsToPlay} von {maxAvailableQuestions} möglichen Fragen. Indizes: {string.Join(", ", selectedQuestionIndices)}");
     }
     
     void SetupUI()
@@ -274,16 +315,17 @@ public class SplitScreenQuizManager : MonoBehaviour
     
     void ShowCurrentQuestion()
     {
-        int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
-        
-        if (currentQuestionIndex >= maxQuestions)
+        if (currentQuestionIndex >= actualQuestionsToPlay)
         {
             ShowResults();
             return;
         }
         
-        QuizQuestion team1Question = team1Questions[currentQuestionIndex];
-        QuizQuestion team2Question = team2Questions[currentQuestionIndex];
+        // Hole den Index aus der zufällig ausgewählten Liste
+        int questionIndex = selectedQuestionIndices[currentQuestionIndex];
+        
+        QuizQuestion team1Question = team1Questions[questionIndex];
+        QuizQuestion team2Question = team2Questions[questionIndex];
         
         player1.ResetForNewQuestion();
         player2.ResetForNewQuestion();
@@ -406,8 +448,9 @@ public class SplitScreenQuizManager : MonoBehaviour
     {
         showingFeedback = true;
         
-        QuizQuestion team1Question = team1Questions[currentQuestionIndex];
-        QuizQuestion team2Question = team2Questions[currentQuestionIndex];
+        int questionIndex = selectedQuestionIndices[currentQuestionIndex];
+        QuizQuestion team1Question = team1Questions[questionIndex];
+        QuizQuestion team2Question = team2Questions[questionIndex];
         
         bool player1Correct = IsAnswerCorrect(player1, team1Question);
         bool player2Correct = IsAnswerCorrect(player2, team2Question);
@@ -621,9 +664,8 @@ public class SplitScreenQuizManager : MonoBehaviour
         
         UpdateTeamIcons();
         
-        // Gewinner/Tie Logik
         string winnerMessage;
-        int winningTeam = 0; // 0 = Tie, 1 = Team1, 2 = Team2
+        int winningTeam = 0;
         
         if (player1.score > player2.score)
         {
@@ -646,18 +688,14 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
         
         resultsMessageText.text = winnerMessage;
-        
-        // Winner Icon setzen (ANALOG ZU PUZZLE)
         UpdateWinnerIcon(winningTeam);
         
-        // Separate Score-Texte mit Prefix
         string scorePrefix = scorePrefixLocalizedText != null ?
             scorePrefixLocalizedText.GetText(currentLanguage) : GetDefaultScorePrefix(currentLanguage);
         
         team1ScoreText.text = $"{scorePrefix} {player1.score}";
         team2ScoreText.text = $"{scorePrefix} {player2.score}";
         
-        // GameDataManager speichern
         if (GameDataManager.Instance != null && roomData != null)
         {
             GameDataManager.Instance.SaveRoomResult(
@@ -665,14 +703,11 @@ public class SplitScreenQuizManager : MonoBehaviour
                 roomData.roomNumber,
                 player1.score,
                 player2.score,
-                currentQuestionIndex
+                actualQuestionsToPlay // Tatsächlich gespielte Fragen
             );
         }
     }
     
-    /// <summary>
-    /// Setzt das Winner Icon basierend auf Gewinner-Team (ANALOG ZU PUZZLE)
-    /// </summary>
     void UpdateWinnerIcon(int winningTeam)
     {
         if (winnerTeamIcon == null || teamIconProvider == null)
@@ -689,7 +724,6 @@ public class SplitScreenQuizManager : MonoBehaviour
             winnerIcon = teamIconProvider.GetTeam2Icon();
         }
         
-        // Bei Tie: Icon ausblenden oder Default-Icon anzeigen
         if (winnerIcon != null)
         {
             winnerTeamIcon.sprite = winnerIcon;
@@ -743,11 +777,11 @@ public class SplitScreenQuizManager : MonoBehaviour
         currentQuestionIndex = 0;
         
         LoadQuestionsForTeams();
+        SelectRandomQuestions(); // NEUE Zufallsauswahl
         
         if (questionProgressIcons != null)
         {
-            int maxQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
-            questionProgressIcons.Initialize(maxQuestions);
+            questionProgressIcons.Initialize(actualQuestionsToPlay);
             questionProgressIcons.ResetProgress();
         }
         
