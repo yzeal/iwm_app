@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
-  m_Name: Title
+  m_Name: Los
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  textKey: tabu_title
+  textKey: 
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: Wort-Grube
-  englishStandard: Word Pit
+  germanStandard: LOS!
+  englishStandard: GO!
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0

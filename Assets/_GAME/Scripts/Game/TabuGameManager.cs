@@ -28,6 +28,7 @@ public class TabuGameManager : MonoBehaviour
     [Header("Gameplay UI")]
     public TextMeshProUGUI mainTermText;
     public Button mainTermButton; // NEU: Button für Begriff-Tap
+    public GameObject startIndicatorIcon; // NEU: "Los!"-Icon für visuelles Feedback
     public Transform tabuWordsContainer;
     public GameObject tabuWordPrefab;
     public TextMeshProUGUI timerText;
@@ -422,7 +423,7 @@ public class TabuGameManager : MonoBehaviour
 
     /// <summary>
     /// NEU: Wird aufgerufen wenn Spieler auf den Begriff tippt
-    /// - Erstes Tap: Begriff ausblenden + Timer starten
+    /// - Erstes Tap: Begriff ausblenden + Timer starten + "Los!"-Icon verstecken
     /// - Weiteres Tap: Begriff ein/ausblenden (Toggle) OHNE Timer zu pausieren
     /// </summary>
     void OnTermTapped()
@@ -445,6 +446,9 @@ public class TabuGameManager : MonoBehaviour
             // Timer starten
             timerPaused = false;
 
+            // NEU: "Los!"-Icon ausblenden
+            UpdateStartIndicatorVisibility();
+
             // NEU: Correct Button einblenden
             UpdateButtonVisibility();
 
@@ -460,6 +464,18 @@ public class TabuGameManager : MonoBehaviour
 
                 Debug.Log($"Begriff {(termVisible ? "eingeblendet" : "ausgeblendet")} (Timer läuft weiter)");
             }
+        }
+    }
+
+    /// <summary>
+    /// NEU: Aktualisiert "Los!"-Icon Sichtbarkeit
+    /// Icon wird nur angezeigt wenn Timer pausiert ist
+    /// </summary>
+    void UpdateStartIndicatorVisibility()
+    {
+        if (startIndicatorIcon != null)
+        {
+            startIndicatorIcon.SetActive(timerPaused);
         }
     }
 
@@ -511,6 +527,9 @@ public class TabuGameManager : MonoBehaviour
 
         // NEU: Timer pausieren für nächsten Begriff
         timerPaused = true;
+
+        // NEU: "Los!"-Icon wieder einblenden
+        UpdateStartIndicatorVisibility();
 
         // NEU: Button-Sichtbarkeit aktualisieren
         UpdateButtonVisibility();

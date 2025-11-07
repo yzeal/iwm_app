@@ -138,6 +138,63 @@
 - **Zeit abgelaufen**: Runde endet
 - **Alle Begriffe durch**: Runde endet
 
+### TABU-MINISPIEL - TAP-TO-START TIMER-SYSTEM (NEU - 07.11.2025)
+
+**TabuGameManager.cs - Timer-Steuerungs-Erweiterung**
+- **Tap-to-Start Mechanik**: Timer startet erst nach Touch auf den Begriff
+- **Begriff-Toggle**: Begriff kann während Timer-Lauf ein/ausgeblendet werden
+- **Correct-Button-Delay**: Correct-Button wird erst nach Timer-Start sichtbar
+- **Start-Indikator**: Optionales GameObject ("Los!"-Icon) für visuelles Feedback
+
+#### Neue Features:
+1. **mainTermButton** - Button für Begriff-Interaktion
+   - Erstes Tap: Begriff ausblenden + Timer starten + "Los!"-Icon verstecken
+   - Weiteres Tap: Begriff togglen OHNE Timer zu pausieren
+   - Haptic Feedback bei jedem Tap
+
+2. **startIndicatorIcon** - GameObject für "Tap to Start" Visualisierung
+   - Sichtbar wenn Timer pausiert ist (neuer Begriff)
+   - Ausgeblendet wenn Timer läuft
+   - Automatische Show/Hide-Logik über UpdateStartIndicatorVisibility()
+
+3. **Neue Game-State-Variablen**:
+   - timerPaused (bool) - Steuert Timer-Pausierung
+   - termVisible (bool) - Trackt Begriff-Sichtbarkeit
+
+4. **Neue Methoden**:
+   - OnTermTapped() - Handler für Begriff-Button-Clicks
+   - UpdateStartIndicatorVisibility() - Steuert "Los!"-Icon
+   - UpdateButtonVisibility() - Steuert Correct/Skip-Button-Sichtbarkeit
+
+#### Spielablauf-Änderungen:
+- **Alt**: Timer läuft sofort nach Countdown ? Begriff sofort sichtbar
+- **Neu**: Timer pausiert ? Spieler 1 tippt auf Begriff ? Begriff ausgeblendet ? Timer startet
+
+#### UI-Visibility-States:
+- **Timer pausiert** (neuer Begriff):
+  - Begriff: Sichtbar
+  - "Los!"-Icon: Sichtbar
+  - Correct-Button: Versteckt
+  - Skip-Button: Sichtbar
+
+- **Timer läuft**:
+  - Begriff: Ausgeblendet (togglebar)
+  - "Los!"-Icon: Versteckt
+  - Correct-Button: Sichtbar
+  - Skip-Button: Sichtbar
+
+#### Integration Points:
+- StartRound(): Timer startet mit timerPaused = true
+- ShowCurrentTerm(): Timer pausieren + Begriff einblenden + Icon anzeigen
+- Update(): Timer läuft nur wenn !timerPaused
+- EndRound(): Timer pausieren
+
+#### UX-Verbesserungen:
+- **Anti-Peek**: Begriff wird vor Timer-Start ausgeblendet
+- **Flexible Review**: Begriff kann jederzeit wieder angeschaut werden
+- **Clear Indication**: "Los!"-Icon zeigt deutlich wann zu tippen ist
+- **Delayed Correct-Button**: Verhindert versehentliche Klicks
+
 ## AKTUELLE CODE-STRUKTUR
 
 ### HAUPTKLASSEN - MEHRSPRACHIGKEITSSYSTEM (IMPLEMENTIERT)
