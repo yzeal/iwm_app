@@ -19,7 +19,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI player1ScoreText;
     public GameObject player1FeedbackPanel;
     public TextMeshProUGUI player1FeedbackText;
-    public Image player1TeamIcon; // NEU: Dynamisches Team-Icon
+    public Image player1TeamIcon;
     
     [Header("Player 2 UI (Top - Rotated)")]
     public TextMeshProUGUI player2QuestionText;
@@ -27,7 +27,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     public TextMeshProUGUI player2ScoreText;
     public GameObject player2FeedbackPanel;
     public TextMeshProUGUI player2FeedbackText;
-    public Image player2TeamIcon; // NEU: Dynamisches Team-Icon
+    public Image player2TeamIcon;
     
     [Header("Shared UI")]
     public QuestionProgressIcons questionProgressIcons;
@@ -38,14 +38,17 @@ public class SplitScreenQuizManager : MonoBehaviour
     [SerializeField] private Color wrongAnswerColor = new Color(0.8f, 0.2f, 0.2f);
     [SerializeField] private Color selectedAnswerColor = Color.gray;
     
-    [Header("Result Screen")]
-    public TextMeshProUGUI finalScoreText;
+    [Header("Result Screen - ANALOG ZU PUZZLE")]
+    public TextMeshProUGUI resultsMessageText; // Gewinner/Tie Nachricht
+    public Image winnerTeamIcon; // GROSSES Gewinner-Icon (NEU!)
+    public Image team1ResultIcon; // Team 1 Icon
+    public Image team2ResultIcon; // Team 2 Icon
+    public TextMeshProUGUI team1ScoreText; // Team 1 Score
+    public TextMeshProUGUI team2ScoreText; // Team 2 Score
     public Button playAgainButton;
     public Button continueToNextRoomButton;
-    public Image result1TeamIcon; // NEU: Team-Icon auf Results Screen
-    public Image result2TeamIcon; // NEU: Team-Icon auf Results Screen
     
-    [Header("Team Icon Provider (NEU)")]
+    [Header("Team Icon Provider")]
     [SerializeField] private TeamIconProvider teamIconProvider;
     
     [Header("Localized Texts")]
@@ -58,6 +61,7 @@ public class SplitScreenQuizManager : MonoBehaviour
     [SerializeField] private LocalizedText tieLocalizedText;
     [SerializeField] private LocalizedText team1NameLocalizedText;
     [SerializeField] private LocalizedText team2NameLocalizedText;
+    [SerializeField] private LocalizedText scorePrefixLocalizedText;
     
     // Game State
     private PlayerData player1 = new PlayerData { playerName = "Team 1" };
@@ -66,27 +70,20 @@ public class SplitScreenQuizManager : MonoBehaviour
     private bool bothPlayersAnswered = false;
     private bool showingFeedback = false;
     
-    // Fragen für beide Teams basierend auf Schwierigkeitsgrad
     private QuizQuestion[] team1Questions;
     private QuizQuestion[] team2Questions;
     
-    // Timing system for first/second answer
     private float player1AnswerTime = float.MaxValue;
     private float player2AnswerTime = float.MaxValue;
     private float questionStartTime;
     
-    // Aktuelle Sprache für Performance
     private LanguageSystem.Language currentLanguage = LanguageSystem.Language.German_Standard;
     
     void Start()
     {
         InitializeLocalization();
         InitializeQuiz();
-        
-        // NEU: Team-Icons setzen
         UpdateTeamIcons();
-        
-        // Event-Listener für Sprachwechsel
         LanguageSystem.OnLanguageChanged += OnLanguageChanged;
     }
     
@@ -127,12 +124,12 @@ public class SplitScreenQuizManager : MonoBehaviour
         };
     }
     
-    // NEU: Team-Icons aktualisieren
     void UpdateTeamIcons()
     {
         if (teamIconProvider == null)
         {
             Debug.LogWarning("TeamIconProvider nicht zugewiesen! Verwende Fallback.");
+            SetupTeamIconsLegacy();
             return;
         }
         
@@ -152,21 +149,29 @@ public class SplitScreenQuizManager : MonoBehaviour
         }
         
         // Results Screen Icons
-        if (result1TeamIcon != null)
+        if (team1ResultIcon != null)
         {
             Sprite team1Icon = teamIconProvider.GetTeam1Icon();
             if (team1Icon != null)
-                result1TeamIcon.sprite = team1Icon;
+                team1ResultIcon.sprite = team1Icon;
         }
         
-        if (result2TeamIcon != null)
+        if (team2ResultIcon != null)
         {
             Sprite team2Icon = teamIconProvider.GetTeam2Icon();
             if (team2Icon != null)
-                result2TeamIcon.sprite = team2Icon;
+                team2ResultIcon.sprite = team2Icon;
         }
         
         Debug.Log($"Team Icons updated: Team1={teamIconProvider.GetTeam1Icon()?.name}, Team2={teamIconProvider.GetTeam2Icon()?.name}");
+    }
+    
+    void SetupTeamIconsLegacy()
+    {
+        if (roomData != null)
+        {
+            Debug.LogWarning("TeamIconProvider fehlt! Nutze Legacy team1/2Image aus QuizRoomData.");
+        }
     }
     
     void OnLanguageChanged(LanguageSystem.Language newLanguage)
@@ -470,13 +475,11 @@ public class SplitScreenQuizManager : MonoBehaviour
         UpdateFeedbackText(feedbackText, points, correct);
         feedbackPanel.SetActive(true);
         
-        // Schritt 1: Alle Buttons zurücksetzen
         for (int i = 0; i < buttons.Length; i++)
         {
             HighlightSelectedButtonWithTextColor(buttons[i], Color.white, Color.black);
         }
         
-        // Schritt 2: Finde den Index der korrekten Antwort
         string correctAnswer = question.GetCorrectAnswer(currentLanguage);
         int correctAnswerIndex = -1;
         
@@ -489,17 +492,14 @@ public class SplitScreenQuizManager : MonoBehaviour
             }
         }
         
-        // Schritt 3: Markiere die gewählte Antwort (falls falsch in Rot)
         if (player.selectedAnswerIndex >= 0 && player.selectedAnswerIndex < buttons.Length)
         {
             if (!correct)
             {
-                // Falsche Antwort in Rot
                 HighlightSelectedButtonWithTextColor(buttons[player.selectedAnswerIndex], wrongAnswerColor, Color.white);
             }
         }
         
-        // Schritt 4: Markiere IMMER die richtige Antwort in Grün
         if (correctAnswerIndex >= 0 && correctAnswerIndex < buttons.Length)
         {
             HighlightSelectedButtonWithTextColor(buttons[correctAnswerIndex], correctAnswerColor, Color.white);
@@ -619,31 +619,45 @@ public class SplitScreenQuizManager : MonoBehaviour
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
         
-        // NEU: Icons auf Results Screen aktualisieren
         UpdateTeamIcons();
         
-        string winnerText;
+        // Gewinner/Tie Logik
+        string winnerMessage;
+        int winningTeam = 0; // 0 = Tie, 1 = Team1, 2 = Team2
+        
         if (player1.score > player2.score)
         {
+            winningTeam = 1;
             string winnerFormat = winnerLocalizedText != null ? 
                 winnerLocalizedText.GetText(currentLanguage) : GetDefaultWinnerText(currentLanguage);
-            winnerText = string.Format(winnerFormat, player1.playerName);
+            winnerMessage = string.Format(winnerFormat, player1.playerName);
         }
         else if (player2.score > player1.score)
         {
+            winningTeam = 2;
             string winnerFormat = winnerLocalizedText != null ? 
                 winnerLocalizedText.GetText(currentLanguage) : GetDefaultWinnerText(currentLanguage);
-            winnerText = string.Format(winnerFormat, player2.playerName);
+            winnerMessage = string.Format(winnerFormat, player2.playerName);
         }
         else
         {
-            winnerText = tieLocalizedText != null ? 
+            winnerMessage = tieLocalizedText != null ? 
                 tieLocalizedText.GetText(currentLanguage) : GetDefaultTieText(currentLanguage);
         }
         
-        string pointsLabel = GetDefaultPointsLabel(currentLanguage);
-        finalScoreText.text = $"{winnerText}\n\n{player1.playerName}: {player1.score} {pointsLabel}\n{player2.playerName}: {player2.score} {pointsLabel}";
+        resultsMessageText.text = winnerMessage;
         
+        // Winner Icon setzen (ANALOG ZU PUZZLE)
+        UpdateWinnerIcon(winningTeam);
+        
+        // Separate Score-Texte mit Prefix
+        string scorePrefix = scorePrefixLocalizedText != null ?
+            scorePrefixLocalizedText.GetText(currentLanguage) : GetDefaultScorePrefix(currentLanguage);
+        
+        team1ScoreText.text = $"{scorePrefix} {player1.score}";
+        team2ScoreText.text = $"{scorePrefix} {player2.score}";
+        
+        // GameDataManager speichern
         if (GameDataManager.Instance != null && roomData != null)
         {
             GameDataManager.Instance.SaveRoomResult(
@@ -654,6 +668,39 @@ public class SplitScreenQuizManager : MonoBehaviour
                 currentQuestionIndex
             );
         }
+    }
+    
+    /// <summary>
+    /// Setzt das Winner Icon basierend auf Gewinner-Team (ANALOG ZU PUZZLE)
+    /// </summary>
+    void UpdateWinnerIcon(int winningTeam)
+    {
+        if (winnerTeamIcon == null || teamIconProvider == null)
+            return;
+        
+        Sprite winnerIcon = null;
+        
+        if (winningTeam == 1)
+        {
+            winnerIcon = teamIconProvider.GetTeam1Icon();
+        }
+        else if (winningTeam == 2)
+        {
+            winnerIcon = teamIconProvider.GetTeam2Icon();
+        }
+        
+        // Bei Tie: Icon ausblenden oder Default-Icon anzeigen
+        if (winnerIcon != null)
+        {
+            winnerTeamIcon.sprite = winnerIcon;
+            winnerTeamIcon.gameObject.SetActive(true);
+        }
+        else
+        {
+            winnerTeamIcon.gameObject.SetActive(false);
+        }
+        
+        Debug.Log($"Winner Icon updated: WinningTeam={winningTeam}, Icon={winnerIcon?.name}");
     }
     
     string GetDefaultWinnerText(LanguageSystem.Language language)
@@ -678,6 +725,17 @@ public class SplitScreenQuizManager : MonoBehaviour
         };
     }
     
+    string GetDefaultScorePrefix(LanguageSystem.Language language)
+    {
+        return language switch
+        {
+            LanguageSystem.Language.English_Standard => "Points:",
+            LanguageSystem.Language.English_Simple => "Points:",
+            LanguageSystem.Language.German_Simple => "Punkte:",
+            _ => "Punkte:"
+        };
+    }
+    
     void RestartQuiz()
     {
         player1.score = 0;
@@ -696,7 +754,6 @@ public class SplitScreenQuizManager : MonoBehaviour
         gameplayUI.SetActive(true);
         resultUI.SetActive(false);
         
-        // NEU: Icons neu laden (falls geändert)
         UpdateTeamIcons();
         
         ShowCurrentQuestion();
