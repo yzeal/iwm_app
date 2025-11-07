@@ -27,6 +27,7 @@ public class TabuGameManager : MonoBehaviour
 
     [Header("Gameplay UI")]
     public TextMeshProUGUI mainTermText;
+    public Button mainTermButton; // NEU: Button für Begriff-Tap
     public Transform tabuWordsContainer;
     public GameObject tabuWordPrefab;
     public TextMeshProUGUI timerText;
@@ -75,6 +76,7 @@ public class TabuGameManager : MonoBehaviour
     private int currentTermIndex = 0;
     private float roundTimeLeft;
     private bool gameActive = false;
+    private bool timerPaused = true; // NEU: Timer-Pausierung
     private int currentTeam = 1;
     private int team1Score = 0;
     private int team2Score = 0;
@@ -166,6 +168,12 @@ public class TabuGameManager : MonoBehaviour
         skipButton.onClick.AddListener(OnSkipTerm);
         playAgainButton.onClick.AddListener(RestartGame);
         backToMenuButton.onClick.AddListener(BackToMenu);
+        
+        // NEU: Begriff-Button für Tap-to-Start
+        if (mainTermButton != null)
+        {
+            mainTermButton.onClick.AddListener(OnTermTapped);
+        }
 
         explanationUI.SetActive(true);
         countdownUI.SetActive(false);
@@ -360,6 +368,7 @@ public class TabuGameManager : MonoBehaviour
         currentTermIndex = 0;
         roundTimeLeft = tabuCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
         gameActive = true;
+        timerPaused = true; // NEU: Timer startet pausiert
 
         hasPlayedThreeSecondWarning = false;
         hasPlayedTwoSecondWarning = false;
@@ -373,15 +382,19 @@ public class TabuGameManager : MonoBehaviour
     {
         if (!gameActive) return;
 
-        roundTimeLeft -= Time.deltaTime;
-        CheckTimerCountdownSounds();
-
-        if (roundTimeLeft <= 0)
+        // NEU: Timer nur aktualisieren wenn nicht pausiert
+        if (!timerPaused)
         {
-            EndRound();
-        }
+            roundTimeLeft -= Time.deltaTime;
+            CheckTimerCountdownSounds();
 
-        UpdateTimerDisplay();
+            if (roundTimeLeft <= 0)
+            {
+                EndRound();
+            }
+
+            UpdateTimerDisplay();
+        }
     }
 
     void CheckTimerCountdownSounds()
@@ -406,6 +419,35 @@ public class TabuGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// NEU: Wird aufgerufen wenn Spieler auf den Begriff tippt
+    /// Blendet Begriff aus und startet Timer
+    /// </summary>
+    void OnTermTapped()
+    {
+        if (!gameActive || !timerPaused) return;
+
+        // Begriff ausblenden
+        if (mainTermText != null)
+        {
+            mainTermText.gameObject.SetActive(false);
+        }
+
+        // Button deaktivieren
+        if (mainTermButton != null)
+        {
+            mainTermButton.interactable = false;
+        }
+
+        // Timer starten
+        timerPaused = false;
+
+        // Optional: Haptic Feedback
+        TriggerHapticFeedback();
+
+        Debug.Log($"Begriff ausgeblendet, Timer gestartet. Verbleibende Zeit: {Mathf.FloorToInt(roundTimeLeft)}s");
+    }
+
     void ShowCurrentTerm()
     {
         if (currentTermIndex >= currentRoundTerms.Count)
@@ -420,7 +462,21 @@ public class TabuGameManager : MonoBehaviour
         }
 
         TabuTerm term = currentRoundTerms[currentTermIndex];
-        mainTermText.text = term.GetMainTerm(currentLanguage);
+        
+        // NEU: Begriff wieder einblenden und Button aktivieren
+        if (mainTermText != null)
+        {
+            mainTermText.text = term.GetMainTerm(currentLanguage);
+            mainTermText.gameObject.SetActive(true);
+        }
+
+        if (mainTermButton != null)
+        {
+            mainTermButton.interactable = true;
+        }
+
+        // NEU: Timer pausieren für nächsten Begriff
+        timerPaused = true;
 
         // Aktualisiere Tabu-Wörter
         UpdateTabuWordsUI(term);
@@ -532,6 +588,7 @@ public class TabuGameManager : MonoBehaviour
     void EndRound()
     {
         gameActive = false;
+        timerPaused = true; // NEU: Timer pausieren
 
         if (audioSource && timeUpSound)
         {
