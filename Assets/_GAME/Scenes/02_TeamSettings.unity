@@ -3124,11 +3124,11 @@ MonoBehaviour:
   team1Icon: {fileID: 0}
   team1Label: {fileID: 750793081}
   team1DifficultyGroup: {fileID: 182209536}
-  team1IconGroup: {fileID: 0}
+  team1IconGroup: {fileID: 1872017896}
   team2Icon: {fileID: 0}
   team2Label: {fileID: 1129246329}
   team2DifficultyGroup: {fileID: 714558070}
-  team2IconGroup: {fileID: 0}
+  team2IconGroup: {fileID: 715083657}
   applyButton: {fileID: 344060436}
   backButton: {fileID: 2131695632}
   defaultTeam1Icon: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}

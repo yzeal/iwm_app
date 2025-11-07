@@ -17,33 +17,40 @@ public class TeamIconRadioGroup : MonoBehaviour
         public Sprite normalSprite;          // Icon wenn NICHT ausgewählt
         public Sprite selectedSprite;        // Icon wenn ausgewählt (Hervorhebung)
     }
-    
+
     [Header("Icon Buttons (3 Icons pro Team)")]
     [SerializeField] private IconButton[] iconButtons = new IconButton[3];
-    
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip selectionSound;
-    
+
     [Header("Mobile Settings")]
     [SerializeField] private bool enableHapticFeedback = true;
-    
+
     // Events
     public event Action<int> OnIconChanged;
-    
+
     private int currentSelectedIndex = 0;
-    
+    private bool isInitialized = false;
+
     void Start()
     {
         SetupButtons();
+        isInitialized = true;
+
+        // WICHTIG: Initial-Visuals NACH Button-Setup aktualisieren
+        UpdateVisuals();
+
+        Debug.Log($"TeamIconRadioGroup initialized with icon {currentSelectedIndex}");
     }
-    
+
     void SetupButtons()
     {
         for (int i = 0; i < iconButtons.Length; i++)
         {
             int index = i; // Closure für Lambda
-            
+
             if (iconButtons[i].button != null)
             {
                 iconButtons[i].button.onClick.AddListener(() => SelectIcon(index));
@@ -54,21 +61,22 @@ public class TeamIconRadioGroup : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// Setzt den ausgewählten Icon-Index (0-2)
+    /// WICHTIG: Kann VOR Start() aufgerufen werden (beim Laden gespeicherter Settings)
     /// </summary>
     public void SetSelectedIcon(int iconIndex)
     {
         iconIndex = Mathf.Clamp(iconIndex, 0, 2);
-        
-        if (currentSelectedIndex != iconIndex)
-        {
-            currentSelectedIndex = iconIndex;
-            UpdateVisuals();
-        }
+        currentSelectedIndex = iconIndex;
+
+        // UpdateVisuals() IMMER aufrufen (auch vor Start())
+        UpdateVisuals();
+
+        Debug.Log($"SetSelectedIcon: index={iconIndex}, initialized={isInitialized}");
     }
-    
+
     /// <summary>
     /// Gibt den aktuell ausgewählten Icon-Index zurück (0-2)
     /// </summary>
@@ -76,40 +84,51 @@ public class TeamIconRadioGroup : MonoBehaviour
     {
         return currentSelectedIndex;
     }
-    
+
     /// <summary>
     /// Icon auswählen via Button-Click
+    /// WICHTIG: Early return NUR wenn schon ausgewählt (NACH dem Setzen!)
     /// </summary>
     void SelectIcon(int iconIndex)
     {
-        if (currentSelectedIndex == iconIndex)
-            return; // Bereits ausgewählt
-        
+        // FIX: Prüfe ZUERST ob bereits ausgewählt BEVOR wir den Index ändern
+        bool alreadySelected = (currentSelectedIndex == iconIndex);
+
+        // Index IMMER setzen (damit GetSelectedIconIndex() funktioniert)
         currentSelectedIndex = iconIndex;
         UpdateVisuals();
-        
-        // Feedback
+
+        // Wenn bereits ausgewählt war, keine Feedback-Sounds/Events
+        if (alreadySelected)
+        {
+            Debug.Log($"Icon {iconIndex} already selected (skipping feedback)");
+            return;
+        }
+
+        // Feedback nur bei tatsächlicher Änderung
         PlaySelectionSound();
         TriggerHapticFeedback();
-        
+
         // Event feuern
         OnIconChanged?.Invoke(currentSelectedIndex);
-        
-        Debug.Log($"Icon {iconIndex} selected");
+
+        Debug.Log($"Icon {iconIndex} selected via button click (changed)");
     }
-    
+
     /// <summary>
     /// Aktualisiert die visuellen States aller Buttons
+    /// WICHTIG: Funktioniert auch VOR Start() - robuste Null-Checks
     /// </summary>
     void UpdateVisuals()
     {
         for (int i = 0; i < iconButtons.Length; i++)
         {
-            if (iconButtons[i].iconImage == null)
+            // Robuste Null-Checks
+            if (iconButtons[i] == null || iconButtons[i].iconImage == null)
                 continue;
-            
+
             bool isSelected = (i == currentSelectedIndex);
-            
+
             // Sprite-Swapping: Selected vs Normal
             if (isSelected && iconButtons[i].selectedSprite != null)
             {
@@ -121,7 +140,7 @@ public class TeamIconRadioGroup : MonoBehaviour
             }
         }
     }
-    
+
     void PlaySelectionSound()
     {
         if (audioSource != null && selectionSound != null)
@@ -129,44 +148,44 @@ public class TeamIconRadioGroup : MonoBehaviour
             audioSource.PlayOneShot(selectionSound);
         }
     }
-    
+
     void TriggerHapticFeedback()
     {
         if (!enableHapticFeedback) return;
-        
-        #if UNITY_IOS || UNITY_ANDROID
+
+#if UNITY_IOS || UNITY_ANDROID
         if (SystemInfo.supportsVibration)
         {
             Handheld.Vibrate();
         }
-        #endif
+#endif
     }
-    
+
     #region Debug Methods
-    
+
     [ContextMenu("Test - Select Icon 0")]
     void DebugSelectIcon0()
     {
-        SelectIcon(0);
+        SetSelectedIcon(0);
     }
-    
+
     [ContextMenu("Test - Select Icon 1")]
     void DebugSelectIcon1()
     {
-        SelectIcon(1);
+        SetSelectedIcon(1);
     }
-    
+
     [ContextMenu("Test - Select Icon 2")]
     void DebugSelectIcon2()
     {
-        SelectIcon(2);
+        SetSelectedIcon(2);
     }
-    
+
     [ContextMenu("Print Current Selection")]
     void DebugPrintSelection()
     {
         Debug.Log($"Currently selected icon: {currentSelectedIndex}");
     }
-    
+
     #endregion
 }
