@@ -41,7 +41,7 @@ public class GameDataManager : MonoBehaviour
     [SerializeField] private bool enableLocalBackup = true;
     
     [Header("Debug Settings")]
-    [SerializeField] private bool enableVerboseLogging = true; // NEU: Detaillierte Logs
+    [SerializeField] private bool enableVerboseLogging = false; // NEU: Detaillierte Logs
     
     private const string SAVE_KEY = "MuseumQuizProgress";
     private const string BACKUP_KEY = "MuseumQuizBackup";

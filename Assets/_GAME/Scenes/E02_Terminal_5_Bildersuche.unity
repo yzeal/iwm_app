@@ -1502,6 +1502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
   enableCloudSave: 0
   enableLocalBackup: 1
+  enableVerboseLogging: 0
 --- !u!1 &372836673
 GameObject:
   m_ObjectHideFlags: 0

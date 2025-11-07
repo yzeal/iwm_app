@@ -473,10 +473,44 @@ public class PuzzleGameManager : MonoBehaviour
         
         // NEU: Icons auf Results Screen aktualisieren
         UpdateTeamIcons();
-        
+
+        SaveResults();
+
         StartCoroutine(UpdateResultsUIDelayed());
         
         PlayHapticFeedback();
+    }
+
+    /// <summary>
+    /// Speichert die Ergebnisse des Spiels im GameDataManager
+    /// </summary>
+    private void SaveResults()
+    {
+        if (GameDataManager.Instance == null)
+        {
+            Debug.LogWarning("GameDataManager nicht gefunden! Ergebnisse können nicht gespeichert werden.");
+            return;
+        }
+
+        if (puzzleCollection == null)
+        {
+            Debug.LogError("PuzzleCollection fehlt! Kann roomNumber nicht abrufen.");
+            return;
+        }
+
+        string collectionName = puzzleCollection.GetCollectionName(currentLanguage);
+        int roomNumber = puzzleCollection.roomNumber;
+        int totalRounds = puzzleCollection.roundsPerTeam; // Anzahl Runden pro Team
+
+        GameDataManager.Instance.SaveRoomResult(
+            collectionName,
+            roomNumber,
+            team1Score,
+            team2Score,
+            totalRounds * 2 // Total Questions = Runden pro Team * 2 Teams
+        );
+
+        Debug.Log($"Puzzle results saved: {collectionName} (Room {roomNumber}) - Team1: {team1Score}, Team2: {team2Score}");
     }
 
     private IEnumerator UpdateResultsUIDelayed()
