@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5bcf673e35f74783331226fb76e94, type: 3}
+  m_Name: Explanation new
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  textKey: 
+  description: "Beschreibung des Texts f\xFCr Editor"
+  germanStandard: "Halte dein Handy <b><color=#FFA588>an deine Stirn</color></b>,
+    so dass die anderen den Begriff darauf lesen k\xF6nnen.\n\nStelle Fragen stellen,
+    die von mit <b><color=#FFA588>Ja</color></b> oder <b>Nein</b> beantwortet werden.
+    \n\nWenn du den Begriff richtig erraten hast, kippe <b><color=#FFA588>das Handy
+    nach vorne</color></b>!\nDer n\xE4chste Begriff erscheint.\n\n<b><color=#FFA588>Kippe
+    das Handys nach hinten</color></b>, um einen Begriff zu \xFCberspringen. \n\nErrate
+    so viele Begriffe wie m\xF6glich innerhalb des <b><color=#FFA588>Zeitlimits</color></b>!"
+  englishStandard: "Hold your phone <b><color=#FFA588>to your forehead</color></b>
+    so the others can read the term on it.\n\nAsk questions that can be answered
+    with <b><color=#FFA588>\u201CYes\u201D</color></b> or <b><color=#FFA588>\u201CNo.\u201D</color></b>\n\nWhen
+    you\u2019ve guessed the term correctly, <b><color=#FFA588>tilt the phone forward</color></b>
+    \u2014 the next term will appear.\n\n<b><color=#FFA588>Tilt the phone backward</color></b>
+    to skip a term.\n\nGuess as many terms as you can within the <b><color=#FFA588>time
+    limit</color></b>!"
+  germanSimple: 
+  englishSimple: 
+  enableDebugLogs: 0

@@ -14,13 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: tabu_explanation
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: "Ein Spieler erkl\xE4rt Begriffe, ohne die verbotenen W\xF6rter
-    zu verwenden.\n\nDer Rest  r\xE4t!"
-  englishStandard: 'One player explains terms without using the forbidden words.
+  germanStandard: "Ein Spieler erkl\xE4rt Begriffe, ohne die <b><color=#FFA588>verbotenen
+    W\xF6rter</color></b> zu verwenden.\n\nDer Rest r\xE4t!\n\nSchaue dir erste den
+    Begriff an, <b><color=#FFA588>ohne ihn den anderen zu zeigen</color></b>.\n\nTippe
+    dann auf den Begriff um ihn zu <b><color=#FFA588>verstecken</color></b> und die
+    <b><color=#FFA588>Zeit</color></b> zu starten! \n\nDie anderen d\xFCrfen nun
+    auch die <b><color=#FFA588>verbotenen Begriffe</color></b> sehen."
+  englishStandard: 'One player explains the terms without using the <b><color=#FFA588>forbidden
+    words</color></b>.
+
+
+    Everyone else guesses!
+
+
+    First, look at the term
+    <b><color=#FFA588>without showing it to the others</color></b>.
+
+
+    Then tap
+    the term to <b><color=#FFA588>hide it and start the <b><color=#FFA588>timer</color></b>!
 
 
     The
-    others guess!'
+    others can now also see the <b><color=#FFA588>forbidden terms</color></b>.'
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0
