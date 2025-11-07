@@ -801,6 +801,82 @@ public void TriggerAction()
 - ReturnToHub-Buttons in Raum-Szenen implementieren
 - iOS-Testing sobald Device verfügbar
 
+### NFC-SCENE-LOADER - EDITOR DEBUG MODE (NEU - 07.11.2025)
+
+**NFCSceneLoader.cs - Editor-Tastatur-Steuerung**
+- **Neues Unity Input System Integration**: Verwendet Keyboard.current statt altem Input Manager
+- **Editor-Only Debug-Modus**: Nur in Unity Editor aktiv (via #if UNITY_EDITOR)
+- **Tastatur-Steuerung für Raum-Wechsel**: Keine NFC-Tags im Editor nötig
+
+#### Neue Features:
+1. **Keyboard-basierte Raum-Auswahl**
+   - Tasten 0-9 (Alpha + Numpad): Lädt Raum mit Index 0-9 aus NFCRoomMapping
+   - H-Taste: Kehrt zur Hub-Szene zurück
+   - P-Taste: Zeigt verfügbare Räume-Liste erneut an
+   - Optional: Ctrl als Modifier (konfigurierbar)
+
+2. **Automatische Raum-Liste beim Start**
+   - Zeigt alle verfügbaren Räume im Console-Log
+   - Format: [Index] DisplayName (Tag: TagID)
+   - Hilfstexte für Tastenbelegung
+
+3. **Reflection-basierter Zugriff**
+   - GetSceneNameByIndex(int index) - Holt Szenen-Namen via Reflection
+   - PrintAvailableRooms() - Listet alle Mappings aus NFCRoomMapping
+   - Zugriff auf private roomMappings Array ohne Code-Änderungen
+
+4. **Neue Inspector-Einstellungen** (nur im Editor):
+   - enableEditorDebug (bool) - Debug-Modus aktivieren/deaktivieren
+   - debugKeyModifier (KeyCode) - Optional: Modifier-Taste (z.B. Ctrl)
+   - requireModifier (bool) - Muss Modifier gedrückt werden?
+
+#### Verwendung im Editor:
+
+// Console-Output beim Start:
+[NFCSceneLoader] ?? EDITOR DEBUG MODE aktiv!
+[NFCSceneLoader] Drücke Tasten 0-9 um Räume zu laden
+========== VERFÜGBARE RÄUME (EDITOR DEBUG) ==========
+  [0] Fossil-Raum (Tag: ROOM_01)
+  [1] Puzzle-Raum (Tag: ROOM_02)
+  [2] Quiz-Raum (Tag: ROOM_03)
+?? Drücke Taste 0-2 zum Laden
+?? Drücke 'H' für Hub-Szene
+?? Drücke 'P' um diese Liste erneut anzuzeigen
+
+
+#### Technische Details:
+- **Input System Integration**: using UnityEngine.InputSystem (nur Editor)
+- **Keyboard.current**: Neues Input System API statt Input.GetKeyDown()
+- **Tastatur-Abfragen**:
+  - keyboard.digit0Key.wasPressedThisFrame (Zifferntasten)
+  - keyboard.numpad0Key.wasPressedThisFrame (Numpad)
+  - keyboard.hKey.wasPressedThisFrame (H-Taste)
+  - keyboard.ctrlKey.isPressed (Modifier-Check)
+- **Build-Kompatibilität**: Debug-Code wird in Builds automatisch entfernt
+- **Kein Input-Mode-Wechsel**: Funktioniert parallel zu Android/iOS Input
+
+#### Vorteile:
+- ? **Kein NFC-Scanner benötigt** für PC-Testing
+- ? **Schnelles Testen** aller Räume ohne Hardware
+- ? **Kein Unity-Neustart** bei Input-Änderungen
+- ? **Build-Safe**: Editor-Code wird automatisch entfernt
+- ? **Konsistent**: Nutzt gleiches Input System wie FossilInputHandler
+
+#### Integration Points:
+- Start(): Keyboard-Initialisierung, Auto-Print verfügbarer Räume
+- Update(): Tastatur-Abfrage nur wenn enableEditorDebug == true
+- LoadRoomByIndex(int index): Wrapper für Index-basiertes Scene-Loading
+- GetSceneNameByIndex(int index): Reflection-Access auf NFCRoomMapping
+- PrintAvailableRooms(): Console-Output aller verfügbaren Räume
+
+#### Debug-Workflow:
+1. NFCSceneLoader im Hub platzieren
+2. NFCRoomMapping Asset zuweisen
+3. Play-Mode starten
+4. Console öffnen ? Raum-Liste anschauen
+5. Taste drücken ? Raum wird geladen
+6. H drücken ? Zurück zum Hub
+
 # PROJEKT-UPDATE: TEAM-ICON-AUSWAHL-SYSTEM (05.11.2025)
 
 ## NEUE FEATURES IMPLEMENTIERT
@@ -1124,6 +1200,7 @@ Assets/_GAME/
 ?   ?   ??? PuzzleGameManager.cs (ERWEITERT - Icon-System + Dokumentiert)
 ?   ?   ??? PlayerData.cs
 ?   ?   ??? LoadScene.cs
+?   ?   ??? NFCSceneLoader.cs (ERWEITERT - Editor Debug Mode)
 ?   ??? Data/
 ?   ?   ??? TeamIconProvider.cs (NEU)
 ?   ?   ??? GameDataManager.cs (ERWEITERT - Icon-Management)
@@ -1260,6 +1337,15 @@ void SetupTeamIconsLegacy()
 - **TeamIconProvider**: 0-basiert (0 = Team 1, 1 = Team 2)
 - **UI-Anzeige**: 1-basiert (currentTeam = 1 oder 2)
 - **Konvertierung**: teamIconProvider.GetTeamIcon(currentTeam - 1)
+
+#### NFC-System mit Editor-Debug-Support (ERWEITERT - 07.11.2025)
+- **Editor-Tastatur-Steuerung**: 0-9 für Räume, H für Hub, P für Liste
+- **Neues Unity Input System**: Keyboard.current API statt altem Input Manager
+- **Reflection-basiert**: Zugriff auf NFCRoomMapping ohne Code-Änderungen
+- **Automatische Raum-Liste**: Console-Output beim Editor-Start
+- **Build-Safe**: Debug-Code nur im Editor aktiv (#if UNITY_EDITOR)
+- **Kein Input-Mode-Wechsel**: Kompatibel mit Android/iOS Input
+- **Optional Modifier-Key**: Ctrl + Zahl konfigurierbar
 
 ### PUZZLE-GAME DETAILS
 
