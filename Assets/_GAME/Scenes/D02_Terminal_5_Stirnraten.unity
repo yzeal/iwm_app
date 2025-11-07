@@ -709,6 +709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
   enableCloudSave: 0
   enableLocalBackup: 1
+  enableVerboseLogging: 0
 --- !u!1 &423046076
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,7 +1265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FossilGameManager
   fossilCollection: {fileID: 11400000, guid: 2d50caa1a54df664fa9eb7c4424a429e, type: 2}
-  nextScene: E01_Terminal_5
+  nextScene: 00_NFCHub
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
   gameplayUI: {fileID: 1725218809}

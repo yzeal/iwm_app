@@ -19,13 +19,17 @@ MonoBehaviour:
     roomIcon: {fileID: 0}
   - nfcTagId: ROOM_02
     sceneName: B01_Terminal_3
-    displayName: '"Fossilienraum"'
+    displayName: '"Vulkan"'
     roomIcon: {fileID: 0}
   - nfcTagId: ROOM_03
     sceneName: C01_Terminal_4
-    displayName: '"Fossilienraum"'
+    displayName: '"Bohrkern"'
     roomIcon: {fileID: 0}
   - nfcTagId: ROOM_04
     sceneName: D01_Terminal_5
-    displayName: '"Fossilienraum"'
+    displayName: '"Forschung"'
+    roomIcon: {fileID: 0}
+  - nfcTagId: ROOM_05
+    sceneName: E01_Terminal_5
+    displayName: '"Schatzkammer"'
     roomIcon: {fileID: 0}
