@@ -15,12 +15,20 @@ public class QuizRoomData : ScriptableObject
     [SerializeField] private QuizQuestion[] bigKidsQuestions;
     [SerializeField] private QuizQuestion[] adultsQuestions;
     
+    [Header("Spiel-Einstellungen")]
+    [SerializeField] private int questionsPerGame = 5; // NEU: Wie viele Fragen pro Spiel (analog zu anderen Collections)
+    
     [Header("UI Einstellungen")]
     public Color roomColor = Color.blue;
     public Sprite roomIcon;
     
     [Header("Zeit-Einstellungen (optional)")]
     public DifficultyTimeSettings timeSettings = new DifficultyTimeSettings();
+
+    /// <summary>
+    /// Anzahl der Fragen pro Spiel
+    /// </summary>
+    public int QuestionsPerGame => questionsPerGame;
 
     /// <summary>
     /// Raum-Name für aktuelle Sprache abrufen
@@ -124,7 +132,8 @@ public class QuizRoomData : ScriptableObject
     [ContextMenu("Validate All Difficulties")]
     private void ValidateQuestions()
     {
-        Debug.Log($"Room {GetRoomName()} - Kids: {GetQuestionCountForDifficulty(DifficultyLevel.Kids)}, " +
+        Debug.Log($"Room {GetRoomName()} - Questions Per Game: {questionsPerGame}\n" +
+                 $"Kids: {GetQuestionCountForDifficulty(DifficultyLevel.Kids)}, " +
                  $"BigKids: {GetQuestionCountForDifficulty(DifficultyLevel.BigKids)}, " +
                  $"Adults: {GetQuestionCountForDifficulty(DifficultyLevel.Adults)}");
     }

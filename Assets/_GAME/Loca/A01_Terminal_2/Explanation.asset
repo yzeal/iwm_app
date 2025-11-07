@@ -19,7 +19,7 @@ MonoBehaviour:
     der Landschaft rund um die Grube Messel gef\xFChrt haben, zu entdecken. \n\nAn
     dieser Station erwarten euch <b><color=#FFA588>Quizfragen</color></b>. \n\nSie
     werden im <b><color=#FFA588>Splitscreen</color></b> angezeigt, also haltet das
-    Handy bitte so, dass jede Person sie sehen kann. \n\nGespielt wird 13 Runden.
+    Handy bitte so, dass jede Person sie sehen kann. \n\nGespielt wird 7 Runden.
     \n\nAuf jede Frage gibt es <b><color=#FFA588>eine richtige Antwort</color></b>
     und einige der L\xF6sungen sind sogar im Raum versteckt. \n\nF\xFCr jede richtig
     beantwortete Frage gibt es einen Punkt. \n\nDas Team, das schneller die richtige
@@ -29,11 +29,11 @@ MonoBehaviour:
     Pit over the course of Earth\u2019s history.\n\nAt this station, you\u2019ll
     be playing a  <b><color=#FFA588>quiz game</color></b>.\n\nThe questions will
     appear in  <b><color=#FFA588>split-screen mode</color></b>, so make sure to hold
-    the phone so that everyone on your team can see. \n\nThe game consists of 13
-    rounds.\n\nEach question has  <b><color=#FFA588>one correct answer</color></b>
-    \u2014 and some of the clues are even hidden in the room! \n\nYou\u2019ll earn
-    one point for every correct answer.\n\nThe team that locks in the correct answer
-    faster gets an  <b><color=#FFA588>extra point</color></b>!"
+    the phone so that everyone on your team can see. \n\nThe game consists of 7 rounds.\n\nEach
+    question has  <b><color=#FFA588>one correct answer</color></b> \u2014 and some
+    of the clues are even hidden in the room! \n\nYou\u2019ll earn one point for
+    every correct answer.\n\nThe team that locks in the correct answer faster gets
+    an  <b><color=#FFA588>extra point</color></b>!"
   germanSimple: 
   englishSimple: 
   enableDebugLogs: 0

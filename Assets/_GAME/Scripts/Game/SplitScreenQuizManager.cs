@@ -10,9 +10,6 @@ public class SplitScreenQuizManager : MonoBehaviour
     [Header("Quiz Data")]
     public QuizRoomData roomData;
     [SerializeField] private string nextScene = "Auswahl";
-    
-    [Header("Game Settings")]
-    [SerializeField] private int questionsPerGame = 5; // Wie viele Fragen gespielt werden sollen (konfigurierbar im Inspector)
 
     [Header("UI References")]
     public GameObject gameplayUI;
@@ -75,11 +72,11 @@ public class SplitScreenQuizManager : MonoBehaviour
     private bool bothPlayersAnswered = false;
     private bool showingFeedback = false;
     
-    private QuizQuestion[] team1Questions; // VOLLSTÄNDIGE Fragen aus Schwierigkeitsgrad
-    private QuizQuestion[] team2Questions; // VOLLSTÄNDIGE Fragen aus Schwierigkeitsgrad
+    private QuizQuestion[] team1Questions;
+    private QuizQuestion[] team2Questions;
     
-    private List<int> selectedQuestionIndices; // ZUFÄLLIGE Indizes für diese Session
-    private int actualQuestionsToPlay; // Tatsächliche Anzahl (Min von questionsPerGame und verfügbaren Fragen)
+    private List<int> selectedQuestionIndices;
+    private int actualQuestionsToPlay;
     
     private float player1AnswerTime = float.MaxValue;
     private float player2AnswerTime = float.MaxValue;
@@ -269,7 +266,8 @@ public class SplitScreenQuizManager : MonoBehaviour
         // Minimum der verfügbaren Fragen beider Teams
         int maxAvailableQuestions = Mathf.Min(team1Questions.Length, team2Questions.Length);
         
-        // Tatsächliche Anzahl = Minimum von gewünschter Anzahl und verfügbaren Fragen
+        // Tatsächliche Anzahl = Minimum von gewünschter Anzahl (aus roomData) und verfügbaren Fragen
+        int questionsPerGame = roomData != null ? roomData.QuestionsPerGame : 5; // Fallback auf 5
         actualQuestionsToPlay = Mathf.Min(questionsPerGame, maxAvailableQuestions);
         
         if (actualQuestionsToPlay <= 0)
@@ -286,7 +284,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         System.Random rng = new System.Random();
         selectedQuestionIndices = availableIndices.OrderBy(x => rng.Next()).Take(actualQuestionsToPlay).ToList();
         
-        Debug.Log($"Spiele {actualQuestionsToPlay} von {maxAvailableQuestions} möglichen Fragen. Indizes: {string.Join(", ", selectedQuestionIndices)}");
+        Debug.Log($"Spiele {actualQuestionsToPlay} von {maxAvailableQuestions} möglichen Fragen (QuestionsPerGame={questionsPerGame}). Indizes: {string.Join(", ", selectedQuestionIndices)}");
     }
     
     void SetupUI()
@@ -703,7 +701,7 @@ public class SplitScreenQuizManager : MonoBehaviour
                 roomData.roomNumber,
                 player1.score,
                 player2.score,
-                actualQuestionsToPlay // Tatsächlich gespielte Fragen
+                actualQuestionsToPlay
             );
         }
     }
@@ -777,7 +775,7 @@ public class SplitScreenQuizManager : MonoBehaviour
         currentQuestionIndex = 0;
         
         LoadQuestionsForTeams();
-        SelectRandomQuestions(); // NEUE Zufallsauswahl
+        SelectRandomQuestions();
         
         if (questionProgressIcons != null)
         {

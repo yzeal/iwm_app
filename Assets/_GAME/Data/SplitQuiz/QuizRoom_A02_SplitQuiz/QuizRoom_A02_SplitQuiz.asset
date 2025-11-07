@@ -330,6 +330,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 402e4c867dee66d48acf0942b61957b4, type: 2}
     - {fileID: 11400000, guid: 21a44e9f58c004b46a2edfdee140918c, type: 2}
     answers: []
+  questionsPerGame: 7
   roomColor: {r: 0, g: 0, b: 1, a: 1}
   roomIcon: {fileID: 0}
   timeSettings:
