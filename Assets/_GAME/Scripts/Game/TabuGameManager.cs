@@ -77,6 +77,7 @@ public class TabuGameManager : MonoBehaviour
     private float roundTimeLeft;
     private bool gameActive = false;
     private bool timerPaused = true; // NEU: Timer-Pausierung
+    private bool termVisible = true; // NEU: Begriff-Sichtbarkeit-Tracking
     private int currentTeam = 1;
     private int team1Score = 0;
     private int team2Score = 0;
@@ -169,7 +170,7 @@ public class TabuGameManager : MonoBehaviour
         playAgainButton.onClick.AddListener(RestartGame);
         backToMenuButton.onClick.AddListener(BackToMenu);
         
-        // NEU: Begriff-Button für Tap-to-Start
+        // NEU: Begriff-Button für Tap-to-Start/Toggle
         if (mainTermButton != null)
         {
             mainTermButton.onClick.AddListener(OnTermTapped);
@@ -421,31 +422,63 @@ public class TabuGameManager : MonoBehaviour
 
     /// <summary>
     /// NEU: Wird aufgerufen wenn Spieler auf den Begriff tippt
-    /// Blendet Begriff aus und startet Timer
+    /// - Erstes Tap: Begriff ausblenden + Timer starten
+    /// - Weiteres Tap: Begriff ein/ausblenden (Toggle) OHNE Timer zu pausieren
     /// </summary>
     void OnTermTapped()
     {
-        if (!gameActive || !timerPaused) return;
+        if (!gameActive) return;
 
-        // Begriff ausblenden
-        if (mainTermText != null)
-        {
-            mainTermText.gameObject.SetActive(false);
-        }
-
-        // Button deaktivieren
-        if (mainTermButton != null)
-        {
-            mainTermButton.interactable = false;
-        }
-
-        // Timer starten
-        timerPaused = false;
-
-        // Optional: Haptic Feedback
+        // Haptic Feedback
         TriggerHapticFeedback();
 
-        Debug.Log($"Begriff ausgeblendet, Timer gestartet. Verbleibende Zeit: {Mathf.FloorToInt(roundTimeLeft)}s");
+        // FALL 1: Timer ist noch pausiert ? Erstes Tap (Spiel starten)
+        if (timerPaused)
+        {
+            // Begriff ausblenden
+            if (mainTermText != null)
+            {
+                mainTermText.gameObject.SetActive(false);
+                termVisible = false;
+            }
+
+            // Timer starten
+            timerPaused = false;
+
+            // NEU: Correct Button einblenden
+            UpdateButtonVisibility();
+
+            Debug.Log($"Begriff ausgeblendet, Timer gestartet. Verbleibende Zeit: {Mathf.FloorToInt(roundTimeLeft)}s");
+        }
+        // FALL 2: Timer läuft bereits ? Toggle Begriff-Sichtbarkeit
+        else
+        {
+            if (mainTermText != null)
+            {
+                termVisible = !termVisible;
+                mainTermText.gameObject.SetActive(termVisible);
+
+                Debug.Log($"Begriff {(termVisible ? "eingeblendet" : "ausgeblendet")} (Timer läuft weiter)");
+            }
+        }
+    }
+
+    /// <summary>
+    /// NEU: Aktualisiert Button-Sichtbarkeit basierend auf Timer-Zustand
+    /// Correct-Button wird nur angezeigt wenn Timer läuft
+    /// </summary>
+    void UpdateButtonVisibility()
+    {
+        if (correctButton != null)
+        {
+            correctButton.gameObject.SetActive(!timerPaused);
+        }
+
+        // Skip-Button ist immer sichtbar
+        if (skipButton != null)
+        {
+            skipButton.gameObject.SetActive(true);
+        }
     }
 
     void ShowCurrentTerm()
@@ -468,6 +501,7 @@ public class TabuGameManager : MonoBehaviour
         {
             mainTermText.text = term.GetMainTerm(currentLanguage);
             mainTermText.gameObject.SetActive(true);
+            termVisible = true; // NEU: Tracking aktualisieren
         }
 
         if (mainTermButton != null)
@@ -477,6 +511,9 @@ public class TabuGameManager : MonoBehaviour
 
         // NEU: Timer pausieren für nächsten Begriff
         timerPaused = true;
+
+        // NEU: Button-Sichtbarkeit aktualisieren
+        UpdateButtonVisibility();
 
         // Aktualisiere Tabu-Wörter
         UpdateTabuWordsUI(term);
@@ -710,8 +747,8 @@ public class TabuGameManager : MonoBehaviour
         
         scoreText.text = $"{correctTermsThisRound}/{tabuCollection.TermsPerRound}";
         
-        // Tabu Words Header (falls vorhanden)
-        // Header wird im Backup-Code nicht aktualisiert, daher optional
+        // NEU: Button-Sichtbarkeit aktualisieren
+        UpdateButtonVisibility();
         
         // Buttons
         if (correctButton != null && correctButton.GetComponentInChildren<TextMeshProUGUI>() != null)
