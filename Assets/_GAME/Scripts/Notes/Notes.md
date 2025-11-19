@@ -877,6 +877,134 @@ public void TriggerAction()
 5. Taste drücken ? Raum wird geladen
 6. H drücken ? Zurück zum Hub
 
+### TEAM-NAMEN-SYSTEM DETAILS (NEU - 19.11.2025)
+
+#### TeamIconProvider-Erweiterung
+- **icon0Name, icon1Name, icon2Name**: LocalizedText pro Icon (optional)
+- **GetIconName(index)**: Gibt LocalizedText zurück (kann null sein)
+- **GetTeam1IconNameText(Language)**: Helper für direkten String-Zugriff
+- **HasAllNames()**: Validation für Vollständigkeit
+- **Fallback**: "Team 1" / "Team 2" wenn kein Name zugewiesen
+
+#### UpdateTeamNames() Pattern (Alle Game-Manager)
+
+private void UpdateTeamNames()
+{
+    if (teamIconProvider == null) return;
+    
+    // Aktuelles Team (für Explanation/Countdown/Gameplay)
+    string currentTeamName = teamIconProvider.GetTeamIconNameText(currentTeam - 1, currentLanguage);
+    
+    if (explanationTeamNameText != null)
+    {
+        explanationTeamNameText.text = currentTeamName;
+        explanationTeamNameText.gameObject.SetActive(true);
+    }
+    
+    // Results Screen - beide Teams
+    if (team1NameText != null)
+    {
+        team1NameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+        team1NameText.gameObject.SetActive(true);
+    }
+    // ... team2NameText analog
+}
+
+
+#### Aufruf-Zeitpunkte
+- **ShowExplanationScreen()**: Nach UpdateTeamIconForImage()
+- **ShowCountdownScreen()**: Nach UpdateTeamIconForImage()
+- **ShowGameplayScreen()**: Nach UpdateTeamIconForImage()
+- **ShowResultsScreen()**: In UpdateResultsUI() am Anfang
+- **HandleLanguageChanged()**: Bei allen States außer Solution
+
+#### UI-Referenzen (Optional!)
+- **explanationTeamNameText**: Name auf Explanation Screen (aktuelles Team)
+- **countdownTeamNameText**: Name auf Countdown Screen (aktuelles Team)
+- **gameplayTeamNameText**: Name auf Gameplay Screen (aktuelles Team)
+- **team1NameText**: Name auf Results Screen (Team 1)
+- **team2NameText**: Name auf Results Screen (Team 2)
+- **winnerNameText**: Gewinner-Name auf Results Screen (optional)
+
+#### TeamSettingsManager-Fix
+- **OnTeam1/2IconChanged()**: Speichert Index SOFORT in GameDataManager
+- **Reihenfolge kritisch**: SetTeamIconIndex() VOR UpdateTeamNames()
+- **Problem gelöst**: Namen wurden mit altem Icon-Index aktualisiert
+- **Grund**: UpdateTeamNames() liest Index aus GameDataManager
+
+### TEAM-START-REIHENFOLGE DETAILS (NEU - 19.11.2025)
+
+#### Implementierungspattern
+
+// Header-Feld in allen 3 Managern (Puzzle, Fossil, Tabu)
+[Header("Game Flow Settings")]
+[SerializeField] private bool team2StartsFirst = false;
+[Tooltip("Wenn aktiviert, beginnt Team 2 statt Team 1 das Spiel")]
+
+// InitializeGame() - Puzzle/Fossil/Tabu
+currentTeam = team2StartsFirst ? 2 : 1;
+
+// RestartGame() - Fossil/Tabu
+currentTeam = team2StartsFirst ? 2 : 1;
+
+
+#### EndRound() Fix für Fossil & Tabu
+
+**Problem**: 1 Runde pro Team, aber bei team2StartsFirst endete Spiel zu früh
+
+**Alte Logik (FALSCH)**:
+
+if (currentTeam == 1)  // Funktioniert nur wenn Team 1 startet!
+{
+    currentTeam = 2;
+}
+else
+{
+    ShowResults();
+}
+
+
+**Neue Logik (KORREKT)**:
+
+int startingTeam = team2StartsFirst ? 2 : 1;
+int secondTeam = team2StartsFirst ? 1 : 2;
+
+if (currentTeam == startingTeam)
+{
+    currentTeam = secondTeam;  // Nach Startteam ? Zum 2. Team
+    ShowExplanation();
+}
+else
+{
+    ShowResults();  // 2. Team fertig ? Spiel endet
+}
+
+
+#### Warum Puzzle KEINEN Fix braucht
+- **Puzzle hat currentRound-Tracking**: Globaler Round-Counter über beide Teams
+- **GetCurrentTeamRound()**: Mapped globalen Counter auf team-spezifische Runde
+- **Mehrere Runden pro Team**: roundsPerTeam kann > 1 sein
+- **Team-Wechsel-Logik**: Basiert auf totalRounds, nicht auf currentTeam-Wert
+- **Funktioniert automatisch**: Mit oder ohne team2StartsFirst
+
+#### Optional - Automatisches Toggle (NICHT implementiert)
+Falls später gewünscht - Pattern für automatisches Wechseln:
+
+
+// Bei EndRound() nach letztem Team:
+PlayerPrefs.SetInt("LastStartingTeam", currentTeam);
+
+// Bei InitializeGame():
+int lastStartingTeam = PlayerPrefs.GetInt("LastStartingTeam", 1);
+currentTeam = lastStartingTeam == 1 ? 2 : 1;  // Toggle
+
+
+**Grund für manuelle Kontrolle**:
+- Designer hat volle Kontrolle
+- Keine versteckten State-Änderungen
+- Einfacher zu testen und debuggen
+- Pro Collection individuell konfigurierbar
+
 # PROJEKT-UPDATE: TEAM-ICON-AUSWAHL-SYSTEM (05.11.2025)
 
 ## NEUE FEATURES IMPLEMENTIERT
@@ -1202,7 +1330,7 @@ Assets/_GAME/
 ?   ?   ??? LoadScene.cs
 ?   ?   ??? NFCSceneLoader.cs (ERWEITERT - Editor Debug Mode)
 ?   ??? Data/
-?   ?   ??? TeamIconProvider.cs (NEU)
+?   ?   ??? TeamIconProvider.cs (ERWEITERT - Team-Namen)
 ?   ?   ??? GameDataManager.cs (ERWEITERT - Icon-Management)
 ?   ?   ??? DifficultySystem.cs (ERWEITERT - Icon-Indizes)
 ?   ?   ??? PuzzlePiece.cs (DOKUMENTIERT)
@@ -1396,6 +1524,12 @@ private IEnumerator UpdateExplanationUIDelayed()
 - **Time-Up Popup**: Info-Popup, 1 Button (Weiter)
 - **Popup-Text-Updates**: Auch mit WaitForEndOfFrame-Coroutines
 - **Button-Texte**: Lokalisiert über separate LocalizedText Assets (NEU: 3 zusätzliche)
+
+#### Team-Start-Reihenfolge (NEU - 19.11.2025)
+- **team2StartsFirst Checkbox**: Optional Team 2 statt Team 1 starten lassen
+- **InitializeGame()**: currentTeam = team2StartsFirst ? 2 : 1;
+- **RestartGame()**: Gleiche Logik für Consistency
+- **Mehrere Runden**: Funktioniert mit roundsPerTeam-System (Reihenfolge bleibt erhalten)
 
 ## CONTENT-ANFORDERUNGEN (UPDATE 05.11.2025)
 
@@ -2129,6 +2263,15 @@ public void TriggerAction()
 3. **Sofortige Aktionen zuerst**: Haptic Feedback, Audio, UI-Updates vor Callbacks
 4. **Events als Letztes**: Events können State ändern ? sollten letzte Aktion sein
 5. **Race-Conditions beachten**: Asynchrone Callbacks können State-Management brechen
+
+#### Team-Start-Reihenfolge Fix (NEU - 19.11.2025)
+- **team2StartsFirst Checkbox**: Optional Team 2 statt Team 1 starten lassen
+- **EndRound() Fix**: Neue Logik mit startingTeam/secondTeam Pattern
+- **Problem gelöst**: Bei team2StartsFirst endete Spiel nach 1. Runde
+- **Lösung**: Prüft ob startingTeam oder secondTeam gespielt hat
+- **1 Runde pro Team**: Beide Teams spielen immer, unabhängig von Start-Reihenfolge
+
+
 ### NFC-SYSTEM (VOLLSTÄNDIG IMPLEMENTIERT - 29.10.2025)
 
 **NFCManager.cs**
@@ -2504,6 +2647,51 @@ ALLE 4 Game-Manager verwenden identisches Pattern:
 - Context-Menu Validierungs-Tools
 - CreateAssetMenu Integration
 
+### TEAM-START-REIHENFOLGE (NEU - 19.11.2025)
+
+**Problem gelöst**: Bei Spielen mit Team-Abwechslung (Puzzle, Fossil, Tabu) hat immer Team 1 angefangen
+
+**Implementierung - team2StartsFirst Checkbox**:
+- Neue Inspector-Checkbox in allen 3 Game-Managern (Puzzle, Fossil, Tabu)
+- [SerializeField] private bool team2StartsFirst = false;
+- Tooltip: "Wenn aktiviert, beginnt Team 2 statt Team 1 das Spiel"
+- Platzierung: Direkt unter Collection-Feld im "Game Flow Settings" Header
+
+**Technische Details**:
+- InitializeGame(): currentTeam = team2StartsFirst ? 2 : 1;
+- RestartGame(): Gleiche Logik für Consistency
+- EndRound() Fix bei Tabu/Fossil:
+  - Problem: Bei team2StartsFirst endete Spiel nach 1. Runde (Team 1 kam nie dran)
+  - Lösung: Neue Logik mit startingTeam / secondTeam Pattern
+  - Beide Teams spielen jetzt immer, unabhängig von Start-Reihenfolge
+
+**EndRound() Pattern (Tabu & Fossil)**:
+
+int startingTeam = team2StartsFirst ? 2 : 1;
+int secondTeam = team2StartsFirst ? 1 : 2;
+
+if (currentTeam == startingTeam)
+{
+    currentTeam = secondTeam;  // Nach Startteam ? Zum 2. Team
+    ShowExplanation();
+}
+else
+{
+    ShowResults();  // 2. Team fertig ? Spiel Ende
+}
+
+
+**Anwendungsfälle**:
+- Fairness: Teams wechseln sich ab wer anfängt
+- Pro Collection konfigurierbar: Jede PuzzleCollection / FossilCollection / TabuCollection kann eigene Start-Reihenfolge haben
+- Manual Toggle: Designer kann Checkbox per Hand vor jedem Spiel ändern
+- Restart-Safe: Funktioniert auch beim "Nochmal spielen"
+
+**HINWEIS - Automatisches Toggle NICHT implementiert**:
+- Optional wäre gewesen: Automatisches Wechseln zwischen Runs via PlayerPrefs
+- Bewusst NICHT implementiert: Manuelle Kontrolle bevorzugt
+- Falls später gewünscht: PlayerPrefs.SetInt("LastStartingTeam", currentTeam) speichern und beim Start togglen
+
 ## AKTUALISIERTE PROJEKTSTRUKTUR
 
 Assets/_GAME/
@@ -2551,6 +2739,23 @@ Assets/_GAME/
 - **Debug-System**: Umfangreiches Testing-System mit Simulation
 - **Vollständig lokalisiert**: 4 LocalizedText Assets für verschiedene Szenarien
 - **Mobile-optimiert**: Portrait-Vollbild, Touch-optimiert
+
+#### Team-Namen-System (NEU - 19.11.2025)
+- **Lokalisierte Team-Namen**: Jedes Icon hat festen Namen (z.B. "Team Urpferd" / "Team Ancient Horse")
+- **TeamIconProvider erweitert**: icon0Name, icon1Name, icon2Name pro Team (LocalizedText)
+- **Optional anzeigbar**: UI zeigt Namen nur wenn TextMeshProUGUI-Feld vorhanden
+- **Alle Screens**: Explanation, Countdown, Gameplay, Results (wo Platz vorhanden)
+- **TeamSettingsManager**: Namen werden live aktualisiert bei Icon-Wechsel
+- **Fix**: GameDataManager speichert Icon-Index SOFORT beim Wechsel (nicht erst bei Apply)
+- **Integration**: Alle 4 Game-Manager nutzen UpdateTeamNames() Methode
+- **Content**: 6 LocalizedText Assets benötigt (3 pro Team)
+
+#### Team-Start-Reihenfolge-System (NEU - 19.11.2025)
+- **team2StartsFirst Checkbox**: In Puzzle, Fossil, Tabu Game-Managern
+- **Manuelle Kontrolle**: Designer kann pro Collection festlegen wer startet
+- **EndRound() Fix**: Tabu & Fossil-Manager mit neuer Logik für korrekten Team-Wechsel
+- **Fairness**: Teams können sich abwechseln zwischen verschiedenen Räumen
+- **Restart-Safe**: Funktioniert auch beim "Nochmal spielen"
 
 ---
 
