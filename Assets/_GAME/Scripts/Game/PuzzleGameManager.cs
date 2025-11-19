@@ -51,6 +51,7 @@ public class PuzzleGameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI exhibitDescriptionText;
     [SerializeField] private TextMeshProUGUI earnedPointsText;
     [SerializeField] private Button nextTeamButton;
+    [SerializeField] private Button actuallyWrongButton; // NEU (19.11.2025): "Doch nicht" Button
     
     [Header("Results Screen UI")]
     [SerializeField] private Image team1ResultImage;
@@ -71,7 +72,7 @@ public class PuzzleGameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeUpPopupText;
     [SerializeField] private Button timeUpContinueButton;
     
-    [Header("Team Icon Provider (NEU)")]
+    [Header("Team Icon Provider")]
     [SerializeField] private TeamIconProvider teamIconProvider;
     
     [Header("Audio")]
@@ -84,7 +85,7 @@ public class PuzzleGameManager : MonoBehaviour
     [SerializeField] private AudioClip hintSound;
     [SerializeField] private AudioClip giveUpSound;
     
-    [Header("Localized Texts (21 assets needed)")]
+    [Header("Localized Texts (22 assets needed - NEU: +1 für actuallyWrongButton)")]
     [SerializeField] private LocalizedText explanationTitleLocalizedText;
     [SerializeField] private LocalizedText explanationRulesLocalizedText;
     [SerializeField] private LocalizedText startButtonLocalizedText;
@@ -100,6 +101,7 @@ public class PuzzleGameManager : MonoBehaviour
     [SerializeField] private LocalizedText timeUpPopupLocalizedText;
     [SerializeField] private LocalizedText earnedPointsLocalizedText;
     [SerializeField] private LocalizedText nextTeamButtonLocalizedText;
+    [SerializeField] private LocalizedText actuallyWrongButtonLocalizedText; // NEU (19.11.2025)
     [SerializeField] private LocalizedText resultsWinnerLocalizedText;
     [SerializeField] private LocalizedText resultsTieLocalizedText;
     [SerializeField] private LocalizedText backButtonLocalizedText;
@@ -133,6 +135,7 @@ public class PuzzleGameManager : MonoBehaviour
     private int currentHintLevel = 0;
     private int hintsUsed = 0;
     private int currentPossiblePoints;
+    private int lastEarnedPoints = 0; // NEU (19.11.2025): Tracking für "Doch nicht" Button
     
     private float roundTimer;
     private float roundDuration;
@@ -156,8 +159,8 @@ public class PuzzleGameManager : MonoBehaviour
         
         if (GameDataManager.Instance != null)
         {
-            team1Difficulty = GameDataManager.Instance.GetTeamDifficulty(0); // NEU: 0-basiert (war 1)
-            team2Difficulty = GameDataManager.Instance.GetTeamDifficulty(1); // NEU: 0-basiert (war 2)
+            team1Difficulty = GameDataManager.Instance.GetTeamDifficulty(0);
+            team2Difficulty = GameDataManager.Instance.GetTeamDifficulty(1);
         }
         else
         {
@@ -169,7 +172,6 @@ public class PuzzleGameManager : MonoBehaviour
         SetupButtonListeners();
         InitializeGame();
         
-        // NEU: Team-Icons laden
         UpdateTeamIcons();
         
         ShowExplanationScreen();
@@ -241,7 +243,6 @@ public class PuzzleGameManager : MonoBehaviour
         Debug.Log($"Loaded {team1Puzzles.Count} puzzles for Team 1, {team2Puzzles.Count} puzzles for Team 2");
     }
     
-    // NEU: Team-Icons aktualisieren
     private void UpdateTeamIcons()
     {
         if (teamIconProvider == null)
@@ -251,16 +252,10 @@ public class PuzzleGameManager : MonoBehaviour
             return;
         }
         
-        // Explanation Screen Icon
         UpdateTeamIconForImage(explanationTeamImage, currentTeam);
-        
-        // Countdown Screen Icon
         UpdateTeamIconForImage(countdownTeamImage, currentTeam);
-        
-        // Gameplay Icon
         UpdateTeamIconForImage(gameplayTeamImage, currentTeam);
         
-        // Results Screen Icons
         if (team1ResultImage != null)
         {
             Sprite team1Icon = teamIconProvider.GetTeam1Icon();
@@ -278,14 +273,11 @@ public class PuzzleGameManager : MonoBehaviour
         Debug.Log($"Puzzle Game Team Icons updated: Team1={teamIconProvider.GetTeam1Icon()?.name}, Team2={teamIconProvider.GetTeam2Icon()?.name}");
     }
     
-    /// <summary>
-    /// Aktualisiert ein einzelnes Team-Icon basierend auf aktuellem Team
-    /// </summary>
     private void UpdateTeamIconForImage(Image targetImage, int teamNumber)
     {
         if (targetImage == null || teamIconProvider == null) return;
         
-        Sprite icon = teamIconProvider.GetTeamIcon(teamNumber - 1); // teamNumber ist 1-basiert, Provider ist 0-basiert
+        Sprite icon = teamIconProvider.GetTeamIcon(teamNumber - 1);
         if (icon != null)
         {
             targetImage.sprite = icon;
@@ -293,9 +285,6 @@ public class PuzzleGameManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// LEGACY: Fallback auf alte PuzzleCollection team images
-    /// </summary>
     private void SetupTeamIconsLegacy()
     {
         if (team1ResultImage && puzzleCollection.team1Image)
@@ -309,21 +298,16 @@ public class PuzzleGameManager : MonoBehaviour
         UpdateCurrentTeamImageLegacy(gameplayTeamImage);
     }
     
-    /// <summary>
-    /// DEPRECATED: Legacy-Methode - wird durch UpdateTeamIconForImage ersetzt
-    /// </summary>
     private void UpdateCurrentTeamImageLegacy(Image targetImage)
     {
         if (targetImage == null) return;
 
-        // Versuche zuerst TeamIconProvider
         if (teamIconProvider != null)
         {
             UpdateTeamIconForImage(targetImage, currentTeam);
             return;
         }
 
-        // Legacy-Fallback
         if (currentTeam == 1 && puzzleCollection.team1Image)
         {
             targetImage.sprite = puzzleCollection.team1Image;
@@ -352,6 +336,10 @@ public class PuzzleGameManager : MonoBehaviour
         
         if (nextTeamButton != null)
             nextTeamButton.onClick.AddListener(OnNextTeamButtonClicked);
+        
+        // NEU (19.11.2025): "Doch nicht" Button Listener
+        if (actuallyWrongButton != null)
+            actuallyWrongButton.onClick.AddListener(OnActuallyWrongButtonClicked);
         
         if (backButton != null)
             backButton.onClick.AddListener(OnBackButtonClicked);
@@ -389,7 +377,6 @@ public class PuzzleGameManager : MonoBehaviour
         if (explanationScreen != null)
             explanationScreen.SetActive(true);
         
-        // NEU: Icons für aktuelles Team aktualisieren
         UpdateTeamIconForImage(explanationTeamImage, currentTeam);
         
         StartCoroutine(UpdateExplanationUIDelayed());
@@ -411,7 +398,6 @@ public class PuzzleGameManager : MonoBehaviour
         if (countdownScreen != null)
             countdownScreen.SetActive(true);
         
-        // NEU: Icons für aktuelles Team aktualisieren
         UpdateTeamIconForImage(countdownTeamImage, currentTeam);
         
         UpdateCountdownUI();
@@ -430,7 +416,6 @@ public class PuzzleGameManager : MonoBehaviour
         SetupCurrentPuzzle();
         StartRoundTimer();
         
-        // NEU: Icons für aktuelles Team aktualisieren
         UpdateTeamIconForImage(gameplayTeamImage, currentTeam);
         
         StartCoroutine(UpdateGameplayUIDelayed());
@@ -452,6 +437,9 @@ public class PuzzleGameManager : MonoBehaviour
         if (solutionScreen != null)
             solutionScreen.SetActive(true);
         
+        // NEU (19.11.2025): Tracking für "Doch nicht" Button
+        lastEarnedPoints = earnedPoints;
+        
         StartCoroutine(UpdateSolutionUIDelayed(earnedPoints));
         
         PlayHapticFeedback();
@@ -471,7 +459,6 @@ public class PuzzleGameManager : MonoBehaviour
         if (resultsScreen != null)
             resultsScreen.SetActive(true);
         
-        // NEU: Icons auf Results Screen aktualisieren
         UpdateTeamIcons();
 
         SaveResults();
@@ -481,9 +468,6 @@ public class PuzzleGameManager : MonoBehaviour
         PlayHapticFeedback();
     }
 
-    /// <summary>
-    /// Speichert die Ergebnisse des Spiels im GameDataManager
-    /// </summary>
     private void SaveResults()
     {
         if (GameDataManager.Instance == null)
@@ -500,14 +484,14 @@ public class PuzzleGameManager : MonoBehaviour
 
         string collectionName = puzzleCollection.GetCollectionName(currentLanguage);
         int roomNumber = puzzleCollection.roomNumber;
-        int totalRounds = puzzleCollection.roundsPerTeam; // Anzahl Runden pro Team
+        int totalRounds = puzzleCollection.roundsPerTeam;
 
         GameDataManager.Instance.SaveRoomResult(
             collectionName,
             roomNumber,
             team1Score,
             team2Score,
-            totalRounds * 2 // Total Questions = Runden pro Team * 2 Teams
+            totalRounds * 2
         );
 
         Debug.Log($"Puzzle results saved: {collectionName} (Room {roomNumber}) - Team1: {team1Score}, Team2: {team2Score}");
@@ -525,8 +509,6 @@ public class PuzzleGameManager : MonoBehaviour
     
     private void UpdateExplanationUI()
     {
-        // Team image - NEU: bereits in ShowExplanationScreen() aktualisiert
-        
         if (explanationTitleText != null)
         {
             explanationTitleText.text = GetLocalizedText(explanationTitleLocalizedText, "Bilderrätsel");
@@ -554,13 +536,11 @@ public class PuzzleGameManager : MonoBehaviour
     
     private void UpdateCountdownUI()
     {
-        // Team image - NEU: bereits in ShowCountdownScreen() aktualisiert
+        // Team image already updated in ShowCountdownScreen()
     }
     
     private void UpdateGameplayUI()
     {
-        // Team image - NEU: bereits in ShowGameplayScreen() aktualisiert
-        
         if (teamScoreText != null)
         {
             int currentScore = currentTeam == 1 ? team1Score : team2Score;
@@ -694,28 +674,31 @@ public class PuzzleGameManager : MonoBehaviour
         {
             nextTeamButton.GetComponentInChildren<TextMeshProUGUI>().text = GetLocalizedText(nextTeamButtonLocalizedText, "Nächstes Team");
         }
+        
+        // NEU (19.11.2025): "Doch nicht" Button Text
+        if (actuallyWrongButton != null && actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+        {
+            actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>().text = 
+                GetLocalizedText(actuallyWrongButtonLocalizedText, "Doch nicht");
+        }
     }
     
     private void UpdateResultsUI()
     {
-        // Team 1 - NEU: bereits in ShowResultsScreen() aktualisiert
         if (team1ScoreText != null)
         {
             team1ScoreText.text = team1Score.ToString();
         }
         
-        // Team 2 - NEU: bereits in ShowResultsScreen() aktualisiert
         if (team2ScoreText != null)
         {
             team2ScoreText.text = team2Score.ToString();
         }
         
-        // Winner
         if (winnerTeamImage != null && winnerText != null)
         {
             if (team1Score > team2Score)
             {
-                // NEU: Verwende TeamIconProvider
                 if (teamIconProvider != null)
                 {
                     Sprite team1Icon = teamIconProvider.GetTeam1Icon();
@@ -725,7 +708,7 @@ public class PuzzleGameManager : MonoBehaviour
                         winnerTeamImage.gameObject.SetActive(true);
                     }
                 }
-                else if (puzzleCollection != null && puzzleCollection.team1Image != null) // Legacy-Fallback
+                else if (puzzleCollection != null && puzzleCollection.team1Image != null)
                 {
                     winnerTeamImage.sprite = puzzleCollection.team1Image;
                     winnerTeamImage.gameObject.SetActive(true);
@@ -736,7 +719,6 @@ public class PuzzleGameManager : MonoBehaviour
             }
             else if (team2Score > team1Score)
             {
-                // NEU: Verwende TeamIconProvider
                 if (teamIconProvider != null)
                 {
                     Sprite team2Icon = teamIconProvider.GetTeam2Icon();
@@ -746,7 +728,7 @@ public class PuzzleGameManager : MonoBehaviour
                         winnerTeamImage.gameObject.SetActive(true);
                     }
                 }
-                else if (puzzleCollection != null && puzzleCollection.team2Image != null) // Legacy-Fallback
+                else if (puzzleCollection != null && puzzleCollection.team2Image != null)
                 {
                     winnerTeamImage.sprite = puzzleCollection.team2Image;
                     winnerTeamImage.gameObject.SetActive(true);
@@ -768,7 +750,7 @@ public class PuzzleGameManager : MonoBehaviour
         }
     }
     
-    // =================================-----------
+    // ============================================
     // GAMEPLAY LOGIC
     // ============================================
     
@@ -980,6 +962,46 @@ public class PuzzleGameManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// NEU (19.11.2025): "Doch nicht" Button Handler
+    /// Wird aufgerufen wenn Spieler nach Anzeige der Lösung merkt, dass er falsch lag.
+    /// Verhält sich wie NextTeamButton, aber gibt 0 Punkte statt der erarbeiteten Punkte.
+    /// </summary>
+    private void OnActuallyWrongButtonClicked()
+    {
+        PlayHapticFeedback();
+        
+        // Punkte rückgängig machen: Bereits vergebene Punkte abziehen
+        if (lastEarnedPoints > 0)
+        {
+            if (currentTeam == 1)
+            {
+                team1Score -= lastEarnedPoints;
+            }
+            else
+            {
+                team2Score -= lastEarnedPoints;
+            }
+            
+            Debug.Log($"[Actually Wrong] Team {currentTeam}: Removed {lastEarnedPoints} points. New total: {(currentTeam == 1 ? team1Score : team2Score)}");
+        }
+        
+        // Weiter wie bei NextTeamButton
+        currentRound++;
+        
+        int totalRounds = puzzleCollection.roundsPerTeam * 2;
+        
+        if (currentRound >= totalRounds)
+        {
+            ShowResultsScreen();
+        }
+        else
+        {
+            currentTeam = currentTeam == 1 ? 2 : 1;
+            ShowExplanationScreen();
+        }
+    }
+    
     private void OnStartButtonClicked()
     {
         PlayHapticFeedback();
@@ -1026,7 +1048,7 @@ public class PuzzleGameManager : MonoBehaviour
                 UpdateGameplayUI();
                 break;
             case GameState.Solution:
-                UpdateSolutionUI(0);
+                UpdateSolutionUI(lastEarnedPoints); // NEU: Nutzt lastEarnedPoints
                 break;
             case GameState.Results:
                 UpdateResultsUI();
