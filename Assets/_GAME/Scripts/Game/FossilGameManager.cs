@@ -20,9 +20,12 @@ public class FossilGameManager : MonoBehaviour
     [Header("Explanation Screen")]
     public TextMeshProUGUI explanationText;
     public Image currentTeamImageExplanation;
+    [SerializeField] private TextMeshProUGUI explanationTeamNameText; // NEU (19.11.2025) - Optional
     public Button startButton;
 
     [Header("Countdown")]
+    [SerializeField] private Image countdownTeamImage;
+    [SerializeField] private TextMeshProUGUI countdownTeamNameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI countdownText;
 
     [Header("Gameplay UI")]
@@ -30,6 +33,7 @@ public class FossilGameManager : MonoBehaviour
     public TextMeshProUGUI fossilNameText;
     public TextMeshProUGUI timerText;
     public Image currentTeamImage;
+    [SerializeField] private TextMeshProUGUI gameplayTeamNameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI scoreText;
 
     [Header("Input")]
@@ -38,10 +42,13 @@ public class FossilGameManager : MonoBehaviour
     [Header("Result Screen")]
     public Image team1ImageResult;
     public TextMeshProUGUI team1ScoreText;
+    [SerializeField] private TextMeshProUGUI team1NameText; // NEU (19.11.2025) - Optional
     public Image team2ImageResult;
     public TextMeshProUGUI team2ScoreText;
+    [SerializeField] private TextMeshProUGUI team2NameText; // NEU (19.11.2025) - Optional
     public Image winnerTeamImage;
     public TextMeshProUGUI winnerText;
+    [SerializeField] private TextMeshProUGUI winnerNameText; // NEU (19.11.2025) - Optional
     public Button playAgainButton;
     public Button backToMenuButton;
     
@@ -123,16 +130,19 @@ public class FossilGameManager : MonoBehaviour
         if (explanationUI.activeInHierarchy)
         {
             ShowExplanation();
+            UpdateTeamNames();
         }
 
         if (gameplayUI.activeInHierarchy)
         {
             UpdateGameplayUI();
+            UpdateTeamNames();
         }
 
         if (resultUI.activeInHierarchy)
         {
             UpdateResultsUI();
+            UpdateTeamNames();
         }
     }
 
@@ -178,6 +188,48 @@ public class FossilGameManager : MonoBehaviour
         countdownUI.SetActive(false);
         gameplayUI.SetActive(false);
         resultUI.SetActive(false);
+    }
+
+    private void UpdateTeamNames()
+    {
+        if (teamIconProvider == null) return;
+
+        // Aktuelles Team (für Explanation/Countdown/Gameplay)
+        string currentTeamName = teamIconProvider.GetTeamIconNameText(currentTeam - 1, currentLanguage);
+
+        // Explanation Screen - aktuelles Team
+        if (explanationTeamNameText != null)
+        {
+            explanationTeamNameText.text = currentTeamName;
+            explanationTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Countdown Screen - aktuelles Team
+        if (countdownTeamNameText != null)
+        {
+            countdownTeamNameText.text = currentTeamName;
+            countdownTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Gameplay Screen - aktuelles Team
+        if (gameplayTeamNameText != null)
+        {
+            gameplayTeamNameText.text = currentTeamName;
+            gameplayTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Results Screen - beide Teams
+        if (team1NameText != null)
+        {
+            team1NameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+            team1NameText.gameObject.SetActive(true);
+        }
+
+        if (team2NameText != null)
+        {
+            team2NameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+            team2NameText.gameObject.SetActive(true);
+        }
     }
 
     // NEU: Team-Icons aktualisieren
@@ -288,6 +340,7 @@ public class FossilGameManager : MonoBehaviour
     
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
+        UpdateTeamNames();
     }
 
     string GetLocalizedInputModeInfo()
@@ -536,6 +589,12 @@ public class FossilGameManager : MonoBehaviour
     {
         explanationUI.SetActive(false);
         countdownUI.SetActive(true);
+
+        UpdateTeamIconForImage(countdownTeamImage, currentTeam);
+
+        // NEU (19.11.2025): Team-Namen aktualisieren
+        UpdateTeamNames();
+
         StartCoroutine(CountdownCoroutine());
     }
 
@@ -754,6 +813,28 @@ public class FossilGameManager : MonoBehaviour
         team1ScoreText.text = $"{team1Score} {pointsLabel}";
         team2ScoreText.text = $"{team2Score} {pointsLabel}";
 
+        // NEU (19.11.2025): Namen aktualisieren (optional)
+        UpdateTeamNames();
+
+        // NEU: Gewinner-Name anzeigen (optional)
+        if (winnerNameText != null && teamIconProvider != null)
+        {
+            if (team1Score > team2Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else if (team2Score > team1Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else
+            {
+                winnerNameText.gameObject.SetActive(false);
+            }
+        }
+
         if (team1Score > team2Score)
         {
             string winnerFormat = GetLocalizedText(winnerLocalizedText, GetDefaultWinner);
@@ -825,6 +906,7 @@ public class FossilGameManager : MonoBehaviour
     {
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImage, currentTeam);
+        UpdateTeamNames();
         scoreText.text = $"{correctFossilsThisRound}/{fossilCollection.fossilsPerRound}";
     }
 

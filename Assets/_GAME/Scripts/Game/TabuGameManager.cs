@@ -20,9 +20,12 @@ public class TabuGameManager : MonoBehaviour
     [Header("Explanation Screen")]
     public TextMeshProUGUI explanationText;
     public Image currentTeamImageExplanation;
+    [SerializeField] private TextMeshProUGUI explanationTeamNameText; // NEU (19.11.2025) - Optional
     public Button startButton;
 
     [Header("Countdown")]
+    [SerializeField] private Image countdownTeamImage;
+    [SerializeField] private TextMeshProUGUI countdownTeamNameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI countdownText;
 
     [Header("Gameplay UI")]
@@ -33,16 +36,20 @@ public class TabuGameManager : MonoBehaviour
     public GameObject tabuWordPrefab;
     public TextMeshProUGUI timerText;
     public Image currentTeamImage;
+    [SerializeField] private TextMeshProUGUI gameplayTeamNameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI scoreText;
     public Button correctButton;
     public Button skipButton;
 
     [Header("Result Screen")]
     public Image team1ImageResult;
+    [SerializeField] private TextMeshProUGUI team1NameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI team1ScoreText;
     public Image team2ImageResult;
+    [SerializeField] private TextMeshProUGUI team2NameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI team2ScoreText;
     public Image winnerTeamImage;
+    [SerializeField] private TextMeshProUGUI winnerNameText; // NEU (19.11.2025) - Optional
     public TextMeshProUGUI winnerText;
     public Button playAgainButton;
     public Button backToMenuButton;
@@ -123,16 +130,19 @@ public class TabuGameManager : MonoBehaviour
         if (explanationUI.activeInHierarchy)
         {
             ShowExplanation();
+            UpdateTeamNames();
         }
 
         if (gameplayUI.activeInHierarchy)
         {
             UpdateGameplayUI();
+            UpdateTeamNames();
         }
 
         if (resultUI.activeInHierarchy)
         {
             UpdateResultsUI();
+            UpdateTeamNames();
         }
     }
 
@@ -184,6 +194,48 @@ public class TabuGameManager : MonoBehaviour
         countdownUI.SetActive(false);
         gameplayUI.SetActive(false);
         resultUI.SetActive(false);
+    }
+
+    private void UpdateTeamNames()
+    {
+        if (teamIconProvider == null) return;
+
+        // Aktuelles Team (für Explanation/Countdown/Gameplay)
+        string currentTeamName = teamIconProvider.GetTeamIconNameText(currentTeam - 1, currentLanguage);
+
+        // Explanation Screen - aktuelles Team
+        if (explanationTeamNameText != null)
+        {
+            explanationTeamNameText.text = currentTeamName;
+            explanationTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Countdown Screen - aktuelles Team
+        if (countdownTeamNameText != null)
+        {
+            countdownTeamNameText.text = currentTeamName;
+            countdownTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Gameplay Screen - aktuelles Team
+        if (gameplayTeamNameText != null)
+        {
+            gameplayTeamNameText.text = currentTeamName;
+            gameplayTeamNameText.gameObject.SetActive(true);
+        }
+
+        // Results Screen - beide Teams
+        if (team1NameText != null)
+        {
+            team1NameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+            team1NameText.gameObject.SetActive(true);
+        }
+
+        if (team2NameText != null)
+        {
+            team2NameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+            team2NameText.gameObject.SetActive(true);
+        }
     }
 
     // Team-Icons aktualisieren
@@ -269,7 +321,8 @@ public class TabuGameManager : MonoBehaviour
     
         // Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
-        
+        UpdateTeamNames();
+
         // Start Button
         if (startButton != null && startButton.GetComponentInChildren<TextMeshProUGUI>() != null)
         {
@@ -312,6 +365,9 @@ public class TabuGameManager : MonoBehaviour
 
     void StartCountdown()
     {
+        UpdateTeamIconForImage(countdownTeamImage, currentTeam);
+        UpdateTeamNames();
+
         explanationUI.SetActive(false);
         countdownUI.SetActive(true);
         StartCoroutine(CountdownCoroutine());
@@ -703,6 +759,29 @@ public class TabuGameManager : MonoBehaviour
 
     void UpdateResultsUI()
     {
+
+        // NEU (19.11.2025): Namen aktualisieren (optional)
+        UpdateTeamNames();
+
+        // NEU: Gewinner-Name anzeigen (optional)
+        if (winnerNameText != null && teamIconProvider != null)
+        {
+            if (team1Score > team2Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else if (team2Score > team1Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else
+            {
+                winnerNameText.gameObject.SetActive(false);
+            }
+        }
+
         // Scores mit lokalisierten Team-Labels
         string team1Label = GetLocalizedText(resultsTeam1LabelLocalizedText, "Team 1");
         string team2Label = GetLocalizedText(resultsTeam2LabelLocalizedText, "Team 2");
@@ -788,7 +867,8 @@ public class TabuGameManager : MonoBehaviour
     {
         // NEU: Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImage, currentTeam);
-        
+        UpdateTeamNames();
+
         scoreText.text = $"{correctTermsThisRound}/{tabuCollection.TermsPerRound}";
         
         // Button-Sichtbarkeit aktualisieren

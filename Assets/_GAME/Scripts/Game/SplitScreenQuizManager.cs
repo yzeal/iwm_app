@@ -43,10 +43,13 @@ public class SplitScreenQuizManager : MonoBehaviour
     [Header("Result Screen - ANALOG ZU PUZZLE")]
     public TextMeshProUGUI resultsMessageText;
     public Image winnerTeamIcon;
+    [SerializeField] private TextMeshProUGUI winnerNameText;
     public Image team1ResultIcon;
     public Image team2ResultIcon;
     public TextMeshProUGUI team1ScoreText;
+    [SerializeField] private TextMeshProUGUI team1NameText;
     public TextMeshProUGUI team2ScoreText;
+    [SerializeField] private TextMeshProUGUI team2NameText;
     public Button playAgainButton;
     public Button continueToNextRoomButton;
     
@@ -128,7 +131,30 @@ public class SplitScreenQuizManager : MonoBehaviour
             _ => $"Team {teamNumber}"
         };
     }
-    
+
+    /// <summary>
+    /// NEU (19.11.2025): Aktualisiert Team-Namen auf ALLEN Screens (optional, nur wenn TextFields zugewiesen)
+    /// Wird aufgerufen bei ShowExplanationScreen(), ShowCountdownScreen(), ShowGameplayScreen(), ShowResultsScreen()
+    /// und bei HandleLanguageChanged()
+    /// </summary>
+    private void UpdateTeamNames()
+    {
+        if (teamIconProvider == null) return;
+
+        // Results Screen - beide Teams
+        if (team1NameText != null)
+        {
+            team1NameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+            team1NameText.gameObject.SetActive(true);
+        }
+
+        if (team2NameText != null)
+        {
+            team2NameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+            team2NameText.gameObject.SetActive(true);
+        }
+    }
+
     void UpdateTeamIcons()
     {
         if (teamIconProvider == null)
@@ -661,7 +687,29 @@ public class SplitScreenQuizManager : MonoBehaviour
         resultUI.SetActive(true);
         
         UpdateTeamIcons();
-        
+
+        // NEU (19.11.2025): Namen aktualisieren (optional)
+        UpdateTeamNames();
+
+        // NEU: Gewinner-Name anzeigen (optional)
+        if (winnerNameText != null && teamIconProvider != null)
+        {
+            if (player1.score > player2.score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else if (player2.score > player1.score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else
+            {
+                winnerNameText.gameObject.SetActive(false);
+            }
+        }
+
         string winnerMessage;
         int winningTeam = 0;
         

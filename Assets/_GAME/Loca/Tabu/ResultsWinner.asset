@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: tabu_resultswinner
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: gewinnt!
-  englishStandard: ' wins! '
-  germanSimple: gewinnt!
-  englishSimple: 'wins! '
+  germanStandard: Gewonnen hat
+  englishStandard: The winner is
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0

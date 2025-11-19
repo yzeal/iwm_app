@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: stirnraten_winner
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: Gewinner!
-  englishStandard: Winner!
-  germanSimple: Gewinner!
-  englishSimple: Winner!
+  germanStandard: Gewonnen hat
+  englishStandard: The winner is
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0

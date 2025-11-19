@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textKey: splitquiz_team2name
   description: "Beschreibung des Texts f\xFCr Editor"
-  germanStandard: Team 2
-  englishStandard: Team 2
-  germanSimple: Team 2
-  englishSimple: Team 2
+  germanStandard: Gewonnen hat
+  englishStandard: The winner is
+  germanSimple: 
+  englishSimple: 
   enableDebugLogs: 0
