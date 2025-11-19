@@ -733,12 +733,22 @@ public class PuzzleGameManager : MonoBehaviour
         {
             nextTeamButton.GetComponentInChildren<TextMeshProUGUI>().text = GetLocalizedText(nextTeamButtonLocalizedText, "Nächstes Team");
         }
-        
+
         // NEU (19.11.2025): "Doch nicht" Button Text
-        if (actuallyWrongButton != null && actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+        if (actuallyWrongButton != null)
         {
-            actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>().text = 
-                GetLocalizedText(actuallyWrongButtonLocalizedText, "Doch nicht");
+            // Button nur anzeigen wenn Spieler tatsächlich Punkte bekommen hat
+            bool showButton = earnedPoints > 0;
+            actuallyWrongButton.gameObject.SetActive(showButton);
+
+            // Text nur setzen wenn Button sichtbar ist
+            if (showButton && actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>() != null)
+            {
+                actuallyWrongButton.GetComponentInChildren<TextMeshProUGUI>().text =
+                    GetLocalizedText(actuallyWrongButtonLocalizedText, "Doch nicht");
+            }
+
+            Debug.Log($"[Solution Screen] 'Doch nicht' Button: {(showButton ? "VISIBLE" : "HIDDEN")} (earnedPoints={earnedPoints})");
         }
     }
     
