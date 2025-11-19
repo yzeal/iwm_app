@@ -731,6 +731,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameDataManager
   enableCloudSave: 0
   enableLocalBackup: 1
+  enableVerboseLogging: 0
 --- !u!1 &378412564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1619,7 +1620,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -15, y: 262.00012}
-  m_SizeDelta: {x: 245.24, y: 52.644}
+  m_SizeDelta: {x: 761.0392, y: 52.644}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &750793081
 MonoBehaviour:
@@ -2269,7 +2270,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -15, y: 262}
-  m_SizeDelta: {x: 245.24, y: 52.644}
+  m_SizeDelta: {x: 761.0392, y: 52.644}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1129246329
 MonoBehaviour:
@@ -3123,14 +3124,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeamSettingsManager
   team1Icon: {fileID: 0}
   team1Label: {fileID: 750793081}
+  team1NameText: {fileID: 750793081}
   team1DifficultyGroup: {fileID: 182209536}
   team1IconGroup: {fileID: 1872017896}
   team2Icon: {fileID: 0}
   team2Label: {fileID: 1129246329}
+  team2NameText: {fileID: 1129246329}
   team2DifficultyGroup: {fileID: 714558070}
   team2IconGroup: {fileID: 715083657}
   applyButton: {fileID: 344060436}
   backButton: {fileID: 2131695632}
+  teamIconProvider: {fileID: 11400000, guid: f94b5d49efe57434295d597f52b96e8c, type: 2}
   defaultTeam1Icon: {fileID: 21300000, guid: f561cbe4cbf5e9446b72e70d910ccc98, type: 3}
   defaultTeam2Icon: {fileID: 21300000, guid: 92ba78a3ad14fa94a8288756fc8dae5d, type: 3}
   audioSource: {fileID: 0}

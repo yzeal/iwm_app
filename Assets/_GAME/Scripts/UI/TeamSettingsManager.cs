@@ -8,18 +8,23 @@ public class TeamSettingsManager : MonoBehaviour
     [Header("Team 1 UI (Bottom)")]
     public Image team1Icon;
     public TextMeshProUGUI team1Label;
+    public TextMeshProUGUI team1NameText; // NEU (19.11.2025): Anzeige des Icon-Namens
     public DifficultyRadioGroup team1DifficultyGroup;
-    public TeamIconRadioGroup team1IconGroup; // NEU
+    public TeamIconRadioGroup team1IconGroup;
     
     [Header("Team 2 UI (Top)")]
     public Image team2Icon;
     public TextMeshProUGUI team2Label;
+    public TextMeshProUGUI team2NameText; // NEU (19.11.2025): Anzeige des Icon-Namens
     public DifficultyRadioGroup team2DifficultyGroup;
-    public TeamIconRadioGroup team2IconGroup; // NEU
+    public TeamIconRadioGroup team2IconGroup;
     
     [Header("Action Buttons")]
     public Button applyButton;
     public Button backButton;
+    
+    [Header("Team Icon Provider (NEU)")]
+    [SerializeField] private TeamIconProvider teamIconProvider;
     
     [Header("Team Icons (Default) - DEPRECATED")]
     public Sprite defaultTeam1Icon;
@@ -33,8 +38,17 @@ public class TeamSettingsManager : MonoBehaviour
     [Header("Mobile UI Settings")]
     [SerializeField] private bool adaptToSafeArea = true;
     
+    private LanguageSystem.Language currentLanguage;
+    
     void Start()
     {
+        // Lokalisierung initialisieren
+        currentLanguage = LanguageSystem.Instance != null ? 
+            LanguageSystem.Instance.GetCurrentLanguage() : LanguageSystem.Language.German_Standard;
+        
+        // Event-Listener für Sprachwechsel
+        LanguageSystem.OnLanguageChanged += OnLanguageChanged;
+        
         // Mobile-spezifische Initialisierung
         if (adaptToSafeArea)
         {
@@ -43,6 +57,23 @@ public class TeamSettingsManager : MonoBehaviour
         
         InitializeSettings();
         SetupUI();
+        
+        // NEU: Namen initial aktualisieren
+        UpdateTeamNames();
+    }
+    
+    void OnDestroy()
+    {
+        LanguageSystem.OnLanguageChanged -= OnLanguageChanged;
+    }
+    
+    /// <summary>
+    /// NEU (19.11.2025): Wird bei Sprachwechsel aufgerufen
+    /// </summary>
+    void OnLanguageChanged(LanguageSystem.Language newLanguage)
+    {
+        currentLanguage = newLanguage;
+        UpdateTeamNames();
     }
     
     /// <summary>
@@ -94,7 +125,7 @@ public class TeamSettingsManager : MonoBehaviour
         team1DifficultyGroup.SetSelectedDifficulty(team1Difficulty);
         team2DifficultyGroup.SetSelectedDifficulty(team2Difficulty);
         
-        // NEU: Setze Icon-Auswahl
+        // Setze Icon-Auswahl
         if (team1IconGroup != null)
             team1IconGroup.SetSelectedIcon(team1IconIndex);
         if (team2IconGroup != null)
@@ -117,7 +148,7 @@ public class TeamSettingsManager : MonoBehaviour
         team1DifficultyGroup.OnDifficultyChanged += OnTeam1DifficultyChanged;
         team2DifficultyGroup.OnDifficultyChanged += OnTeam2DifficultyChanged;
         
-        // NEU: Setup Icon Group Events
+        // Setup Icon Group Events
         if (team1IconGroup != null)
             team1IconGroup.OnIconChanged += OnTeam1IconChanged;
         if (team2IconGroup != null)
@@ -165,19 +196,88 @@ public class TeamSettingsManager : MonoBehaviour
         TriggerHapticFeedback();
     }
     
-    // NEU: Icon-Change-Handler
+    /// <summary>
+    /// NEU (19.11.2025): Icon-Change-Handler - aktualisiert sofort GameDataManager UND Namen
+    /// FIX: GameDataManager MUSS vor UpdateTeamNames() aktualisiert werden!
+    /// </summary>
     void OnTeam1IconChanged(int newIconIndex)
     {
         PlayButtonSound();
+        
+        // FIX: Sofort im GameDataManager speichern
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.SetTeamIconIndex(0, newIconIndex);
+        }
+        
+        // Jetzt Namen aktualisieren (liest korrekten Index aus GameDataManager)
+        UpdateTeamNames();
+        
         Debug.Log($"Team 1 icon changed to: {newIconIndex}");
         TriggerHapticFeedback();
     }
     
+    /// <summary>
+    /// NEU (19.11.2025): Icon-Change-Handler - aktualisiert sofort GameDataManager UND Namen
+    /// FIX: GameDataManager MUSS vor UpdateTeamNames() aktualisiert werden!
+    /// </summary>
     void OnTeam2IconChanged(int newIconIndex)
     {
         PlayButtonSound();
+        
+        // FIX: Sofort im GameDataManager speichern
+        if (GameDataManager.Instance != null)
+        {
+            GameDataManager.Instance.SetTeamIconIndex(1, newIconIndex);
+        }
+        
+        // Jetzt Namen aktualisieren (liest korrekten Index aus GameDataManager)
+        UpdateTeamNames();
+        
         Debug.Log($"Team 2 icon changed to: {newIconIndex}");
         TriggerHapticFeedback();
+    }
+    
+    /// <summary>
+    /// NEU (19.11.2025): Aktualisiert die Team-Namen basierend auf ausgewählten Icons
+    /// </summary>
+    void UpdateTeamNames()
+    {
+        if (teamIconProvider == null)
+        {
+            Debug.LogWarning("TeamIconProvider nicht zugewiesen! Namen können nicht aktualisiert werden.");
+            
+            // Fallback: Zeige generische Namen
+            if (team1NameText != null)
+            {
+                team1NameText.text = "Team 1";
+                team1NameText.gameObject.SetActive(true);
+            }
+            if (team2NameText != null)
+            {
+                team2NameText.text = "Team 2";
+                team2NameText.gameObject.SetActive(true);
+            }
+            return;
+        }
+        
+        // Team 1 Name
+        if (team1NameText != null)
+        {
+            string name = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+            team1NameText.text = name;
+            team1NameText.gameObject.SetActive(true);
+        }
+        
+        // Team 2 Name
+        if (team2NameText != null)
+        {
+            string name = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+            team2NameText.text = name;
+            team2NameText.gameObject.SetActive(true);
+        }
+        
+        Debug.Log($"Team Names updated: Team1={teamIconProvider.GetTeam1IconNameText(currentLanguage)}, Team2={teamIconProvider.GetTeam2IconNameText(currentLanguage)}");
     }
     
     void TriggerHapticFeedback()
@@ -203,7 +303,7 @@ public class TeamSettingsManager : MonoBehaviour
         DifficultyLevel team1Difficulty = team1DifficultyGroup.GetSelectedDifficulty();
         DifficultyLevel team2Difficulty = team2DifficultyGroup.GetSelectedDifficulty();
         
-        // NEU: Icon-Indizes holen
+        // Icon-Indizes holen (wurden bereits bei OnIconChanged gespeichert)
         int team1IconIndex = team1IconGroup != null ? team1IconGroup.GetSelectedIconIndex() : 0;
         int team2IconIndex = team2IconGroup != null ? team2IconGroup.GetSelectedIconIndex() : 0;
         
@@ -211,6 +311,7 @@ public class TeamSettingsManager : MonoBehaviour
         if (GameDataManager.Instance != null)
         {
             GameDataManager.Instance.SetTeamDifficulties(team1Difficulty, team2Difficulty);
+            // Icon-Indizes sind bereits gespeichert, aber zur Sicherheit nochmal setzen
             GameDataManager.Instance.SetTeamIconIndices(team1IconIndex, team2IconIndex);
             Debug.Log($"Settings applied: Team1={team1Difficulty} (Icon {team1IconIndex}), Team2={team2Difficulty} (Icon {team2IconIndex})");
         }
@@ -295,6 +396,11 @@ public class TeamSettingsManager : MonoBehaviour
             Debug.Log($"Current Settings: Team1={GameDataManager.Instance.GetTeamDifficulty(0)} (Icon {GameDataManager.Instance.GetTeamIconIndex(0)}), " +
                      $"Team2={GameDataManager.Instance.GetTeamDifficulty(1)} (Icon {GameDataManager.Instance.GetTeamIconIndex(1)})");
         }
+        
+        if (teamIconProvider != null)
+        {
+            Debug.Log($"Team Names: Team1={teamIconProvider.GetTeam1IconNameText(currentLanguage)}, Team2={teamIconProvider.GetTeam2IconNameText(currentLanguage)}");
+        }
     }
     
     [ContextMenu("Test Mobile Adaptations")]
@@ -303,6 +409,13 @@ public class TeamSettingsManager : MonoBehaviour
         AdaptToSafeArea();
         AdaptButtonsForMobile();
         Debug.Log($"Mobile adaptations applied. Platform: {Application.platform}");
+    }
+    
+    [ContextMenu("Test Update Team Names")]
+    void TestUpdateTeamNames()
+    {
+        UpdateTeamNames();
+        Debug.Log("Team names manually updated");
     }
     
     #endregion
