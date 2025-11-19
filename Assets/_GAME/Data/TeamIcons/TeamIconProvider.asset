@@ -14,9 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeamIconProvider
   team1Icons:
     icon0: {fileID: 7737758374531229269, guid: f082ef21c5aedd840a1d0dfd4bc226c9, type: 3}
+    icon0Name: {fileID: 11400000, guid: 70d813331f29542428824457cc858f80, type: 2}
     icon1: {fileID: -5297267953587320536, guid: 4f6b3e6d83af0e04699d02e6417df77b, type: 3}
+    icon1Name: {fileID: 11400000, guid: 74b6f7e81e6085a47ab2e2668783e90b, type: 2}
     icon2: {fileID: 7413952595828912886, guid: 4733e6d54e2a8c342bacc94a28e116fd, type: 3}
+    icon2Name: {fileID: 11400000, guid: 0c85860d5beb0e642bdba5568d69d785, type: 2}
   team2Icons:
     icon0: {fileID: 8548759473956336968, guid: fa188759a03612e49a37e14977f1ac1a, type: 3}
+    icon0Name: {fileID: 11400000, guid: 4de781756431e5848806adca46b931e1, type: 2}
     icon1: {fileID: 5472611288588223021, guid: c68d9e9e98a35504ab164dba33c0bf36, type: 3}
+    icon1Name: {fileID: 11400000, guid: 25544d53979e068458213c6cf6f40c01, type: 2}
     icon2: {fileID: -6008647230880515285, guid: e6c014e4810650d428d178771a9b0698, type: 3}
+    icon2Name: {fileID: 11400000, guid: 08cefad46220f3a4d9939b4f5c622fff, type: 2}
