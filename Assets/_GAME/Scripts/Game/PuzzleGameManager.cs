@@ -24,16 +24,19 @@ public class PuzzleGameManager : MonoBehaviour
     
     [Header("Explanation Screen UI")]
     [SerializeField] private Image explanationTeamImage;
+    [SerializeField] private TextMeshProUGUI explanationTeamNameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI explanationTitleText;
     [SerializeField] private TextMeshProUGUI explanationRulesText;
     [SerializeField] private Button startButton;
     
     [Header("Countdown Screen UI")]
     [SerializeField] private Image countdownTeamImage;
+    [SerializeField] private TextMeshProUGUI countdownTeamNameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI countdownText;
     
     [Header("Gameplay Screen UI")]
     [SerializeField] private Image gameplayTeamImage;
+    [SerializeField] private TextMeshProUGUI gameplayTeamNameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI teamScoreText;
     [SerializeField] private TextMeshProUGUI roundCounterText;
     [SerializeField] private TextMeshProUGUI timerText;
@@ -55,10 +58,13 @@ public class PuzzleGameManager : MonoBehaviour
     
     [Header("Results Screen UI")]
     [SerializeField] private Image team1ResultImage;
+    [SerializeField] private TextMeshProUGUI team1NameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI team1ScoreText;
     [SerializeField] private Image team2ResultImage;
+    [SerializeField] private TextMeshProUGUI team2NameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI team2ScoreText;
     [SerializeField] private Image winnerTeamImage;
+    [SerializeField] private TextMeshProUGUI winnerNameText; // NEU (19.11.2025) - Optional
     [SerializeField] private TextMeshProUGUI winnerText;
     [SerializeField] private Button backButton;
     
@@ -319,7 +325,54 @@ public class PuzzleGameManager : MonoBehaviour
 
         targetImage.gameObject.SetActive(true);
     }
-    
+
+    /// <summary>
+    /// NEU (19.11.2025): Aktualisiert Team-Namen auf ALLEN Screens (optional, nur wenn TextFields zugewiesen)
+    /// Wird aufgerufen bei ShowExplanationScreen(), ShowCountdownScreen(), ShowGameplayScreen(), ShowResultsScreen()
+    /// und bei HandleLanguageChanged()
+    /// </summary>
+    private void UpdateTeamNames()
+    {
+        if (teamIconProvider == null) return;
+        
+        // Aktuelles Team (für Explanation/Countdown/Gameplay)
+        string currentTeamName = teamIconProvider.GetTeamIconNameText(currentTeam - 1, currentLanguage);
+        
+        // Explanation Screen - aktuelles Team
+        if (explanationTeamNameText != null)
+        {
+            explanationTeamNameText.text = currentTeamName;
+            explanationTeamNameText.gameObject.SetActive(true);
+        }
+        
+        // Countdown Screen - aktuelles Team
+        if (countdownTeamNameText != null)
+        {
+            countdownTeamNameText.text = currentTeamName;
+            countdownTeamNameText.gameObject.SetActive(true);
+        }
+        
+        // Gameplay Screen - aktuelles Team
+        if (gameplayTeamNameText != null)
+        {
+            gameplayTeamNameText.text = currentTeamName;
+            gameplayTeamNameText.gameObject.SetActive(true);
+        }
+        
+        // Results Screen - beide Teams
+        if (team1NameText != null)
+        {
+            team1NameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+            team1NameText.gameObject.SetActive(true);
+        }
+        
+        if (team2NameText != null)
+        {
+            team2NameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+            team2NameText.gameObject.SetActive(true);
+        }
+    }
+
     private void SetupButtonListeners()
     {
         if (startButton != null)
@@ -379,6 +432,9 @@ public class PuzzleGameManager : MonoBehaviour
         
         UpdateTeamIconForImage(explanationTeamImage, currentTeam);
         
+        // NEU (19.11.2025): Team-Namen aktualisieren
+        UpdateTeamNames();
+        
         StartCoroutine(UpdateExplanationUIDelayed());
         
         PlayHapticFeedback();
@@ -399,6 +455,9 @@ public class PuzzleGameManager : MonoBehaviour
             countdownScreen.SetActive(true);
         
         UpdateTeamIconForImage(countdownTeamImage, currentTeam);
+        
+        // NEU (19.11.2025): Team-Namen aktualisieren
+        UpdateTeamNames();
         
         UpdateCountdownUI();
         
@@ -685,6 +744,29 @@ public class PuzzleGameManager : MonoBehaviour
     
     private void UpdateResultsUI()
     {
+
+        // NEU (19.11.2025): Namen aktualisieren (optional)
+        UpdateTeamNames();
+
+        // NEU: Gewinner-Name anzeigen (optional)
+        if (winnerNameText != null && teamIconProvider != null)
+        {
+            if (team1Score > team2Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam1IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else if (team2Score > team1Score)
+            {
+                winnerNameText.text = teamIconProvider.GetTeam2IconNameText(currentLanguage);
+                winnerNameText.gameObject.SetActive(true);
+            }
+            else
+            {
+                winnerNameText.gameObject.SetActive(false);
+            }
+        }
+
         if (team1ScoreText != null)
         {
             team1ScoreText.text = team1Score.ToString();
@@ -1043,15 +1125,24 @@ public class PuzzleGameManager : MonoBehaviour
         {
             case GameState.Explanation:
                 UpdateExplanationUI();
+                UpdateTeamNames(); // NEU (19.11.2025)
                 break;
+                
+            case GameState.Countdown:
+                UpdateTeamNames(); // NEU (19.11.2025)
+                break;
+                
             case GameState.Gameplay:
                 UpdateGameplayUI();
+                UpdateTeamNames(); // NEU (19.11.2025)
                 break;
+                
             case GameState.Solution:
-                UpdateSolutionUI(lastEarnedPoints); // NEU: Nutzt lastEarnedPoints
+                UpdateSolutionUI(lastEarnedPoints); // Nur bei Puzzle/TabuGameManager
                 break;
+                
             case GameState.Results:
-                UpdateResultsUI();
+                UpdateResultsUI(); // Ruft intern UpdateTeamNames() auf
                 break;
         }
         
