@@ -27,8 +27,8 @@ public class TabuGameManager : MonoBehaviour
 
     [Header("Gameplay UI")]
     public TextMeshProUGUI mainTermText;
-    public Button mainTermButton; // NEU: Button für Begriff-Tap
-    public GameObject startIndicatorIcon; // NEU: "Los!"-Icon für visuelles Feedback
+    public Button mainTermButton; // Button für Begriff-Tap (nur im Tap-to-Start-Modus)
+    public GameObject startIndicatorIcon; // "Los!"-Icon (nur im Tap-to-Start-Modus)
     public Transform tabuWordsContainer;
     public GameObject tabuWordPrefab;
     public TextMeshProUGUI timerText;
@@ -47,7 +47,7 @@ public class TabuGameManager : MonoBehaviour
     public Button playAgainButton;
     public Button backToMenuButton;
     
-    [Header("Team Icon Provider (NEU)")]
+    [Header("Team Icon Provider")]
     [SerializeField] private TeamIconProvider teamIconProvider;
 
     [Header("Audio")]
@@ -77,8 +77,8 @@ public class TabuGameManager : MonoBehaviour
     private int currentTermIndex = 0;
     private float roundTimeLeft;
     private bool gameActive = false;
-    private bool timerPaused = true; // NEU: Timer-Pausierung
-    private bool termVisible = true; // NEU: Begriff-Sichtbarkeit-Tracking
+    private bool timerPaused = false; // Timer-Pausierung (nur wenn enableTapToStart = true)
+    private bool termVisible = true; // Begriff-Sichtbarkeit-Tracking
     private int currentTeam = 1;
     private int team1Score = 0;
     private int team2Score = 0;
@@ -157,8 +157,11 @@ public class TabuGameManager : MonoBehaviour
 
         SetupUI();
         
-        // NEU: Team-Icons laden
+        // Team-Icons laden
         UpdateTeamIcons();
+        
+        // NEU (19.11.2025): Modus-Logging
+        Debug.Log($"Tabu-Modus: {(tabuCollection.EnableTapToStart ? "Tap-to-Start (07.11.2025)" : "Continuous Timer (Standard)")}");
         
         ShowExplanation();
     }
@@ -171,7 +174,7 @@ public class TabuGameManager : MonoBehaviour
         playAgainButton.onClick.AddListener(RestartGame);
         backToMenuButton.onClick.AddListener(BackToMenu);
         
-        // NEU: Begriff-Button für Tap-to-Start/Toggle
+        // Begriff-Button für Tap-to-Start/Toggle
         if (mainTermButton != null)
         {
             mainTermButton.onClick.AddListener(OnTermTapped);
@@ -183,7 +186,7 @@ public class TabuGameManager : MonoBehaviour
         resultUI.SetActive(false);
     }
 
-    // NEU: Team-Icons aktualisieren
+    // Team-Icons aktualisieren
     void UpdateTeamIcons()
     {
         if (teamIconProvider == null)
@@ -264,7 +267,7 @@ public class TabuGameManager : MonoBehaviour
 
         explanationText.text = $"<b>{explanationRules}";
     
-        // NEU: Verwende TeamIconProvider
+        // Verwende TeamIconProvider
         UpdateTeamIconForImage(currentTeamImageExplanation, currentTeam);
         
         // Start Button
@@ -370,7 +373,9 @@ public class TabuGameManager : MonoBehaviour
         currentTermIndex = 0;
         roundTimeLeft = tabuCollection.GetAdjustedRoundDuration(currentTeamDifficulty);
         gameActive = true;
-        timerPaused = true; // NEU: Timer startet pausiert
+        
+        // NEU (19.11.2025): Timer-Start basierend auf Modus
+        timerPaused = tabuCollection.EnableTapToStart; // Nur pausieren wenn Tap-to-Start aktiv
 
         hasPlayedThreeSecondWarning = false;
         hasPlayedTwoSecondWarning = false;
@@ -384,7 +389,7 @@ public class TabuGameManager : MonoBehaviour
     {
         if (!gameActive) return;
 
-        // NEU: Timer nur aktualisieren wenn nicht pausiert
+        // Timer nur aktualisieren wenn nicht pausiert
         if (!timerPaused)
         {
             roundTimeLeft -= Time.deltaTime;
@@ -422,13 +427,23 @@ public class TabuGameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// NEU: Wird aufgerufen wenn Spieler auf den Begriff tippt
-    /// - Erstes Tap: Begriff ausblenden + Timer starten + "Los!"-Icon verstecken
-    /// - Weiteres Tap: Begriff ein/ausblenden (Toggle) OHNE Timer zu pausieren
+    /// Wird aufgerufen wenn Spieler auf den Begriff tippt
+    /// MODUS A (Tap-to-Start aktiv):
+    ///   - Erstes Tap: Begriff ausblenden + Timer starten + "Los!"-Icon verstecken
+    ///   - Weiteres Tap: Begriff ein/ausblenden (Toggle) OHNE Timer zu pausieren
+    /// MODUS B (Tap-to-Start inaktiv):
+    ///   - Begriff-Button ist deaktiviert (nicht interaktiv)
     /// </summary>
     void OnTermTapped()
     {
         if (!gameActive) return;
+        
+        // NEU (19.11.2025): Nur reagieren wenn Tap-to-Start-Modus aktiv ist
+        if (!tabuCollection.EnableTapToStart)
+        {
+            Debug.LogWarning("OnTermTapped() aufgerufen, aber Tap-to-Start ist deaktiviert! Button sollte nicht interaktiv sein.");
+            return;
+        }
 
         // Haptic Feedback
         TriggerHapticFeedback();
@@ -446,13 +461,13 @@ public class TabuGameManager : MonoBehaviour
             // Timer starten
             timerPaused = false;
 
-            // NEU: "Los!"-Icon ausblenden
+            // "Los!"-Icon ausblenden
             UpdateStartIndicatorVisibility();
 
-            // NEU: Correct Button einblenden
+            // Correct Button einblenden
             UpdateButtonVisibility();
 
-            Debug.Log($"Begriff ausgeblendet, Timer gestartet. Verbleibende Zeit: {Mathf.FloorToInt(roundTimeLeft)}s");
+            Debug.Log($"[Tap-to-Start Modus] Begriff ausgeblendet, Timer gestartet. Verbleibende Zeit: {Mathf.FloorToInt(roundTimeLeft)}s");
         }
         // FALL 2: Timer läuft bereits ? Toggle Begriff-Sichtbarkeit
         else
@@ -462,32 +477,40 @@ public class TabuGameManager : MonoBehaviour
                 termVisible = !termVisible;
                 mainTermText.gameObject.SetActive(termVisible);
 
-                Debug.Log($"Begriff {(termVisible ? "eingeblendet" : "ausgeblendet")} (Timer läuft weiter)");
+                Debug.Log($"[Tap-to-Start Modus] Begriff {(termVisible ? "eingeblendet" : "ausgeblendet")} (Timer läuft weiter)");
             }
         }
     }
 
     /// <summary>
-    /// NEU: Aktualisiert "Los!"-Icon Sichtbarkeit
-    /// Icon wird nur angezeigt wenn Timer pausiert ist
+    /// Aktualisiert "Los!"-Icon Sichtbarkeit
+    /// - NUR sichtbar wenn Tap-to-Start aktiv UND Timer pausiert ist
+    /// - Versteckt wenn Tap-to-Start inaktiv ODER Timer läuft
     /// </summary>
     void UpdateStartIndicatorVisibility()
     {
         if (startIndicatorIcon != null)
         {
-            startIndicatorIcon.SetActive(timerPaused);
+            // NEU (19.11.2025): Nur anzeigen wenn Tap-to-Start aktiv UND Timer pausiert
+            bool shouldShow = tabuCollection.EnableTapToStart && timerPaused;
+            startIndicatorIcon.SetActive(shouldShow);
         }
     }
 
     /// <summary>
-    /// NEU: Aktualisiert Button-Sichtbarkeit basierend auf Timer-Zustand
-    /// Correct-Button wird nur angezeigt wenn Timer läuft
+    /// Aktualisiert Button-Sichtbarkeit basierend auf Timer-Zustand und Modus
+    /// MODUS A (Tap-to-Start aktiv):
+    ///   - Correct-Button nur sichtbar wenn Timer läuft
+    /// MODUS B (Tap-to-Start inaktiv):
+    ///   - Correct-Button immer sichtbar
     /// </summary>
     void UpdateButtonVisibility()
     {
         if (correctButton != null)
         {
-            correctButton.gameObject.SetActive(!timerPaused);
+            // NEU (19.11.2025): Correct-Button basierend auf Modus
+            bool correctVisible = tabuCollection.EnableTapToStart ? !timerPaused : true;
+            correctButton.gameObject.SetActive(correctVisible);
         }
 
         // Skip-Button ist immer sichtbar
@@ -512,26 +535,28 @@ public class TabuGameManager : MonoBehaviour
 
         TabuTerm term = currentRoundTerms[currentTermIndex];
         
-        // NEU: Begriff wieder einblenden und Button aktivieren
+        // Begriff einblenden und Button-State setzen
         if (mainTermText != null)
         {
             mainTermText.text = term.GetMainTerm(currentLanguage);
             mainTermText.gameObject.SetActive(true);
-            termVisible = true; // NEU: Tracking aktualisieren
+            termVisible = true;
         }
 
+        // NEU (19.11.2025): Button nur aktivieren wenn Tap-to-Start aktiv ist
         if (mainTermButton != null)
         {
-            mainTermButton.interactable = true;
+            mainTermButton.interactable = tabuCollection.EnableTapToStart;
         }
 
-        // NEU: Timer pausieren für nächsten Begriff
-        timerPaused = true;
+        // NEU (19.11.2025): Timer nur pausieren wenn Tap-to-Start aktiv ist
+        if (tabuCollection.EnableTapToStart)
+        {
+            timerPaused = true;
+        }
 
-        // NEU: "Los!"-Icon wieder einblenden
+        // "Los!"-Icon und Button-Sichtbarkeit aktualisieren
         UpdateStartIndicatorVisibility();
-
-        // NEU: Button-Sichtbarkeit aktualisieren
         UpdateButtonVisibility();
 
         // Aktualisiere Tabu-Wörter
@@ -591,7 +616,7 @@ public class TabuGameManager : MonoBehaviour
 
         if (correctTermsThisRound >= tabuCollection.TermsPerRound)
         {
-            Debug.Log($"Erreicht! {correctTermsThisRound}/{tabuCollection.TermsPerRound} Begriffe erraten.");
+            Debug.Log($"Ziel erreicht! {correctTermsThisRound}/{tabuCollection.TermsPerRound} Begriffe erraten.");
             EndRound();
             return;
         }
@@ -644,7 +669,7 @@ public class TabuGameManager : MonoBehaviour
     void EndRound()
     {
         gameActive = false;
-        timerPaused = true; // NEU: Timer pausieren
+        timerPaused = true;
 
         if (audioSource && timeUpSound)
         {
@@ -669,7 +694,7 @@ public class TabuGameManager : MonoBehaviour
         gameplayUI.SetActive(false);
         resultUI.SetActive(true);
         
-        // NEU: Icons auf Results Screen aktualisieren
+        // Icons auf Results Screen aktualisieren
         UpdateTeamIcons();
         
         UpdateResultsUI();
@@ -690,7 +715,7 @@ public class TabuGameManager : MonoBehaviour
             string winnerFormat = GetLocalizedText(resultsWinnerLocalizedText, "gewinnt! ??");
             winnerText.text = winnerFormat;
             
-            // NEU: Verwende TeamIconProvider
+            // Verwende TeamIconProvider
             if (winnerTeamImage && teamIconProvider != null)
             {
                 Sprite team1Icon = teamIconProvider.GetTeam1Icon();
@@ -711,7 +736,7 @@ public class TabuGameManager : MonoBehaviour
             string winnerFormat = GetLocalizedText(resultsWinnerLocalizedText, "gewinnt! ??");
             winnerText.text = winnerFormat;
             
-            // NEU: Verwende TeamIconProvider
+            // Verwende TeamIconProvider
             if (winnerTeamImage && teamIconProvider != null)
             {
                 Sprite team2Icon = teamIconProvider.GetTeam2Icon();
@@ -766,7 +791,7 @@ public class TabuGameManager : MonoBehaviour
         
         scoreText.text = $"{correctTermsThisRound}/{tabuCollection.TermsPerRound}";
         
-        // NEU: Button-Sichtbarkeit aktualisieren
+        // Button-Sichtbarkeit aktualisieren
         UpdateButtonVisibility();
         
         // Buttons

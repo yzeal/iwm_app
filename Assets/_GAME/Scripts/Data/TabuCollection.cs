@@ -27,6 +27,10 @@ public class TabuCollection : ScriptableObject
     [Range(15f, 120f)]
     public float roundDuration = 60f;
     
+    [Header("Timer Modus")]
+    [Tooltip("Aktiviert Tap-to-Start Timer-Modus (07.11.2025 Update). Wenn deaktiviert: Timer läuft durchgehend wie vor dem Update.")]
+    public bool enableTapToStart = false;
+    
     [Header("Zeit-Einstellungen")]
     public DifficultyTimeSettings timeSettings = new DifficultyTimeSettings();
 
@@ -57,6 +61,11 @@ public class TabuCollection : ScriptableObject
     public DifficultyTimeSettings TimeSettings => timeSettings;
     public Sprite Team1Image => team1Image;
     public Sprite Team2Image => team2Image;
+    
+    /// <summary>
+    /// NEU (19.11.2025): Gibt an ob Tap-to-Start Timer-Modus aktiv ist
+    /// </summary>
+    public bool EnableTapToStart => enableTapToStart;
 
     // ==================== TERM SELECTION ====================
 
