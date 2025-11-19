@@ -1404,6 +1404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FossilGameManager
   fossilCollection: {fileID: 11400000, guid: 2d50caa1a54df664fa9eb7c4424a429e, type: 2}
   nextScene: 00_NFCHub
+  team2StartsFirst: 0
   explanationUI: {fileID: 2107524641}
   countdownUI: {fileID: 333924895}
   gameplayUI: {fileID: 1725218809}

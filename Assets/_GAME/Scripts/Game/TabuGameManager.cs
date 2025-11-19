@@ -11,6 +11,11 @@ public class TabuGameManager : MonoBehaviour
     public TabuCollection tabuCollection;
     [SerializeField] private string nextScene = "Auswahl";
 
+    // NEU (19.11.2025): Team-Start-Reihenfolge umkehren
+    [Header("Game Flow Settings")]
+    [SerializeField] private bool team2StartsFirst = false;
+    [Tooltip("Wenn aktiviert, beginnt Team 2 statt Team 1 das Spiel")]
+
     [Header("UI References")]
     public GameObject explanationUI;
     public GameObject countdownUI;
@@ -148,6 +153,10 @@ public class TabuGameManager : MonoBehaviour
 
     void InitializeGame()
     {
+
+        // NEU (19.11.2025): Team-Start-Reihenfolge basierend auf Checkbox
+        currentTeam = team2StartsFirst ? 2 : 1;
+
         if (tabuCollection == null)
         {
             Debug.LogError("No tabu collection assigned!");
@@ -732,9 +741,13 @@ public class TabuGameManager : MonoBehaviour
             audioSource.PlayOneShot(timeUpSound);
         }
 
-        if (currentTeam == 1)
+        // NEU (19.11.2025): Team wechseln
+        int startingTeam = team2StartsFirst ? 2 : 1;
+        int secondTeam = team2StartsFirst ? 1 : 2;
+
+        if (currentTeam == startingTeam)
         {
-            currentTeam = 2;
+            currentTeam = secondTeam;
             ShowExplanation();
             explanationUI.SetActive(true);
             gameplayUI.SetActive(false);
@@ -898,7 +911,7 @@ public class TabuGameManager : MonoBehaviour
     {
         team1Score = 0;
         team2Score = 0;
-        currentTeam = 1;
+        currentTeam = team2StartsFirst ? 2 : 1;
         correctTermsThisRound = 0;
 
         hasPlayedThreeSecondWarning = false;

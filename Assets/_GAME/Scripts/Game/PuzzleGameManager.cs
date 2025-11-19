@@ -15,6 +15,11 @@ public class PuzzleGameManager : MonoBehaviour
     [SerializeField] private PuzzleCollection puzzleCollection;
     [SerializeField] private string nextScene = "Auswahl";
 
+    // NEU (19.11.2025): Team-Start-Reihenfolge umkehren
+    [Header("Game Flow Settings")]
+    [SerializeField] private bool team2StartsFirst = false;
+    [Tooltip("Wenn aktiviert, beginnt Team 2 statt Team 1 das Spiel")]
+
     [Header("UI Screens")]
     [SerializeField] private GameObject explanationScreen;
     [SerializeField] private GameObject countdownScreen;
@@ -230,7 +235,8 @@ public class PuzzleGameManager : MonoBehaviour
         
         team1Score = 0;
         team2Score = 0;
-        currentTeam = 1;
+        // NEU (19.11.2025): Team-Start-Reihenfolge basierend auf Checkbox
+        currentTeam = team2StartsFirst ? 2 : 1;
         currentRound = 0;
         
         LoadPuzzlesForTeams();

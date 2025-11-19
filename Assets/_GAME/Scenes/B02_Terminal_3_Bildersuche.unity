@@ -9056,6 +9056,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleGameManager
   puzzleCollection: {fileID: 11400000, guid: 4bf914f9f68671b47ad68bfefa2adb2b, type: 2}
   nextScene: B03_Terminal_3_Bye
+  team2StartsFirst: 0
   explanationScreen: {fileID: 2107524641}
   countdownScreen: {fileID: 333924895}
   gameplayScreen: {fileID: 1725218809}
