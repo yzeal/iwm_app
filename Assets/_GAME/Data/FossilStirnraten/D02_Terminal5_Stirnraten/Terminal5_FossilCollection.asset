@@ -276,7 +276,7 @@ MonoBehaviour:
     localizedDescription: {fileID: 0}
     description: 
   fossilsPerRound: 5
-  roundDuration: 30
+  roundDuration: 60
   timeSettings:
     kidsTimeMultiplier: 1.5
     bigKidsTimeMultiplier: 1.2
