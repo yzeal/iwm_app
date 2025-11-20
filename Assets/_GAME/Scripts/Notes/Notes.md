@@ -2766,3 +2766,100 @@ Assets/_GAME/
 - Dual-UI-System für unterschiedliche Ergebnisse
 - Umfangreiches Debug-System für Testing
 - Team-Icon-Integration konsistent mit anderen Managern
+
+
+## MOBILE-SPEZIFISCHE FEATURES (ERWEITERT - 20.11.2025)
+
+### SCREEN SLEEP PREVENTION SYSTEM (NEU - 20.11.2025)
+
+**GlobalScreenSleepManager.cs**
+- **Zweck**: Verhindert Sperrbildschirm während der gesamten App-Laufzeit
+- **Implementierung**: Globales Singleton-Pattern mit DontDestroyOnLoad
+- **Platform-Support**: Funktioniert auf iOS und Android
+- **Automatische Aktivierung**: Wird beim App-Start initialisiert
+
+#### Hauptfeatures:
+1. **Persistent über Scene-Wechsel**
+   - DontDestroyOnLoad() - Manager überlebt alle Scene-Transitions
+   - Singleton-Pattern - Nur eine Instanz global
+   - Keine Integration in einzelne Szenen nötig
+
+2. **Screen Sleep Management**
+   - Screen.sleepTimeout = SleepTimeout.NeverSleep bei Awake()
+   - previousSleepTimeout wird gespeichert für Wiederherstellung
+   - OnApplicationPause() reaktiviert Sleep Prevention nach App-Resume
+   - OnApplicationQuit() / OnDestroy() stellen Original-Setting wieder her
+
+3. **Konfigurierbare Steuerung**
+   - Inspector-Checkbox: preventSleepGlobally (Standard: true)
+   - Kann zur Laufzeit geändert werden
+   - Debug-Logging für alle State-Changes
+
+4. **Öffentliche API**
+   - SetSleepPrevention(bool prevent) - Dynamisches An/Ausschalten
+   - IsSleepPreventionActive() - Status-Abfrage
+   - Statische Methoden für globalen Zugriff
+
+#### Integration:
+1. GameObject in erster Scene erstellen (z.B. MainMenu oder Startup)
+2. GlobalScreenSleepManager Component hinzufügen
+3. Inspector: preventSleepGlobally aktivieren
+4. Fertig - funktioniert automatisch in allen Szenen
+
+#### Technische Details:
+
+// Singleton-Pattern mit DontDestroyOnLoad
+private void Awake()
+{
+    if (instance != null && instance != this)
+    {
+        Destroy(gameObject);
+        return;
+    }
+    
+    instance = this;
+    DontDestroyOnLoad(gameObject);
+    
+    if (preventSleepGlobally)
+    {
+        previousSleepTimeout = Screen.sleepTimeout;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
+}
+
+// App-Resume-Handling
+private void OnApplicationPause(bool pauseStatus)
+{
+    if (!pauseStatus && preventSleepGlobally)
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
+}
+
+
+#### Vorteile:
+- ? **Einmalige Integration**: Nur 1x GameObject in Startup-Scene
+- ? **Zero-Maintenance**: Keine Änderungen in bestehenden Game-Managern
+- ? **Persistent**: Funktioniert automatisch über alle Scenes
+- ? **Mobile-optimiert**: Verhindert Sperrbildschirm auf iOS & Android
+- ? **Dynamisch steuerbar**: Kann zur Laufzeit an/ausgeschaltet werden
+- ? **Debug-freundlich**: Console-Logging zeigt alle State-Changes
+
+#### Use-Cases:
+- **Standard**: Screen Sleep global deaktiviert für gesamte App
+- **Optional**: Temporäres Aktivieren in Menüs möglich (SetSleepPrevention(false))
+- **Museum-Kontext**: Spieler können ohne Unterbrechung spielen
+
+#### Unterschied zu lokalem Manager:
+- **Lokal** (ScreenSleepManager): Pro Scene hinzufügen, nur für diese Scene aktiv
+- **Global** (GlobalScreenSleepManager): 1x hinzufügen, für ALLE Scenes aktiv
+- **Projekt**: Global-Variante implementiert für konsistentes Verhalten
+
+---
+
+**LETZTE AKTUALISIERUNG**: 20. November 2025
+**HAUPT-FEATURE DIESES UPDATES**:
+- Global Screen Sleep Prevention System implementiert
+- Verhindert Sperrbildschirm während gesamter App-Laufzeit
+- Einmalige Integration, funktioniert automatisch in allen Szenen
+- Mobile-optimiert für iOS und Android
